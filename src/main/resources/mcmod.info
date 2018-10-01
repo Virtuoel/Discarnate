@@ -1,0 +1,16 @@
+[
+	{
+		"modid": "discarnate",
+		"name": "Discarnate",
+		"description": "A mod where you let spirits control your body to do tasks",
+		"version": "${version}",
+		"mcversion": "${mcversion}",
+		"url": "",
+		"updateUrl": "",
+		"authorList": ["Virtuoel"],
+		"credits": "Code by Virtuoel",
+		"logoFile": "",
+		"screenshots": [],
+		"dependencies": []
+	}
+]
