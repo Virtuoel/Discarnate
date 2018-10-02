@@ -22,25 +22,26 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraftforge.fml.relauncher.Side;
 import virtuoel.discarnate.Discarnate;
+import virtuoel.discarnate.block.BlockSpiritChanneler;
 
 @EventBusSubscriber(modid = Discarnate.MOD_ID)
 @ObjectHolder(Discarnate.MOD_ID)
 public class BlockRegistrar
 {
-	public static final Block SPIRIT_WELL = Blocks.AIR;
+	public static final Block SPIRIT_CHANNELER = Blocks.AIR;
 	
 	@SubscribeEvent
 	public static void registerBlocks(RegistryEvent.Register<Block> event)
 	{
 		Stream.of(
 			setRegistryNameAndTranslationKey(setHarvestLevel(
-				new Block(Material.WOOD, MapColor.BROWN)
+				new BlockSpiritChanneler(Material.IRON, MapColor.BROWN)
 				.setHardness(5.0F)
 				.setResistance(10.0F)
-				.setSoundType(SoundType.WOOD)
+				.setSoundType(SoundType.METAL)
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
-				"axe", 0),
-				"spirit_well"),
+				"pickaxe", 1),
+				"spirit_channeler"),
 		null).filter(Objects::nonNull)
 		.forEach(event.getRegistry()::register);
 	}
@@ -51,7 +52,7 @@ public class BlockRegistrar
 		final Function<Block, Item> makeItemBlock = block -> new ItemBlock(block).setRegistryName(block.getRegistryName());
 		
 		Stream.of(
-			SPIRIT_WELL,
+			SPIRIT_CHANNELER,
 		null).filter(b -> b != null && b != Blocks.AIR)
 		.map(makeItemBlock)
 		.forEach(event.getRegistry()::register);
@@ -69,7 +70,7 @@ public class BlockRegistrar
 			};
 			
 			Stream.of(
-				SPIRIT_WELL,
+				SPIRIT_CHANNELER,
 			null).filter(b -> b != null && b != Blocks.AIR)
 			.map(Item::getItemFromBlock)
 			.filter(i -> i != null && i != Items.AIR)

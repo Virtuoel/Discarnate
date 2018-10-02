@@ -24,7 +24,7 @@ public class Discarnate
 		@SideOnly(Side.CLIENT)
 		public ItemStack createIcon()
 		{
-			return new ItemStack(BlockRegistrar.SPIRIT_WELL);
+			return new ItemStack(BlockRegistrar.SPIRIT_CHANNELER);
 		}
 	};
 	
