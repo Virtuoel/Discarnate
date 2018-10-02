@@ -1,0 +1,28 @@
+{
+	"forge_marker": 1,
+	"defaults":
+	{
+		"textures":
+		{
+			"all": "discarnate:blocks/spirit_channeler"
+		},
+		"model": "cube",
+		"transform": "forge:default-block"
+	},
+	"variants":
+	{
+		"normal": [{}],
+		"inventory": [{}],
+		"active":
+		{
+			"true":
+			{
+				
+			},
+			"false":
+			{
+				
+			}
+		}
+	}
+}

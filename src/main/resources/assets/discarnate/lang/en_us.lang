@@ -1,0 +1,11 @@
+# Blocks
+tile.discarnate.spirit_channeler.name=Spirit Channeler
+
+# Items
+item.discarnate.template_task.name=Template Task
+
+# GUI
+discarnate.spirit_channeler=Spirit Channeler
+
+# Creative Tabs
+itemGroup.discarnate=Discarnate
