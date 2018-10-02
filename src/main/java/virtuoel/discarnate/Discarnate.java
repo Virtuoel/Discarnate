@@ -16,12 +16,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import virtuoel.discarnate.api.DiscarnateAPI;
 import virtuoel.discarnate.api.ITaskManager;
 import virtuoel.discarnate.init.BlockRegistrar;
+import virtuoel.discarnate.init.ItemRegistrar;
 
 @Mod(modid = Discarnate.MOD_ID, version = "@VERSION@", certificateFingerprint = "@FINGERPRINT@")
 public class Discarnate implements ITaskManager
@@ -44,9 +45,10 @@ public class Discarnate implements ITaskManager
 	};
 	
 	@Mod.EventHandler
-	public void preInit(FMLPreInitializationEvent event)
+	public void init(FMLInitializationEvent event)
 	{
-		DiscarnateAPI.taskManager = this;
+		DiscarnateAPI.instance().addTask(ItemRegistrar.TEMPLATE_TASK, (s, p) ->
+		{});
 	}
 	
 	@Mod.EventHandler

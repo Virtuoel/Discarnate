@@ -17,14 +17,39 @@ public interface ITaskManager
 		return false;
 	}
 	
+	public default boolean addTask(String name, @Nonnull BiConsumer<ItemStack, EntityPlayer> task)
+	{
+		return addTask(new ResourceLocation(name), task);
+	}
+	
+	public default boolean addTask(Item item, @Nonnull BiConsumer<ItemStack, EntityPlayer> task)
+	{
+		return addTask(item.getRegistryName(), task);
+	}
+	
+	public default boolean addTask(ItemStack stack, @Nonnull BiConsumer<ItemStack, EntityPlayer> task)
+	{
+		return addTask(stack.getItem(), task);
+	}
+	
 	public default Optional<BiConsumer<ItemStack, EntityPlayer>> removeTask(ResourceLocation name)
 	{
 		return Optional.empty();
 	}
 	
+	public default Optional<BiConsumer<ItemStack, EntityPlayer>> removeTask(String name)
+	{
+		return removeTask(new ResourceLocation(name));
+	}
+	
 	public default Optional<BiConsumer<ItemStack, EntityPlayer>> getTask(ResourceLocation name)
 	{
 		return Optional.empty();
+	}
+	
+	public default Optional<BiConsumer<ItemStack, EntityPlayer>> getTask(String name)
+	{
+		return getTask(new ResourceLocation(name));
 	}
 	
 	public default Optional<BiConsumer<ItemStack, EntityPlayer>> getTask(Item item)
