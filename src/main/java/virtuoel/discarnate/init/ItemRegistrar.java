@@ -4,12 +4,21 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import net.minecraft.block.BlockShulkerBox;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -17,6 +26,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraftforge.fml.relauncher.Side;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateAPI;
+import virtuoel.discarnate.api.TriConsumer;
 
 @EventBusSubscriber(modid = Discarnate.MOD_ID)
 @ObjectHolder(Discarnate.MOD_ID)
@@ -45,6 +55,35 @@ public class ItemRegistrar
 			catch(InterruptedException e)
 			{}
 		});
+		
+		TriConsumer<ItemStack, EntityPlayer, TileEntity> shulkerTask = (i, p, t) ->
+		{
+			NBTTagCompound nbttagcompound = i.getTagCompound();
+			
+			if(nbttagcompound != null && nbttagcompound.hasKey("BlockEntityTag", Constants.NBT.TAG_COMPOUND))
+			{
+				NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("BlockEntityTag");
+				
+				if(nbttagcompound1.hasKey("Items", Constants.NBT.TAG_LIST))
+				{
+					NonNullList<ItemStack> nonnulllist = NonNullList.<ItemStack> withSize(27, ItemStack.EMPTY);
+					ItemStackHelper.loadAllItems(nbttagcompound1, nonnulllist);
+					
+					for(ItemStack itemstack : nonnulllist)
+					{
+						if(!itemstack.isEmpty())
+						{
+							DiscarnateAPI.instance().getTask(itemstack).ifPresent(task -> task.accept(itemstack, p, t));
+						}
+					}
+				}
+			}
+		};
+		
+		for(EnumDyeColor color : EnumDyeColor.values())
+		{
+			DiscarnateAPI.instance().addTask(BlockShulkerBox.getBlockByColor(color), shulkerTask);
+		}
 	}
 	
 	@SubscribeEvent
