@@ -66,14 +66,17 @@ public class ItemRegistrar
 				
 				if(nbttagcompound1.hasKey("Items", Constants.NBT.TAG_LIST))
 				{
-					NonNullList<ItemStack> nonnulllist = NonNullList.<ItemStack> withSize(27, ItemStack.EMPTY);
-					ItemStackHelper.loadAllItems(nbttagcompound1, nonnulllist);
+					NonNullList<ItemStack> stacks = NonNullList.<ItemStack> withSize(27, ItemStack.EMPTY);
+					ItemStackHelper.loadAllItems(nbttagcompound1, stacks);
 					
-					for(ItemStack itemstack : nonnulllist)
+					if(stacks.stream().anyMatch(s -> s.getItem() == Item.getItemFromBlock(BlockRegistrar.SPIRIT_CHANNELER)))
 					{
-						if(!itemstack.isEmpty())
+						for(ItemStack stack : stacks)
 						{
-							DiscarnateAPI.instance().getTask(itemstack).ifPresent(task -> task.accept(itemstack, p, t));
+							if(!stack.isEmpty())
+							{
+								DiscarnateAPI.instance().getTask(stack).ifPresent(task -> task.accept(stack, p, t));
+							}
 						}
 					}
 				}
