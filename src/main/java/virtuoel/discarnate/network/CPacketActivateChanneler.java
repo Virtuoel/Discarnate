@@ -60,9 +60,12 @@ public class CPacketActivateChanneler implements IMessage
 						TileEntitySpiritChanneler channeler = ((TileEntitySpiritChanneler) te);
 						if(message.activating)
 						{
-							channeler.activate(activator);
+							if(!channeler.isActive())
+							{
+								channeler.activate(activator);
+							}
 						}
-						else
+						else if(channeler.isActive())
 						{
 							channeler.deactivate();
 						}

@@ -81,6 +81,12 @@ public class ContainerSpiritChanneler extends Container
 				this.addSlotToContainer(new SlotItemHandler(inventory, col + row * inventorySlotsHorizontal, x, y)
 				{
 					@Override
+					public boolean canTakeStack(EntityPlayer playerIn)
+					{
+						return !tileEntity.isActive() && super.canTakeStack(playerIn);
+					}
+					
+					@Override
 					public boolean isItemValid(ItemStack stack)
 					{
 						return DiscarnateAPI.instance().getTask(stack).isPresent();
