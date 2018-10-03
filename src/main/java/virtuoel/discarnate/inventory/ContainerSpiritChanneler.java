@@ -64,7 +64,7 @@ public class ContainerSpiritChanneler extends Container
 	
 	public void addTileEntitySlots(IItemHandler inventory, TileEntitySpiritChanneler tileEntity)
 	{
-		final int xOffset = 26;
+		final int xOffset = 17;
 		final int yOffset = 18;
 		final int slotBorder = 1;
 		final int slotWidth = 16;

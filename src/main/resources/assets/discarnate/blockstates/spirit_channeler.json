@@ -4,9 +4,11 @@
 	{
 		"textures":
 		{
-			"all": "discarnate:blocks/spirit_channeler"
+			"particle": "discarnate:blocks/spirit_channeler_end",
+			"side": "discarnate:blocks/spirit_channeler_side",
+			"end": "discarnate:blocks/spirit_channeler_end"
 		},
-		"model": "cube",
+		"model": "cube_column",
 		"transform": "forge:default-block"
 	},
 	"variants":
@@ -15,14 +17,8 @@
 		"inventory": [{}],
 		"active":
 		{
-			"true":
-			{
-				
-			},
-			"false":
-			{
-				
-			}
+			"true": { "textures": { "side": "discarnate:blocks/spirit_channeler_side_active" } },
+			"false": { }
 		}
 	}
 }
