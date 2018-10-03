@@ -1,0 +1,21 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:template_task",
+		"count": 6
+	},
+	"pattern":
+	[
+		"BEB",
+		"BJB",
+		"BMB"
+	],
+	"key":
+	{
+		"B": { "type": "forge:ore_dict", "ore": "barsIron" },
+		"E": { "type": "forge:ore_dict", "ore": "gemEmerald" },
+		"J": { "item": "minecraft:jukebox" },
+		"M": { "item": "minecraft:map" }
+	}
+}

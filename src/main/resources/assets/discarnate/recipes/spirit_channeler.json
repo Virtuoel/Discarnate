@@ -1,0 +1,21 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:spirit_channeler",
+		"count": 1
+	},
+	"pattern":
+	[
+		"BTB",
+		"BEB",
+		"BCB"
+	],
+	"key":
+	{
+		"B": { "item": "discarnate:template_task" },
+		"T": { "item": "minecraft:totem_of_undying" },
+		"E": { "type": "forge:ore_dict", "ore": "gemEmerald" },
+		"C": { "item": "minecraft:cauldron" }
+	}
+}

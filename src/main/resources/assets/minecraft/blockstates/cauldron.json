@@ -1,0 +1,19 @@
+{
+	"forge_marker": 1,
+	"defaults":
+	{
+		"model": "cauldron_empty",
+		"transform": "forge:default-block"
+	},
+	"variants":
+	{
+		"inventory": [{}],
+		"level":
+		{
+			"0": { },
+			"1": {"model": "cauldron_level1" },
+			"2": {"model": "cauldron_level2" },
+			"3": {"model": "cauldron_level3" }
+		}
+	}
+}
