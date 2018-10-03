@@ -6,6 +6,8 @@ item.discarnate.template_task.name=Template Task
 
 # GUI
 discarnate.spirit_channeler=Spirit Channeler
+discarnate.spirit_channeler.start=Start
+discarnate.spirit_channeler.stop=Stop
 
 # Creative Tabs
 itemGroup.discarnate=Discarnate

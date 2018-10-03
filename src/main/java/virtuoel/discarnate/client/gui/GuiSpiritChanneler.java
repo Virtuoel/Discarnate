@@ -1,7 +1,12 @@
 package virtuoel.discarnate.client.gui;
 
+import java.util.Optional;
+
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
@@ -9,6 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.inventory.ContainerSpiritChanneler;
+import virtuoel.discarnate.network.CPacketActivateChanneler;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 @SideOnly(Side.CLIENT)
@@ -26,6 +32,44 @@ public class GuiSpiritChanneler extends GuiContainer
 		this.tileEntity = tileEntity;
 		this.xSize = 176;
 		this.ySize = 204;
+	}
+	
+	GuiButton confirmButton;
+	boolean active = false;
+	
+	@Override
+	public void initGui()
+	{
+		super.initGui();
+		this.active = tileEntity.isActive();
+		this.confirmButton = new GuiButton(1, this.guiLeft + 124, this.guiTop + 34, 40, 20, I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start"));
+		this.buttonList.add(this.confirmButton);
+	}
+	
+	@Override
+	public void updateScreen()
+	{
+		super.updateScreen();
+		
+		this.active = tileEntity.isActive();
+		
+		this.confirmButton.displayString = I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start");
+	}
+	
+	@Override
+	protected void actionPerformed(GuiButton button)
+	{
+		if(button.enabled)
+		{
+			if(button.id == 1)
+			{
+				Discarnate.NETWORK.sendToServer(new CPacketActivateChanneler(tileEntity.getPos(), !active));
+				if(!active)
+				{
+					Optional.ofNullable(this.mc.player).ifPresent(EntityPlayerSP::closeScreen);
+				}
+			}
+		}
 	}
 	
 	@Override

@@ -2,11 +2,16 @@ package virtuoel.discarnate.tileentity;
 
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -17,6 +22,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import virtuoel.discarnate.Discarnate;
+import virtuoel.discarnate.api.DiscarnateAPI;
+import virtuoel.discarnate.block.BlockSpiritChanneler;
 
 public class TileEntitySpiritChanneler extends TileEntity
 {
@@ -45,11 +52,97 @@ public class TileEntitySpiritChanneler extends TileEntity
 	{
 		this(25);
 	}
+
+	@Override
+	public void invalidate()
+	{
+		deactivate();
+		super.invalidate();
+	}
+	
+	@Nullable
+	Thread taskThread = null;
 	
 	public boolean activate(EntityPlayer player)
 	{
-		// TODO do stuff
-		return false;
+		synchronized(this)
+		{
+			if(taskThread == null)
+			{
+				taskThread = new Thread(() ->
+				{
+					for(int i = 0; i < itemHandler.getSlots(); i++)
+					{
+						if(isActive())
+						{
+							ItemStack stack = itemHandler.getStackInSlot(i);
+							DiscarnateAPI.instance().getTask(stack).ifPresent(task -> task.accept(stack, player, this));
+						}
+						else
+						{
+							break;
+						}
+					}
+					
+					deactivate();
+				}, "SpiritChannelerTasks");
+				
+				Optional.ofNullable(getWorld()).ifPresent(w ->
+				{
+					IBlockState state = w.getBlockState(getPos());
+					if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+					{
+						w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, true));
+					}
+					w.playSound(null, getPos(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+				});
+				
+				taskThread.start();
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	public boolean deactivate()
+	{
+		synchronized(this)
+		{
+			Optional.ofNullable(getWorld()).ifPresent(w ->
+			{
+				IBlockState state = w.getBlockState(getPos());
+				if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+				{
+					w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, false));
+				}
+				w.playSound(null, getPos(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
+			});
+			
+			if(taskThread != null)
+			{
+				taskThread.interrupt();
+				taskThread = null;
+				return true;
+			}
+			return false;
+		}
+	}
+	
+	public boolean isActive()
+	{
+		synchronized(this)
+		{
+			World w = getWorld();
+			if(w != null)
+			{
+				IBlockState state = w.getBlockState(getPos());
+				if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+				{
+					return state.getValue(BlockSpiritChanneler.ACTIVE);
+				}
+			}
+			return false;
+		}
 	}
 	
 	@Override
