@@ -69,6 +69,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 		{
 			if(taskThread == null)
 			{
+				World w = getWorld();
 				taskThread = new Thread(() ->
 				{
 					for(int i = 0; i < itemHandler.getSlots(); i++)
@@ -84,10 +85,15 @@ public class TileEntitySpiritChanneler extends TileEntity
 						}
 					}
 					
+					if(w != null)
+					{
+						w.playSound(null, getPos(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
+					}
+					
 					deactivate();
 				}, "SpiritChannelerTasks");
 				
-				Optional.ofNullable(getWorld()).ifPresent(w ->
+				if(w != null)
 				{
 					IBlockState state = w.getBlockState(getPos());
 					if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
@@ -95,7 +101,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 						w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, true));
 					}
 					w.playSound(null, getPos(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, 1.0F);
-				});
+				}
 				
 				taskThread.start();
 				return true;
@@ -115,7 +121,6 @@ public class TileEntitySpiritChanneler extends TileEntity
 				{
 					w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, false));
 				}
-				w.playSound(null, getPos(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
 			});
 			
 			if(taskThread != null)
