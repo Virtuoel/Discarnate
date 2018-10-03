@@ -2,7 +2,7 @@
 	"type": "forge:ore_shaped",
 	"result":
 	{
-		"item": "discarnate:template_task",
+		"item": "discarnate:blank_task",
 		"count": 6
 	},
 	"pattern":

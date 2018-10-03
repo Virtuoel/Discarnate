@@ -2,6 +2,6 @@
 	"parent": "item/generated",
 	"textures":
 	{
-		"layer0": "discarnate:items/template_task"
+		"layer0": "discarnate:items/info_task"
 	}
 }

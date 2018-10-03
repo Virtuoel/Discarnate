@@ -35,7 +35,7 @@ public interface ITaskManager
 	
 	public default boolean addTask(@Nonnull ItemStack stack, @Nonnull TriConsumer<ItemStack, EntityPlayer, TileEntity> task)
 	{
-		return addTask(stack.getItem(), task);
+		return stack.isEmpty() ? false : addTask(stack.getItem(), task);
 	}
 	
 	public default Optional<TriConsumer<ItemStack, EntityPlayer, TileEntity>> removeTask(@Nonnull ResourceLocation name)
@@ -70,6 +70,6 @@ public interface ITaskManager
 	
 	public default Optional<TriConsumer<ItemStack, EntityPlayer, TileEntity>> getTask(@Nonnull ItemStack stack)
 	{
-		return getTask(stack.getItem());
+		return stack.isEmpty() ? Optional.empty() : getTask(stack.getItem());
 	}
 }

@@ -13,7 +13,7 @@
 	],
 	"key":
 	{
-		"B": { "item": "discarnate:template_task" },
+		"B": { "item": "discarnate:blank_task" },
 		"T": { "item": "minecraft:totem_of_undying" },
 		"E": { "type": "forge:ore_dict", "ore": "gemEmerald" },
 		"C": { "item": "minecraft:cauldron" }

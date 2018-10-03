@@ -11,12 +11,9 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -24,7 +21,6 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import virtuoel.discarnate.api.DiscarnateAPI;
 import virtuoel.discarnate.api.ITaskManager;
 import virtuoel.discarnate.api.TriConsumer;
 import virtuoel.discarnate.init.BlockRegistrar;
@@ -64,23 +60,7 @@ public class Discarnate implements ITaskManager
 	{
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiProxy());
 		
-		DiscarnateAPI.instance().addTask(ItemRegistrar.TEMPLATE_TASK, (i, p, t) ->
-		{});
-		
-		DiscarnateAPI.instance().addTask(Items.PAPER, (i, p, t) ->
-		{
-			p.sendMessage(new TextComponentString("" + i.getCount()));
-		});
-		
-		DiscarnateAPI.instance().addTask(Blocks.SOUL_SAND, (i, p, t) ->
-		{
-			try
-			{
-				Thread.sleep(i.getCount() * 50);
-			}
-			catch(InterruptedException e)
-			{}
-		});
+		ItemRegistrar.init();
 	}
 	
 	@Mod.EventHandler
