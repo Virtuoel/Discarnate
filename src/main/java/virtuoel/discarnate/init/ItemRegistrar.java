@@ -27,6 +27,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateAPI;
 import virtuoel.discarnate.api.TriConsumer;
+import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 @EventBusSubscriber(modid = Discarnate.MOD_ID)
 @ObjectHolder(Discarnate.MOD_ID)
@@ -35,6 +36,7 @@ public class ItemRegistrar
 	public static final Item BLANK_TASK = Items.AIR;
 	public static final Item INFO_TASK = Items.AIR;
 	public static final Item WAIT_TASK = Items.AIR;
+	public static final Item END_TASK = Items.AIR;
 	
 	public static void init()
 	{
@@ -54,6 +56,14 @@ public class ItemRegistrar
 			}
 			catch(InterruptedException e)
 			{}
+		});
+		
+		DiscarnateAPI.instance().addTask(END_TASK, (i, p, t) ->
+		{
+			if(t instanceof TileEntitySpiritChanneler)
+			{
+				((TileEntitySpiritChanneler) t).deactivate();
+			}
 		});
 		
 		TriConsumer<ItemStack, EntityPlayer, TileEntity> shulkerTask = (i, p, t) ->
@@ -105,6 +115,11 @@ public class ItemRegistrar
 				new Item()
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
 				"wait_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setMaxStackSize(1)
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"end_task"),
 		null).filter(Objects::nonNull)
 		.forEach(event.getRegistry()::register);
 	}
@@ -124,6 +139,7 @@ public class ItemRegistrar
 				BLANK_TASK,
 				INFO_TASK,
 				WAIT_TASK,
+				END_TASK,
 			null).filter(i -> i != null && i != Items.AIR)
 			.forEach(setItemModel);
 		}
