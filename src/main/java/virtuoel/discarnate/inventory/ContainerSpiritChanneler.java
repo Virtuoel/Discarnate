@@ -134,9 +134,22 @@ public class ContainerSpiritChanneler extends Container
 					return ItemStack.EMPTY;
 				}
 			}
-			else if(!this.mergeItemStack(itemstack1, 0, containerSlots, false))
+			else if(tileEntity.isActive() || !this.mergeItemStack(itemstack1, 0, containerSlots, false))
 			{
-				return ItemStack.EMPTY;
+				if(index < containerSlots + 27)
+				{
+					if(!this.mergeItemStack(itemstack1, containerSlots + 27, inventorySlots.size(), false))
+					{
+						return ItemStack.EMPTY;
+					}
+				}
+				else
+				{
+					if(!this.mergeItemStack(itemstack1, containerSlots, containerSlots + 27, false))
+					{
+						return ItemStack.EMPTY;
+					}
+				}
 			}
 			
 			if(itemstack1.isEmpty())
