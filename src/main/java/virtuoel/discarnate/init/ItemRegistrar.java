@@ -18,6 +18,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
@@ -36,6 +37,8 @@ public class ItemRegistrar
 	public static final Item BLANK_TASK = Items.AIR;
 	public static final Item INFO_TASK = Items.AIR;
 	public static final Item WAIT_TASK = Items.AIR;
+	public static final Item JUMP_TASK = Items.AIR;
+	public static final Item DROP_TASK = Items.AIR;
 	public static final Item END_TASK = Items.AIR;
 	
 	public static void init()
@@ -56,6 +59,25 @@ public class ItemRegistrar
 			}
 			catch(InterruptedException e)
 			{}
+		});
+		
+		DiscarnateAPI.instance().addTask(JUMP_TASK, (i, p, t) ->
+		{
+			if(p.onGround)
+			{
+				p.jump();
+				p.velocityChanged = true;
+			}
+		});
+		
+		DiscarnateAPI.instance().addTask(DROP_TASK, (i, p, t) ->
+		{
+			ItemStack stack = p.inventory.getCurrentItem();
+			
+			if(!stack.isEmpty() && stack.getItem().onDroppedByPlayer(stack, p))
+			{
+				ForgeHooks.onPlayerTossEvent(p, p.inventory.decrStackSize(p.inventory.currentItem, i.getCount()), true);
+			}
 		});
 		
 		DiscarnateAPI.instance().addTask(END_TASK, (i, p, t) ->
@@ -119,6 +141,15 @@ public class ItemRegistrar
 				new Item()
 				.setMaxStackSize(1)
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"jump_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"drop_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setMaxStackSize(1)
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
 				"end_task"),
 		null).filter(Objects::nonNull)
 		.forEach(event.getRegistry()::register);
@@ -139,6 +170,8 @@ public class ItemRegistrar
 				BLANK_TASK,
 				INFO_TASK,
 				WAIT_TASK,
+				JUMP_TASK,
+				DROP_TASK,
 				END_TASK,
 			null).filter(i -> i != null && i != Items.AIR)
 			.forEach(setItemModel);
