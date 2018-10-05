@@ -87,7 +87,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 					
 					if(w != null)
 					{
-						w.playSound(null, getPos(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
+						w.playSound(null, player.getPosition(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
 					}
 					
 					deactivate();
@@ -100,7 +100,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 					{
 						w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, true));
 					}
-					w.playSound(null, getPos(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+					w.playSound(null, player.getPosition(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, 1.0F);
 				}
 				
 				taskThread.start();
