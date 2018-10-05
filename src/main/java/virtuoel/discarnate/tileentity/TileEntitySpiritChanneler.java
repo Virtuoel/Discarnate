@@ -1,7 +1,5 @@
 package virtuoel.discarnate.tileentity;
 
-import java.util.Optional;
-
 import javax.annotation.Nullable;
 
 import net.minecraft.block.state.IBlockState;
@@ -39,11 +37,12 @@ public class TileEntitySpiritChanneler extends TileEntity
 				super.onContentsChanged(slot);
 				TileEntitySpiritChanneler.this.markDirty();
 				
-				Optional.ofNullable(getWorld()).ifPresent(world ->
+				World world = getWorld();
+				if(world != null)
 				{
 					IBlockState state = world.getBlockState(getPos());
-					getWorld().notifyBlockUpdate(getPos(), state, state, 3);
-				});
+					world.notifyBlockUpdate(getPos(), state, state, 3);
+				}
 			}
 		};
 	}
@@ -52,7 +51,16 @@ public class TileEntitySpiritChanneler extends TileEntity
 	{
 		this(25);
 	}
-
+	
+	@Override
+	public void onLoad()
+	{
+		if(!getWorld().isRemote)
+		{
+			deactivate();
+		}
+	}
+	
 	@Override
 	public void invalidate()
 	{
@@ -87,7 +95,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 					
 					if(w != null)
 					{
-						w.playSound(null, player.getPosition(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
+						w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
 					}
 					
 					deactivate();
@@ -95,12 +103,16 @@ public class TileEntitySpiritChanneler extends TileEntity
 				
 				if(w != null)
 				{
-					IBlockState state = w.getBlockState(getPos());
-					if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+					BlockPos pos = getPos();
+					if(w.isBlockLoaded(pos))
 					{
-						w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, true));
+						IBlockState state = w.getBlockState(pos);
+						if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE) && !state.getValue(BlockSpiritChanneler.ACTIVE))
+						{
+							w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, true));
+						}
+						w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, 1.0F);
 					}
-					w.playSound(null, player.getPosition(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, 1.0F);
 				}
 				
 				taskThread.start();
@@ -114,14 +126,19 @@ public class TileEntitySpiritChanneler extends TileEntity
 	{
 		synchronized(this)
 		{
-			Optional.ofNullable(getWorld()).ifPresent(w ->
+			World w = getWorld();
+			if(w != null)
 			{
-				IBlockState state = w.getBlockState(getPos());
-				if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+				BlockPos pos = getPos();
+				if(w.isBlockLoaded(pos))
 				{
-					w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, false));
+					IBlockState state = w.getBlockState(pos);
+					if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE) && state.getValue(BlockSpiritChanneler.ACTIVE))
+					{
+						w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, false));
+					}
 				}
-			});
+			}
 			
 			if(taskThread != null)
 			{
@@ -140,10 +157,14 @@ public class TileEntitySpiritChanneler extends TileEntity
 			World w = getWorld();
 			if(w != null)
 			{
-				IBlockState state = w.getBlockState(getPos());
-				if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+				BlockPos pos = getPos();
+				if(w.isBlockLoaded(pos))
 				{
-					return state.getValue(BlockSpiritChanneler.ACTIVE);
+					IBlockState state = w.getBlockState(pos);
+					if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+					{
+						return state.getValue(BlockSpiritChanneler.ACTIVE);
+					}
 				}
 			}
 			return false;
