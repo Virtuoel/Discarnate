@@ -1,0 +1,13 @@
+{
+	"type": "forge:ore_shapeless",
+	"result":
+	{
+		"item": "discarnate:jump_task",
+		"count": 1
+	},
+	"ingredients":
+	[
+		{ "item": "discarnate:blank_task" },
+		{ "type": "forge:ore_dict", "ore": "feather" }
+	]
+}

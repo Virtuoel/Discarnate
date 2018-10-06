@@ -1,0 +1,19 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:end_task",
+		"count": 1
+	},
+	"pattern":
+	[
+		"BBB",
+		"BTB",
+		"BBB"
+	],
+	"key":
+	{
+		"T": { "item": "discarnate:blank_task" },
+		"B": { "type": "forge:ore_dict", "ore": "bone" }
+	}
+}

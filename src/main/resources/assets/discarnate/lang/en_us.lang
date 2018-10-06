@@ -5,6 +5,8 @@ tile.discarnate.spirit_channeler.name=Spirit Channeler
 item.discarnate.blank_task.name=Task: None
 item.discarnate.info_task.name=Task: Info
 item.discarnate.wait_task.name=Task: Wait
+item.discarnate.jump_task.name=Task: Jump
+item.discarnate.drop_task.name=Task: Drop
 item.discarnate.end_task.name=Task: Terminate
 
 # GUI

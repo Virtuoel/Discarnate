@@ -1,0 +1,19 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:drop_task",
+		"count": 8
+	},
+	"pattern":
+	[
+		"BBB",
+		"BSB",
+		"BBB"
+	],
+	"key":
+	{
+		"B": { "item": "discarnate:blank_task" },
+		"S": { "item": "minecraft:snowball" }
+	}
+}
