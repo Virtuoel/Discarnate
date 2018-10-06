@@ -105,9 +105,16 @@ public class ItemRegistrar
 					{
 						for(ItemStack stack : stacks)
 						{
-							if(!stack.isEmpty())
+							if(p != null && !p.isDead && TileEntitySpiritChanneler.isActive(t.getWorld(), t.getPos()))
 							{
-								DiscarnateAPI.instance().getTask(stack).ifPresent(task -> task.accept(stack, p, t));
+								if(!stack.isEmpty())
+								{
+									DiscarnateAPI.instance().getTask(stack).ifPresent(task -> task.accept(stack, p, t));
+								}
+							}
+							else
+							{
+								break;
 							}
 						}
 					}

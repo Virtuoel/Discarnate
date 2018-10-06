@@ -82,10 +82,13 @@ public class TileEntitySpiritChanneler extends TileEntity
 				{
 					for(int i = 0; i < itemHandler.getSlots(); i++)
 					{
-						if(isActive())
+						if(player != null && !player.isDead && isActive())
 						{
 							ItemStack stack = itemHandler.getStackInSlot(i);
-							DiscarnateAPI.instance().getTask(stack).ifPresent(task -> task.accept(stack, player, this));
+							if(!stack.isEmpty())
+							{
+								DiscarnateAPI.instance().getTask(stack).ifPresent(task -> task.accept(stack, player, this));
+							}
 						}
 						else
 						{
@@ -154,21 +157,24 @@ public class TileEntitySpiritChanneler extends TileEntity
 	{
 		synchronized(this)
 		{
-			World w = getWorld();
-			if(w != null)
+			return isActive(getWorld(), getPos());
+		}
+	}
+	
+	public static boolean isActive(@Nullable World w, BlockPos pos)
+	{
+		if(w != null)
+		{
+			if(w.isBlockLoaded(pos))
 			{
-				BlockPos pos = getPos();
-				if(w.isBlockLoaded(pos))
+				IBlockState state = w.getBlockState(pos);
+				if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
 				{
-					IBlockState state = w.getBlockState(pos);
-					if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
-					{
-						return state.getValue(BlockSpiritChanneler.ACTIVE);
-					}
+					return state.getValue(BlockSpiritChanneler.ACTIVE);
 				}
 			}
-			return false;
 		}
+		return false;
 	}
 	
 	@Override
