@@ -21,6 +21,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.ITask;
 import virtuoel.discarnate.api.Task;
+import virtuoel.discarnate.reference.DiscarnateConfig;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 @EventBusSubscriber(modid = Discarnate.MOD_ID)
@@ -124,6 +125,15 @@ public class TaskRegistrar
 			.setType(Task.class)
 			.setDefaultKey(new ResourceLocation("empty"))
 			.create();
+	}
+	
+	@SubscribeEvent
+	public static void onMissingTasks(RegistryEvent.MissingMappings<Task> event)
+	{
+		if(DiscarnateConfig.ignoreMissingTasks)
+		{
+			event.getMappings().forEach(RegistryEvent.MissingMappings.Mapping::ignore);
+		}
 	}
 	
 	public static <T extends IForgeRegistryEntry<?>> Task createTask(ITask task, T name)
