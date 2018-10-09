@@ -1,5 +1,7 @@
 package virtuoel.discarnate.tileentity;
 
+import java.util.Optional;
+
 import javax.annotation.Nullable;
 
 import net.minecraft.block.state.IBlockState;
@@ -20,7 +22,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.api.DiscarnateAPI;
+import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
 
 public class TileEntitySpiritChanneler extends TileEntity
@@ -87,7 +89,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 							ItemStack stack = itemHandler.getStackInSlot(i);
 							if(!stack.isEmpty())
 							{
-								DiscarnateAPI.instance().getTask(stack).ifPresent(task -> task.accept(stack, player, this));
+								Optional.ofNullable(Task.REGISTRY.getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, player, this));
 							}
 						}
 						else
