@@ -21,9 +21,6 @@ public class Discarnate
 {
 	public static final String MOD_ID = "discarnate";
 	
-	@Mod.Instance(MOD_ID)
-	public static Discarnate instance;
-	
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	
 	public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
@@ -46,12 +43,23 @@ public class Discarnate
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event)
 	{
-		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiProxy());
+		NetworkRegistry.INSTANCE.registerGuiHandler(instance(), new GuiProxy());
 	}
 	
 	@Mod.EventHandler
 	public void onFingerprintViolation(FMLFingerprintViolationEvent event)
 	{
 		LOGGER.error("Expecting signature {}, however there is no signature matching that description. The file {} may have been tampered with. This version will NOT be supported by the author!", event.getExpectedFingerprint(), event.getSource().getName());
+	}
+	
+	private static final class InstanceHolder
+	{
+		private static final Discarnate INSTANCE = new Discarnate();
+	}
+	
+	@Mod.InstanceFactory
+	public static Discarnate instance()
+	{
+		return InstanceHolder.INSTANCE;
 	}
 }
