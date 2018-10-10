@@ -22,8 +22,8 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
+import virtuoel.discarnate.init.TaskRegistrar;
 
 public class TileEntitySpiritChanneler extends TileEntity
 {
@@ -89,7 +89,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 							ItemStack stack = itemHandler.getStackInSlot(i);
 							if(!stack.isEmpty())
 							{
-								Optional.ofNullable(Task.REGISTRY.getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, player, this));
+								Optional.ofNullable(TaskRegistrar.REGISTRY.getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, player, this));
 							}
 						}
 						else

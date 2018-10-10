@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
-import virtuoel.discarnate.api.Task;
+import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 public class ContainerSpiritChanneler extends Container
@@ -89,7 +89,7 @@ public class ContainerSpiritChanneler extends Container
 					@Override
 					public boolean isItemValid(ItemStack stack)
 					{
-						return Task.REGISTRY.getValue(stack.getItem().getRegistryName()) != null;
+						return TaskRegistrar.REGISTRY.getValue(stack.getItem().getRegistryName()) != null;
 					}
 					
 					@Override

@@ -14,6 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import virtuoel.discarnate.init.BlockRegistrar;
 import virtuoel.discarnate.network.CPacketActivateChanneler;
+import virtuoel.discarnate.network.SPacketBuiltinClientTask;
 import virtuoel.discarnate.proxy.GuiProxy;
 
 @Mod(modid = Discarnate.MOD_ID, version = "@VERSION@", certificateFingerprint = "@FINGERPRINT@")
@@ -38,6 +39,7 @@ public class Discarnate
 	static
 	{
 		NETWORK.registerMessage(CPacketActivateChanneler.Handler.class, CPacketActivateChanneler.class, 0, Side.SERVER);
+		NETWORK.registerMessage(SPacketBuiltinClientTask.Handler.class, SPacketBuiltinClientTask.class, 1, Side.CLIENT);
 	}
 	
 	@Mod.EventHandler

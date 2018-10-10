@@ -16,17 +16,22 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryBuilder;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.ITask;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.reference.DiscarnateConfig;
+import virtuoel.discarnate.task.ClientTask;
+import virtuoel.discarnate.task.CommonTask;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 @EventBusSubscriber(modid = Discarnate.MOD_ID)
 public class TaskRegistrar
 {
+	public static IForgeRegistry<Task> REGISTRY;
+	
 	@SubscribeEvent
 	public static void registerTasks(RegistryEvent.Register<Task> event)
 	{
@@ -98,7 +103,7 @@ public class TaskRegistrar
 							{
 								if(!stack.isEmpty())
 								{
-									Optional.ofNullable(Task.REGISTRY.getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, p, t));
+									Optional.ofNullable(REGISTRY.getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, p, t));
 								}
 							}
 							else
@@ -120,7 +125,7 @@ public class TaskRegistrar
 	@SubscribeEvent
 	public static void registerTaskRegistry(RegistryEvent.NewRegistry event)
 	{
-		new RegistryBuilder<Task>()
+		REGISTRY = new RegistryBuilder<Task>()
 			.setName(new ResourceLocation(Discarnate.MOD_ID, "tasks"))
 			.setType(Task.class)
 			.setDefaultKey(new ResourceLocation("empty"))
@@ -138,6 +143,11 @@ public class TaskRegistrar
 	
 	public static <T extends IForgeRegistryEntry<?>> Task createTask(ITask task, T name)
 	{
-		return new Task(task).setRegistryName(name.getRegistryName());
+		return new CommonTask(task).setRegistryName(name.getRegistryName());
+	}
+	
+	public static <T extends IForgeRegistryEntry<?>> Task createClientTask(ITask task, T name)
+	{
+		return new ClientTask(task).setRegistryName(name.getRegistryName());
 	}
 }
