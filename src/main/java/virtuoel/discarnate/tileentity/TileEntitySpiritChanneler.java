@@ -2,13 +2,19 @@ package virtuoel.discarnate.tileentity;
 
 import java.util.Optional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.EntityMoveHelper.Action;
+import net.minecraft.entity.monster.EntityVex;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
@@ -77,6 +83,9 @@ public class TileEntitySpiritChanneler extends TileEntity
 	private static final Task CANCEL_MOVEMENT_TASK = null;
 	
 	@Nullable
+	EntityVex marker = null;
+	
+	@Nullable
 	Thread taskThread = null;
 	
 	public boolean activate(EntityPlayer player)
@@ -104,21 +113,29 @@ public class TileEntitySpiritChanneler extends TileEntity
 						}
 					}
 					
-					if(w != null)
-					{
-						w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
-					}
-					
 					if(CANCEL_MOVEMENT_TASK != null)
 					{
 						CANCEL_MOVEMENT_TASK.accept(new ItemStack(ItemRegistrar.CANCEL_MOVEMENT_TASK), player, this);
 					}
 					
-					deactivate();
+					if(w != null)
+					{
+						Optional.ofNullable(w.getMinecraftServer()).ifPresent(s ->
+						{
+							s.addScheduledTask(() ->
+							{
+								deactivate();
+							});
+						});
+					}
 				}, "SpiritChannelerTasks");
 				
 				if(w != null)
 				{
+					marker = new EntityVex(w);
+					setupMarkerVex(marker, w, getPos(), player);
+					w.spawnEntity(marker);
+					
 					BlockPos pos = getPos();
 					if(w.isBlockLoaded(pos))
 					{
@@ -145,6 +162,11 @@ public class TileEntitySpiritChanneler extends TileEntity
 			World w = getWorld();
 			if(w != null)
 			{
+				if(marker != null)
+				{
+					marker = null;
+				}
+				
 				BlockPos pos = getPos();
 				if(w.isBlockLoaded(pos))
 				{
@@ -164,6 +186,58 @@ public class TileEntitySpiritChanneler extends TileEntity
 			}
 			return false;
 		}
+	}
+	
+	protected void setupMarkerVex(EntityVex marker, @Nonnull World w, BlockPos pos, EntityPlayer player)
+	{
+		marker.tasks.addTask(0, new EntityAIBase()
+		{
+			@Override
+			public boolean shouldExecute()
+			{
+				return TileEntitySpiritChanneler.this.marker != null;
+			}
+			
+			@Override
+			public void updateTask()
+			{
+				if(marker != null)
+				{
+					marker.setLimitedLife(2);
+					marker.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 1, 5, false, false));
+					marker.setCharging(marker.getMoveHelper().action == Action.MOVE_TO);
+				}
+			}
+		});
+		
+		EntityAIBase follow = new EntityAIBase()
+		{
+			@Override
+			public boolean shouldExecute()
+			{
+				return player != null;
+			}
+			
+			@Override
+			public void updateTask()
+			{
+				if(player != null && marker != null)
+				{
+					marker.faceEntity(player, 360, 360);
+					marker.getMoveHelper().setMoveTo(player.posX, player.posY + player.eyeHeight + 0.5D, player.posZ, 1.0D);
+				}
+			}
+		};
+		
+		follow.setMutexBits(3);
+		marker.tasks.addTask(1, follow);
+		marker.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 1000000, 0, true, true));
+		marker.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 10, 0));
+		marker.setHealth(0.1F);
+		marker.moveToBlockPosAndAngles(pos.up(), 0.0F, 0.0F);
+		marker.onInitialSpawn(w.getDifficultyForLocation(pos), null);
+		marker.targetTasks.taskEntries.clear();
+		marker.setBoundOrigin(pos.up());
 	}
 	
 	public boolean isActive()
