@@ -11,6 +11,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Constants;
@@ -115,6 +116,30 @@ public class TaskRegistrar
 				ClientEventHandler.setSneakTicks(0);
 				ClientEventHandler.setJumpTicks(0);
 			}, ItemRegistrar.CANCEL_MOVEMENT_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				p.prevRotationPitch = p.rotationPitch;
+				p.rotationPitch = MathHelper.clamp(Math.round(p.rotationPitch) - i.getCount(), -90, 90);
+			}, ItemRegistrar.LOOK_UP_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				p.prevRotationPitch = p.rotationPitch;
+				p.rotationPitch = MathHelper.clamp(Math.round(p.rotationPitch) + i.getCount(), -90, 90);
+			}, ItemRegistrar.LOOK_DOWN_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				p.prevRotationYaw = p.rotationYaw;
+				p.rotationYaw = ((Math.round(p.rotationYaw) + 180 - i.getCount()) % 360.0F) - 180;
+			}, ItemRegistrar.LOOK_LEFT_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				p.prevRotationYaw = p.rotationYaw;
+				p.rotationYaw = ((Math.round(p.rotationYaw) + 180 + i.getCount()) % 360.0F) - 180;
+			}, ItemRegistrar.LOOK_RIGHT_TASK),
 			
 			createTask((i, p, t) ->
 			{
