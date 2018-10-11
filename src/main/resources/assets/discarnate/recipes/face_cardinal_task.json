@@ -1,0 +1,17 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:face_cardinal_task",
+		"count": 1
+	},
+	"pattern":
+	[
+		"LR"
+	],
+	"key":
+	{
+		"L": { "item": "discarnate:look_left_task" },
+		"R": { "item": "discarnate:look_right_task" }
+	}
+}

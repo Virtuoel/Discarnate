@@ -34,6 +34,8 @@ public class ItemRegistrar
 	public static final Item LOOK_DOWN_TASK = Items.AIR;
 	public static final Item LOOK_LEFT_TASK = Items.AIR;
 	public static final Item LOOK_RIGHT_TASK = Items.AIR;
+	public static final Item FACE_HORIZON_TASK = Items.AIR;
+	public static final Item FACE_CARDINAL_TASK = Items.AIR;
 	public static final Item SNEAK_TASK = Items.AIR;
 	public static final Item JUMP_TASK = Items.AIR;
 	public static final Item END_TASK = Items.AIR;
@@ -102,6 +104,16 @@ public class ItemRegistrar
 				"look_right_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
+				.setMaxStackSize(1)
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"face_horizon_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setMaxStackSize(1)
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"face_cardinal_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
 				"sneak_task"),
 			setRegistryNameAndTranslationKey(
@@ -143,6 +155,8 @@ public class ItemRegistrar
 				LOOK_DOWN_TASK,
 				LOOK_LEFT_TASK,
 				LOOK_RIGHT_TASK,
+				FACE_HORIZON_TASK,
+				FACE_CARDINAL_TASK,
 				SNEAK_TASK,
 				JUMP_TASK,
 				END_TASK,

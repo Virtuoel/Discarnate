@@ -1,0 +1,12 @@
+{
+	"type": "forge:ore_shapeless",
+	"result":
+	{
+		"item": "discarnate:look_right_task",
+		"count": 2
+	},
+	"ingredients":
+	[
+		{ "item": "discarnate:face_cardinal_task" }
+	]
+}

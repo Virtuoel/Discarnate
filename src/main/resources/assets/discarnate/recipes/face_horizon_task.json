@@ -1,0 +1,18 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:face_horizon_task",
+		"count": 1
+	},
+	"pattern":
+	[
+		"U",
+		"D"
+	],
+	"key":
+	{
+		"U": { "item": "discarnate:look_up_task" },
+		"D": { "item": "discarnate:look_down_task" }
+	}
+}

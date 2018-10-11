@@ -132,14 +132,26 @@ public class TaskRegistrar
 			createClientTask((i, p, t) ->
 			{
 				p.prevRotationYaw = p.rotationYaw;
-				p.rotationYaw = ((Math.round(p.rotationYaw) + 180 - i.getCount()) % 360.0F) - 180;
+				p.rotationYaw = ((Math.round(p.rotationYaw) + 180 - i.getCount()) % 360) - 180;
 			}, ItemRegistrar.LOOK_LEFT_TASK),
 			
 			createClientTask((i, p, t) ->
 			{
 				p.prevRotationYaw = p.rotationYaw;
-				p.rotationYaw = ((Math.round(p.rotationYaw) + 180 + i.getCount()) % 360.0F) - 180;
+				p.rotationYaw = ((Math.round(p.rotationYaw) + 180 + i.getCount()) % 360) - 180;
 			}, ItemRegistrar.LOOK_RIGHT_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				p.prevRotationPitch = p.rotationPitch;
+				p.rotationPitch = 0.0F;
+			}, ItemRegistrar.FACE_HORIZON_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				p.prevRotationYaw = MathHelper.normalizeAngle(Math.round(p.rotationYaw) + 180, 360) - 180;
+				p.rotationYaw = MathHelper.clamp(Math.round(p.prevRotationYaw / 90.0F) * 90, -180, 180);
+			}, ItemRegistrar.FACE_CARDINAL_TASK),
 			
 			createTask((i, p, t) ->
 			{
