@@ -2,14 +2,14 @@
 	"type": "forge:ore_shaped",
 	"result":
 	{
-		"item": "discarnate:info_task",
-		"count": 8
+		"item": "discarnate:swap_task",
+		"count": 1
 	},
 	"pattern":
 	[
-		"BBB",
-		"BTB",
-		"BBB"
+		"TTT",
+		"TBT",
+		"TTT"
 	],
 	"key":
 	{

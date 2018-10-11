@@ -23,8 +23,19 @@ public class ItemRegistrar
 	public static final Item BLANK_TASK = Items.AIR;
 	public static final Item INFO_TASK = Items.AIR;
 	public static final Item WAIT_TASK = Items.AIR;
-	public static final Item JUMP_TASK = Items.AIR;
 	public static final Item DROP_TASK = Items.AIR;
+	public static final Item SWAP_TASK = Items.AIR;
+	public static final Item MOVE_FORWARD_TASK = Items.AIR;
+	public static final Item MOVE_BACKWARD_TASK = Items.AIR;
+	public static final Item STRAFE_LEFT_TASK = Items.AIR;
+	public static final Item STRAFE_RIGHT_TASK = Items.AIR;
+	public static final Item CANCEL_MOVEMENT_TASK = Items.AIR;
+	public static final Item LOOK_UP_TASK = Items.AIR;
+	public static final Item LOOK_DOWN_TASK = Items.AIR;
+	public static final Item LOOK_LEFT_TASK = Items.AIR;
+	public static final Item LOOK_RIGHT_TASK = Items.AIR;
+	public static final Item SNEAK_TASK = Items.AIR;
+	public static final Item JUMP_TASK = Items.AIR;
 	public static final Item END_TASK = Items.AIR;
 	
 	@SubscribeEvent
@@ -45,13 +56,58 @@ public class ItemRegistrar
 				"wait_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"drop_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
 				.setMaxStackSize(1)
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
-				"jump_task"),
+				"swap_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
-				"drop_task"),
+				"move_forward_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"move_backward_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"strafe_left_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"strafe_right_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setMaxStackSize(1)
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"cancel_movement_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"look_up_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"look_down_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"look_left_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"look_right_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"sneak_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"jump_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
 				.setMaxStackSize(1)
@@ -76,8 +132,19 @@ public class ItemRegistrar
 				BLANK_TASK,
 				INFO_TASK,
 				WAIT_TASK,
-				JUMP_TASK,
 				DROP_TASK,
+				SWAP_TASK,
+				MOVE_FORWARD_TASK,
+				MOVE_BACKWARD_TASK,
+				STRAFE_LEFT_TASK,
+				STRAFE_RIGHT_TASK,
+				CANCEL_MOVEMENT_TASK,
+				LOOK_UP_TASK,
+				LOOK_DOWN_TASK,
+				LOOK_LEFT_TASK,
+				LOOK_RIGHT_TASK,
+				SNEAK_TASK,
+				JUMP_TASK,
 				END_TASK,
 			null).filter(i -> i != null && i != Items.AIR)
 			.forEach(setItemModel);

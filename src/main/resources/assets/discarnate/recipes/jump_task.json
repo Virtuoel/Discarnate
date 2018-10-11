@@ -1,13 +1,19 @@
 {
-	"type": "forge:ore_shapeless",
+	"type": "forge:ore_shaped",
 	"result":
 	{
 		"item": "discarnate:jump_task",
-		"count": 1
+		"count": 8
 	},
-	"ingredients":
+	"pattern":
 	[
-		{ "item": "discarnate:blank_task" },
-		{ "type": "forge:ore_dict", "ore": "feather" }
-	]
+		"BBB",
+		"BSB",
+		"BBB"
+	],
+	"key":
+	{
+		"B": { "item": "discarnate:blank_task" },
+		"S": { "type": "forge:ore_dict", "ore": "feather" }
+	}
 }

@@ -2,18 +2,18 @@
 	"type": "forge:ore_shaped",
 	"result":
 	{
-		"item": "discarnate:info_task",
+		"item": "discarnate:sneak_task",
 		"count": 8
 	},
 	"pattern":
 	[
 		"BBB",
-		"BTB",
+		"BSB",
 		"BBB"
 	],
 	"key":
 	{
 		"B": { "item": "discarnate:blank_task" },
-		"T": { "type": "forge:ore_dict", "ore": "torch" }
+		"S": { "item": "minecraft:soul_sand" }
 	}
 }

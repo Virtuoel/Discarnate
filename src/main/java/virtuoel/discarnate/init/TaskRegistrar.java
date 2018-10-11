@@ -8,6 +8,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
@@ -22,6 +23,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.ITask;
 import virtuoel.discarnate.api.Task;
+import virtuoel.discarnate.client.handler.ClientEventHandler;
 import virtuoel.discarnate.reference.DiscarnateConfig;
 import virtuoel.discarnate.task.ClientTask;
 import virtuoel.discarnate.task.CommonTask;
@@ -56,15 +58,6 @@ public class TaskRegistrar
 			
 			createTask((i, p, t) ->
 			{
-				if(p.onGround)
-				{
-					p.jump();
-					p.velocityChanged = true;
-				}
-			}, ItemRegistrar.JUMP_TASK),
-			
-			createTask((i, p, t) ->
-			{
 				ItemStack stack = p.inventory.getCurrentItem();
 				
 				if(!stack.isEmpty() && stack.getItem().onDroppedByPlayer(stack, p))
@@ -72,6 +65,56 @@ public class TaskRegistrar
 					ForgeHooks.onPlayerTossEvent(p, p.inventory.decrStackSize(p.inventory.currentItem, i.getCount()), true);
 				}
 			}, ItemRegistrar.DROP_TASK),
+			
+			createTask((i, p, t) ->
+			{
+				if(!p.isSpectator())
+				{
+					ItemStack itemstack = p.getHeldItem(EnumHand.OFF_HAND);
+					p.setHeldItem(EnumHand.OFF_HAND, p.getHeldItem(EnumHand.MAIN_HAND));
+					p.setHeldItem(EnumHand.MAIN_HAND, itemstack);
+				}
+			}, ItemRegistrar.SWAP_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addForwardTicks(i.getCount());
+			}, ItemRegistrar.MOVE_FORWARD_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addBackwardTicks(i.getCount());
+			}, ItemRegistrar.MOVE_BACKWARD_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addLeftTicks(i.getCount());
+			}, ItemRegistrar.STRAFE_LEFT_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addRightTicks(i.getCount());
+			}, ItemRegistrar.STRAFE_RIGHT_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addSneakTicks(i.getCount());
+			}, ItemRegistrar.SNEAK_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addJumpTicks(i.getCount());
+			}, ItemRegistrar.JUMP_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.setForwardTicks(0);
+				ClientEventHandler.setBackwardTicks(0);
+				ClientEventHandler.setLeftTicks(0);
+				ClientEventHandler.setRightTicks(0);
+				ClientEventHandler.setSneakTicks(0);
+				ClientEventHandler.setJumpTicks(0);
+			}, ItemRegistrar.CANCEL_MOVEMENT_TASK),
 			
 			createTask((i, p, t) ->
 			{

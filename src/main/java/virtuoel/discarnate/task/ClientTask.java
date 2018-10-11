@@ -25,7 +25,7 @@ public class ClientTask extends CommonTask
 	@Override
 	public void accept(@Nonnull ItemStack s, @Nullable EntityPlayer p, @Nullable TileEntity t)
 	{
-		if(!p.getEntityWorld().isRemote && p instanceof EntityPlayerMP)
+		if(p instanceof EntityPlayerMP && !p.getEntityWorld().isRemote)
 		{
 			Discarnate.NETWORK.sendTo(new SPacketBuiltinClientTask(this, getPosFromTileEntity(t), s, getSlotForStack(s, t), getDimensionFromTileEntity(t)), (EntityPlayerMP) p);
 		}

@@ -18,11 +18,14 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import virtuoel.discarnate.Discarnate;
+import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
+import virtuoel.discarnate.init.ItemRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 
 public class TileEntitySpiritChanneler extends TileEntity
@@ -70,6 +73,9 @@ public class TileEntitySpiritChanneler extends TileEntity
 		super.invalidate();
 	}
 	
+	@ObjectHolder(Discarnate.MOD_ID + ":cancel_movement_task")
+	private static final Task CANCEL_MOVEMENT_TASK = null;
+	
 	@Nullable
 	Thread taskThread = null;
 	
@@ -101,6 +107,11 @@ public class TileEntitySpiritChanneler extends TileEntity
 					if(w != null)
 					{
 						w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_VEX_DEATH, SoundCategory.BLOCKS, 0.5F, 1.0F);
+					}
+					
+					if(CANCEL_MOVEMENT_TASK != null)
+					{
+						CANCEL_MOVEMENT_TASK.accept(new ItemStack(ItemRegistrar.CANCEL_MOVEMENT_TASK), player, this);
 					}
 					
 					deactivate();

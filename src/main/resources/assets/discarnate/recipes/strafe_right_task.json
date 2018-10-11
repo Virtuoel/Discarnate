@@ -1,0 +1,12 @@
+{
+	"type": "forge:ore_shapeless",
+	"result":
+	{
+		"item": "discarnate:strafe_right_task",
+		"count": 1
+	},
+	"ingredients":
+	[
+		{ "item": "discarnate:move_forward_task" }
+	]
+}

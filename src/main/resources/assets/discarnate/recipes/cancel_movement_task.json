@@ -1,0 +1,19 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:cancel_movement_task",
+		"count": 1
+	},
+	"pattern":
+	[
+		"SSS",
+		"SBS",
+		"SSS"
+	],
+	"key":
+	{
+		"B": { "item": "discarnate:blank_task" },
+		"S": { "type": "forge:ore_dict", "ore": "string" }
+	}
+}
