@@ -94,6 +94,15 @@ public class TileEntitySpiritChanneler extends TileEntity
 		{
 			if(taskThread == null)
 			{
+				if(player != null)
+				{
+					if(!player.capabilities.isCreativeMode && player.experienceLevel == 0)
+					{
+						return false;
+					}
+					player.addExperienceLevel(-1);
+				}
+				
 				World w = getWorld();
 				taskThread = new Thread(() ->
 				{

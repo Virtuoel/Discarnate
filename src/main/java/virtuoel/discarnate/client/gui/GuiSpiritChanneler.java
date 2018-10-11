@@ -42,7 +42,8 @@ public class GuiSpiritChanneler extends GuiContainer
 	{
 		super.initGui();
 		this.active = tileEntity.isActive();
-		this.confirmButton = new GuiButton(1, this.guiLeft + 124, this.guiTop + 34, 40, 20, I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start"));
+		this.confirmButton = new GuiButton(1, this.guiLeft + 124, this.guiTop + 52, 40, 20, I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start"));
+		this.confirmButton.enabled = this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
 		this.buttonList.add(this.confirmButton);
 	}
 	
@@ -54,6 +55,7 @@ public class GuiSpiritChanneler extends GuiContainer
 		this.active = tileEntity.isActive();
 		
 		this.confirmButton.displayString = I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start");
+		this.confirmButton.enabled = this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
 	}
 	
 	@Override
@@ -84,7 +86,7 @@ public class GuiSpiritChanneler extends GuiContainer
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
 		String s = this.tileEntity.getDisplayName().getUnformattedText();
-		this.fontRenderer.drawString(s, this.xSize / 2 - this.fontRenderer.getStringWidth(s) / 2, 6, 0x404040);
+		this.fontRenderer.drawString(s, this.xSize / 2 - this.fontRenderer.getStringWidth(s) / 2 - 26, 6, 0x404040);
 		this.fontRenderer.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 0x404040);
 	}
 	
