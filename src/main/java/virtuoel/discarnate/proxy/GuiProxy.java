@@ -2,6 +2,7 @@ package virtuoel.discarnate.proxy;
 
 import javax.annotation.Nullable;
 
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.tileentity.TileEntity;
@@ -42,7 +43,7 @@ public class GuiProxy implements IGuiHandler
 	
 	@Override
 	@Nullable
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
+	public GuiScreen getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
 	{
 		BlockPos pos = new BlockPos(x, y, z);
 		if(world.isBlockLoaded(pos))
