@@ -233,7 +233,9 @@ public class TileEntitySpiritChanneler extends TileEntity
 				if(player != null && marker != null)
 				{
 					marker.faceEntity(player, 360, 360);
-					marker.getMoveHelper().setMoveTo(player.posX, player.posY + player.eyeHeight + 0.5D, player.posZ, 1.0D);
+					marker.rotationYawHead = player.rotationYawHead;
+					double yaw = -Math.toRadians(player.rotationYaw + 180D);
+					marker.getMoveHelper().setMoveTo(player.posX + (Math.sin(yaw) * 1.25 * player.width), player.posY + player.eyeHeight + 0.5D, player.posZ + (Math.cos(yaw) * 1.25 * player.width), 1.0D);
 				}
 			}
 		};
@@ -241,9 +243,9 @@ public class TileEntitySpiritChanneler extends TileEntity
 		follow.setMutexBits(3);
 		marker.tasks.addTask(1, follow);
 		marker.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 1000000, 0, true, true));
-		marker.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 10, 0));
 		marker.setHealth(0.1F);
-		marker.moveToBlockPosAndAngles(pos.up(), 0.0F, 0.0F);
+		marker.motionY = 0.25D;
+		marker.moveToBlockPosAndAngles(pos, 0.0F, 0.0F);
 		marker.onInitialSpawn(w.getDifficultyForLocation(pos), null);
 		marker.targetTasks.taskEntries.clear();
 		marker.setBoundOrigin(pos.up());
