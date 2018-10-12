@@ -1,10 +1,13 @@
 package virtuoel.discarnate.client.handler;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovementInput;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import virtuoel.discarnate.Discarnate;
 
@@ -17,11 +20,75 @@ public class ClientEventHandler
 	private static int rightTicks = 0;
 	private static int jumpTicks = 0;
 	private static int sneakTicks = 0;
+	private static int digTicks = 0;
+	private static int useItemTicks = 0;
+	
+	@SubscribeEvent
+	public static void onClientTick(ClientTickEvent event)
+	{
+		if(event.phase == Phase.END)
+			return;
+		
+		boolean allowInput = Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput;
+		
+		synchronized(ClientEventHandler.class)
+		{
+			if(digTicks > 0)
+			{
+				if(allowInput)
+				{
+					int key = Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode();
+					KeyBinding.onTick(key);
+				}
+				digTicks--;
+			}
+			
+			if(useItemTicks > 0)
+			{
+				if(allowInput)
+				{
+					int key = Minecraft.getMinecraft().gameSettings.keyBindUseItem.getKeyCode();
+					KeyBinding.onTick(key);
+				}
+				useItemTicks--;
+			}
+		}
+	}
+	
+	public static synchronized int getDigTicks()
+	{
+		return digTicks;
+	}
+	
+	public static synchronized void setDigTicks(int ticks)
+	{
+		digTicks = ticks <= 0 ? 0 : ticks;
+	}
+	
+	public static synchronized void addDigTicks(int ticks)
+	{
+		digTicks = Math.max(0, digTicks + ticks);
+	}
+	
+	public static synchronized int getUseItemTicks()
+	{
+		return useItemTicks;
+	}
+	
+	public static synchronized void setUseItemTicks(int ticks)
+	{
+		useItemTicks = ticks <= 0 ? 0 : ticks;
+	}
+	
+	public static synchronized void addUseItemTicks(int ticks)
+	{
+		useItemTicks = Math.max(0, useItemTicks + ticks);
+	}
 	
 	@SubscribeEvent
 	public static void onInputUpdate(InputUpdateEvent event)
 	{
-		boolean guiClosed = Minecraft.getMinecraft().currentScreen == null;
+		boolean allowInput = Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput;
 		
 		MovementInput input = event.getMovementInput();
 		
@@ -29,7 +96,7 @@ public class ClientEventHandler
 		{
 			if(forwardTicks > 0)
 			{
-				if(guiClosed && !input.forwardKeyDown)
+				if(allowInput && !input.forwardKeyDown)
 				{
 					input.moveForward++;
 					input.forwardKeyDown = true;
@@ -39,7 +106,7 @@ public class ClientEventHandler
 			
 			if(backwardTicks > 0)
 			{
-				if(guiClosed && !input.backKeyDown)
+				if(allowInput && !input.backKeyDown)
 				{
 					input.moveForward--;
 					input.backKeyDown = true;
@@ -49,7 +116,7 @@ public class ClientEventHandler
 			
 			if(leftTicks > 0)
 			{
-				if(guiClosed && !input.leftKeyDown)
+				if(allowInput && !input.leftKeyDown)
 				{
 					input.moveStrafe++;
 					input.leftKeyDown = true;
@@ -59,7 +126,7 @@ public class ClientEventHandler
 			
 			if(rightTicks > 0)
 			{
-				if(guiClosed && !input.rightKeyDown)
+				if(allowInput && !input.rightKeyDown)
 				{
 					input.moveStrafe--;
 					input.rightKeyDown = true;
@@ -69,7 +136,7 @@ public class ClientEventHandler
 			
 			if(jumpTicks > 0)
 			{
-				if(guiClosed && !input.jump)
+				if(allowInput && !input.jump)
 				{
 					input.jump = true;
 				}
@@ -78,7 +145,7 @@ public class ClientEventHandler
 			
 			if(sneakTicks > 0)
 			{
-				if(guiClosed && !input.sneak)
+				if(allowInput && !input.sneak)
 				{
 					input.sneak = true;
 					input.moveStrafe = (float) (input.moveStrafe * 0.3D);

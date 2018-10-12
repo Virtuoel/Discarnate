@@ -153,6 +153,28 @@ public class TaskRegistrar
 				p.rotationYaw = MathHelper.clamp(Math.round(p.prevRotationYaw / 90.0F) * 90, -180, 180);
 			}, ItemRegistrar.FACE_CARDINAL_TASK),
 			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addDigTicks(i.getCount());
+			}, ItemRegistrar.DIG_TASK),
+			
+			createClientTask((i, p, t) ->
+			{
+				ClientEventHandler.addUseItemTicks(i.getCount());
+			}, ItemRegistrar.USE_ITEM_TASK),
+			
+			new ClientTask((i, p, t) ->
+			{
+				ClientEventHandler.setForwardTicks(0);
+				ClientEventHandler.setBackwardTicks(0);
+				ClientEventHandler.setLeftTicks(0);
+				ClientEventHandler.setRightTicks(0);
+				ClientEventHandler.setSneakTicks(0);
+				ClientEventHandler.setJumpTicks(0);
+				ClientEventHandler.setDigTicks(0);
+				ClientEventHandler.setUseItemTicks(0);
+			}).setRegistryName(Discarnate.MOD_ID + ":reset_channeler_task"),
+			
 			createTask((i, p, t) ->
 			{
 				if(t instanceof TileEntitySpiritChanneler)

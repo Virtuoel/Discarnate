@@ -1,0 +1,19 @@
+{
+	"type": "forge:ore_shaped",
+	"result":
+	{
+		"item": "discarnate:use_item_task",
+		"count": 8
+	},
+	"pattern":
+	[
+		"BBB",
+		"BLB",
+		"BBB"
+	],
+	"key":
+	{
+		"B": { "item": "discarnate:blank_task" },
+		"L": { "item": "minecraft:lever" }
+	}
+}

@@ -38,6 +38,8 @@ public class ItemRegistrar
 	public static final Item FACE_CARDINAL_TASK = Items.AIR;
 	public static final Item SNEAK_TASK = Items.AIR;
 	public static final Item JUMP_TASK = Items.AIR;
+	public static final Item DIG_TASK = Items.AIR;
+	public static final Item USE_ITEM_TASK = Items.AIR;
 	public static final Item END_TASK = Items.AIR;
 	
 	@SubscribeEvent
@@ -122,6 +124,14 @@ public class ItemRegistrar
 				"jump_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"dig_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"use_item_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
 				.setMaxStackSize(1)
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
 				"end_task"),
@@ -159,6 +169,8 @@ public class ItemRegistrar
 				FACE_CARDINAL_TASK,
 				SNEAK_TASK,
 				JUMP_TASK,
+				DIG_TASK,
+				USE_ITEM_TASK,
 				END_TASK,
 			null).filter(i -> i != null && i != Items.AIR)
 			.forEach(setItemModel);

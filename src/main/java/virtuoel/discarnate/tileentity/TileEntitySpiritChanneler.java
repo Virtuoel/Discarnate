@@ -31,7 +31,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
-import virtuoel.discarnate.init.ItemRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 
 public class TileEntitySpiritChanneler extends TileEntity
@@ -79,8 +78,8 @@ public class TileEntitySpiritChanneler extends TileEntity
 		super.invalidate();
 	}
 	
-	@ObjectHolder(Discarnate.MOD_ID + ":cancel_movement_task")
-	private static final Task CANCEL_MOVEMENT_TASK = null;
+	@ObjectHolder(Discarnate.MOD_ID + ":reset_channeler_task")
+	private static final Task RESET_CHANNELER_TASK = null;
 	
 	@Nullable
 	EntityVex marker = null;
@@ -122,9 +121,9 @@ public class TileEntitySpiritChanneler extends TileEntity
 						}
 					}
 					
-					if(CANCEL_MOVEMENT_TASK != null)
+					if(RESET_CHANNELER_TASK != null)
 					{
-						CANCEL_MOVEMENT_TASK.accept(new ItemStack(ItemRegistrar.CANCEL_MOVEMENT_TASK), player, this);
+						RESET_CHANNELER_TASK.accept(ItemStack.EMPTY, player, this);
 					}
 					
 					if(w != null)
