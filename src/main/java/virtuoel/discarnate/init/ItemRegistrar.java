@@ -1,12 +1,16 @@
 package virtuoel.discarnate.init;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
@@ -14,6 +18,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import virtuoel.discarnate.Discarnate;
 
 @EventBusSubscriber(modid = Discarnate.MOD_ID)
@@ -125,6 +130,14 @@ public class ItemRegistrar
 				"jump_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
+				{
+					@Override
+					@SideOnly(Side.CLIENT)
+					public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
+					{
+						tooltip.add("WIP");
+					}
+				}
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
 				"swing_item_task"),
 			setRegistryNameAndTranslationKey(
