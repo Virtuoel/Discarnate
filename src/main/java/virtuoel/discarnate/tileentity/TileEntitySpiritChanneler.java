@@ -242,6 +242,16 @@ public class TileEntitySpiritChanneler extends TileEntity
 			{
 				if(marker != null)
 				{
+					if(marker.isBeingRidden())
+					{
+						marker.removePassengers();
+					}
+					
+					if(marker.isRiding())
+					{
+						marker.dismountRidingEntity();
+					}
+					
 					marker.setLimitedLife(2);
 					marker.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 1, 5, false, false));
 					marker.setCharging(marker.getMoveHelper().action == Action.MOVE_TO);
