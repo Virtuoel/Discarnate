@@ -30,7 +30,7 @@ public class ClientEventHandler
 				int keyCode = key.getKeyCode();
 				try
 				{
-					KeyBinding.setKeyBindState(keyCode, true);
+					KeyBinding.setKeyBindState(keyCode, Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput);
 					Thread.sleep(millis);
 				}
 				catch(InterruptedException e)

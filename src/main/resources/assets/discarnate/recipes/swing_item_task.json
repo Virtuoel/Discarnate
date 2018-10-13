@@ -2,18 +2,18 @@
 	"type": "forge:ore_shaped",
 	"result":
 	{
-		"item": "discarnate:dig_task",
+		"item": "discarnate:swing_item_task",
 		"count": 8
 	},
 	"pattern":
 	[
 		"BBB",
-		"BSB",
+		"BAB",
 		"BBB"
 	],
 	"key":
 	{
 		"B": { "item": "discarnate:blank_task" },
-		"S": { "type": "forge:ore_dict", "ore": "stone" }
+		"A": { "item": "minecraft:arrow" }
 	}
 }

@@ -40,6 +40,7 @@ public class ItemRegistrar
 	public static final Item JUMP_TASK = Items.AIR;
 	public static final Item SWING_ITEM_TASK = Items.AIR;
 	public static final Item USE_ITEM_TASK = Items.AIR;
+	public static final Item SWITCH_SLOT_TASK = Items.AIR;
 	public static final Item END_TASK = Items.AIR;
 	
 	@SubscribeEvent
@@ -132,6 +133,11 @@ public class ItemRegistrar
 				"use_item_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
+				.setMaxStackSize(9)
+				.setCreativeTab(Discarnate.CREATIVE_TAB),
+				"switch_slot_task"),
+			setRegistryNameAndTranslationKey(
+				new Item()
 				.setMaxStackSize(1)
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
 				"end_task"),
@@ -171,6 +177,7 @@ public class ItemRegistrar
 				JUMP_TASK,
 				SWING_ITEM_TASK,
 				USE_ITEM_TASK,
+				SWITCH_SLOT_TASK,
 				END_TASK,
 			null).filter(i -> i != null && i != Items.AIR)
 			.forEach(setItemModel);

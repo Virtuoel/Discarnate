@@ -164,6 +164,11 @@ public class TaskRegistrar
 				ClientEventHandler.tryHoldKey(Minecraft.getMinecraft().gameSettings.keyBindUseItem, i.getCount() * 50);
 			}, ItemRegistrar.USE_ITEM_TASK),
 			
+			createClientTask((i, p, t) ->
+			{
+				p.inventory.currentItem = (i.getCount() - 1) % 9;
+			}, ItemRegistrar.SWITCH_SLOT_TASK),
+			
 			new ClientTask((i, p, t) ->
 			{
 				ClientEventHandler.setForwardTicks(0);

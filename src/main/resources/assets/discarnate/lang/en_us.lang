@@ -20,8 +20,9 @@ item.discarnate.face_horizon_task.name=Task: Face Horizon
 item.discarnate.face_cardinal_task.name=Task: Face Cardinal Direction
 item.discarnate.sneak_task.name=Task: Sneak
 item.discarnate.jump_task.name=Task: Jump
-item.discarnate.dig_task.name=Task: Dig
+item.discarnate.swing_item_task.name=Task: Swing Held Item
 item.discarnate.use_item_task.name=Task: Use Held Item
+item.discarnate.switch_slot_task.name=Task: Switch Hotbar Slot
 item.discarnate.end_task.name=Task: Terminate
 
 # GUI
