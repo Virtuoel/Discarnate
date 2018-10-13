@@ -11,6 +11,8 @@ import virtuoel.discarnate.Discarnate;
 public class DiscarnateConfig
 {
 	public static boolean ignoreMissingTasks = true;
+	public static boolean requirePumpkinToStart = true;
+	public static boolean requirePumpkinToContinue = false;
 	
 	@EventBusSubscriber(modid = Discarnate.MOD_ID)
 	private static class EventHandler

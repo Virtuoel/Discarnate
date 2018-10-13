@@ -1,6 +1,7 @@
 package virtuoel.discarnate.tileentity;
 
 import java.util.Optional;
+import java.util.Random;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -10,8 +11,11 @@ import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityMoveHelper.Action;
 import net.minecraft.entity.monster.EntityVex;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
@@ -32,6 +36,7 @@ import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
 import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.reference.DiscarnateConfig;
 
 public class TileEntitySpiritChanneler extends TileEntity
 {
@@ -78,8 +83,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 		super.invalidate();
 	}
 	
-	@ObjectHolder(Discarnate.MOD_ID + ":reset_channeler_task")
-	private static final Task RESET_CHANNELER_TASK = null;
+	private static final Random RAND = new Random();
 	
 	@Nullable
 	EntityVex marker = null;
@@ -93,21 +97,19 @@ public class TileEntitySpiritChanneler extends TileEntity
 		{
 			if(taskThread == null)
 			{
-				if(player != null)
-				{
-					if(!player.capabilities.isCreativeMode && player.experienceLevel == 0)
-					{
-						return false;
-					}
-					player.addExperienceLevel(-1);
-				}
-				
 				World w = getWorld();
+				if(player == null || !canPlayerStart(player))
+				{
+					w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+					return false;
+				}
+				onPlayerStart(player);
+				
 				taskThread = new Thread(() ->
 				{
 					for(int i = 0; i < itemHandler.getSlots(); i++)
 					{
-						if(player != null && !player.isDead && isActive())
+						if(player != null && canPlayerContinue(player) && isActive())
 						{
 							ItemStack stack = itemHandler.getStackInSlot(i);
 							if(!stack.isEmpty())
@@ -121,10 +123,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 						}
 					}
 					
-					if(RESET_CHANNELER_TASK != null)
-					{
-						RESET_CHANNELER_TASK.accept(ItemStack.EMPTY, player, this);
-					}
+					onPlayerStop(player);
 					
 					if(w != null)
 					{
@@ -152,7 +151,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 						{
 							w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, true));
 						}
-						w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, 1.0F);
+						w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
 				}
 				
@@ -194,6 +193,38 @@ public class TileEntitySpiritChanneler extends TileEntity
 			}
 			return false;
 		}
+	}
+	
+	protected boolean canPlayerStart(@Nonnull EntityPlayer player)
+	{
+		return canPlayerContinue(player) && !player.isDead && (player.capabilities.isCreativeMode || (player.experienceLevel > 0 && (!DiscarnateConfig.requirePumpkinToStart || isWearingPumpkin(player))));
+	}
+	
+	protected boolean canPlayerContinue(@Nonnull EntityPlayer player)
+	{
+		return !player.isDead && (player.capabilities.isCreativeMode || !DiscarnateConfig.requirePumpkinToContinue || isWearingPumpkin(player));
+	}
+	
+	protected void onPlayerStart(@Nonnull EntityPlayer player)
+	{
+		player.addExperienceLevel(-1);
+	}
+	
+	@ObjectHolder(Discarnate.MOD_ID + ":reset_channeler_task")
+	private static final Task RESET_CHANNELER_TASK = null;
+	
+	protected void onPlayerStop(@Nonnull EntityPlayer player)
+	{
+		if(RESET_CHANNELER_TASK != null)
+		{
+			RESET_CHANNELER_TASK.accept(ItemStack.EMPTY, player, this);
+		}
+		
+	}
+	
+	protected static boolean isWearingPumpkin(@Nonnull EntityPlayer player)
+	{
+		return player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == Item.getItemFromBlock(Blocks.PUMPKIN);
 	}
 	
 	protected void setupMarkerVex(EntityVex marker, @Nonnull World w, BlockPos pos, EntityPlayer player)
