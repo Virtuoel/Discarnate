@@ -17,7 +17,9 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -224,10 +226,13 @@ public class TaskRegistrar
 			}
 		};
 		
+		ModContainer lastContainer = Loader.instance().activeModContainer();
+		Loader.instance().setActiveModContainer(Loader.instance().getMinecraftModContainer());
 		for(EnumDyeColor color : EnumDyeColor.values())
 		{
 			event.getRegistry().register(createTask(shulkerTask, BlockShulkerBox.getBlockByColor(color)));
 		}
+		Loader.instance().setActiveModContainer(lastContainer);
 	}
 	
 	@SubscribeEvent
