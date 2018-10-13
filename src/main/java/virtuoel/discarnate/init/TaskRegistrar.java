@@ -3,6 +3,7 @@ package virtuoel.discarnate.init;
 import java.util.Optional;
 
 import net.minecraft.block.BlockShulkerBox;
+import net.minecraft.client.Minecraft;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
@@ -155,12 +156,12 @@ public class TaskRegistrar
 			
 			createClientTask((i, p, t) ->
 			{
-				ClientEventHandler.addDigTicks(i.getCount());
-			}, ItemRegistrar.DIG_TASK),
+				ClientEventHandler.tryHoldKey(Minecraft.getMinecraft().gameSettings.keyBindAttack, i.getCount() * 50);
+			}, ItemRegistrar.SWING_ITEM_TASK),
 			
 			createClientTask((i, p, t) ->
 			{
-				ClientEventHandler.addUseItemTicks(i.getCount());
+				ClientEventHandler.tryHoldKey(Minecraft.getMinecraft().gameSettings.keyBindUseItem, i.getCount() * 50);
 			}, ItemRegistrar.USE_ITEM_TASK),
 			
 			new ClientTask((i, p, t) ->
@@ -171,8 +172,8 @@ public class TaskRegistrar
 				ClientEventHandler.setRightTicks(0);
 				ClientEventHandler.setSneakTicks(0);
 				ClientEventHandler.setJumpTicks(0);
-				ClientEventHandler.setDigTicks(0);
-				ClientEventHandler.setUseItemTicks(0);
+				ClientEventHandler.tryReleaseKey(Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode());
+				ClientEventHandler.tryReleaseKey(Minecraft.getMinecraft().gameSettings.keyBindUseItem.getKeyCode());
 			}).setRegistryName(Discarnate.MOD_ID + ":reset_channeler_task"),
 			
 			createTask((i, p, t) ->

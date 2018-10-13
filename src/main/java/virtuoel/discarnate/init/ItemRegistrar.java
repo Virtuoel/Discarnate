@@ -38,7 +38,7 @@ public class ItemRegistrar
 	public static final Item FACE_CARDINAL_TASK = Items.AIR;
 	public static final Item SNEAK_TASK = Items.AIR;
 	public static final Item JUMP_TASK = Items.AIR;
-	public static final Item DIG_TASK = Items.AIR;
+	public static final Item SWING_ITEM_TASK = Items.AIR;
 	public static final Item USE_ITEM_TASK = Items.AIR;
 	public static final Item END_TASK = Items.AIR;
 	
@@ -125,7 +125,7 @@ public class ItemRegistrar
 			setRegistryNameAndTranslationKey(
 				new Item()
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
-				"dig_task"),
+				"swing_item_task"),
 			setRegistryNameAndTranslationKey(
 				new Item()
 				.setCreativeTab(Discarnate.CREATIVE_TAB),
@@ -169,7 +169,7 @@ public class ItemRegistrar
 				FACE_CARDINAL_TASK,
 				SNEAK_TASK,
 				JUMP_TASK,
-				DIG_TASK,
+				SWING_ITEM_TASK,
 				USE_ITEM_TASK,
 				END_TASK,
 			null).filter(i -> i != null && i != Items.AIR)

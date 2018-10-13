@@ -1,13 +1,13 @@
 package virtuoel.discarnate.client.handler;
 
+import org.lwjgl.input.Keyboard;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovementInput;
 import net.minecraftforge.client.event.InputUpdateEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
 import virtuoel.discarnate.Discarnate;
 
@@ -20,80 +20,54 @@ public class ClientEventHandler
 	private static int rightTicks = 0;
 	private static int jumpTicks = 0;
 	private static int sneakTicks = 0;
-	private static int digTicks = 0;
-	private static int useItemTicks = 0;
 	
-	@SubscribeEvent
-	public static void onClientTick(ClientTickEvent event)
+	public static void tryHoldKey(KeyBinding key, int millis)
 	{
-		if(event.phase == Phase.END)
-			return;
-		
-		boolean allowInput = Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput;
-		
-		synchronized(ClientEventHandler.class)
+		new Thread(() ->
 		{
-			if(digTicks > 0)
+			synchronized(key)
 			{
-				if(allowInput)
+				int keyCode = key.getKeyCode();
+				try
 				{
-					int key = Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode();
-					KeyBinding.onTick(key);
+					KeyBinding.setKeyBindState(keyCode, true);
+					Thread.sleep(millis);
 				}
-				digTicks--;
+				catch(InterruptedException e)
+				{}
+				finally
+				{
+					tryReleaseKey(keyCode);
+				}
 			}
-			
-			if(useItemTicks > 0)
+		}).start();
+	}
+	
+	public static void tryReleaseKey(KeyBinding key)
+	{
+		new Thread(() ->
+		{
+			synchronized(key)
 			{
-				if(allowInput)
-				{
-					int key = Minecraft.getMinecraft().gameSettings.keyBindUseItem.getKeyCode();
-					KeyBinding.onTick(key);
-				}
-				useItemTicks--;
+				tryReleaseKey(key.getKeyCode());
 			}
-		}
+		}).start();
 	}
 	
-	public static synchronized int getDigTicks()
+	public static void tryReleaseKey(int keyCode)
 	{
-		return digTicks;
-	}
-	
-	public static synchronized void setDigTicks(int ticks)
-	{
-		digTicks = ticks <= 0 ? 0 : ticks;
-	}
-	
-	public static synchronized void addDigTicks(int ticks)
-	{
-		digTicks = Math.max(0, digTicks + ticks);
-	}
-	
-	public static synchronized int getUseItemTicks()
-	{
-		return useItemTicks;
-	}
-	
-	public static synchronized void setUseItemTicks(int ticks)
-	{
-		useItemTicks = ticks <= 0 ? 0 : ticks;
-	}
-	
-	public static synchronized void addUseItemTicks(int ticks)
-	{
-		useItemTicks = Math.max(0, useItemTicks + ticks);
+		KeyBinding.setKeyBindState(keyCode, keyCode >= 0 && keyCode < 256 && Keyboard.isKeyDown(keyCode));
 	}
 	
 	@SubscribeEvent
 	public static void onInputUpdate(InputUpdateEvent event)
 	{
-		boolean allowInput = Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput;
-		
 		MovementInput input = event.getMovementInput();
 		
 		synchronized(ClientEventHandler.class)
 		{
+			boolean allowInput = Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput;
+			
 			if(forwardTicks > 0)
 			{
 				if(allowInput && !input.forwardKeyDown)
