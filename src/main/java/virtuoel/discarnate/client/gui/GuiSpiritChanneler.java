@@ -43,7 +43,7 @@ public class GuiSpiritChanneler extends GuiContainer
 		super.initGui();
 		this.active = tileEntity.isActive();
 		this.confirmButton = new GuiButton(1, this.guiLeft + 124, this.guiTop + 52, 40, 20, I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start"));
-		this.confirmButton.enabled = this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
+		this.confirmButton.enabled = this.active || this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
 		this.buttonList.add(this.confirmButton);
 	}
 	
@@ -55,7 +55,7 @@ public class GuiSpiritChanneler extends GuiContainer
 		this.active = tileEntity.isActive();
 		
 		this.confirmButton.displayString = I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start");
-		this.confirmButton.enabled = this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
+		this.confirmButton.enabled = this.active || this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
 	}
 	
 	@Override
