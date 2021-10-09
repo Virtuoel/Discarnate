@@ -197,7 +197,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 	
 	protected boolean canPlayerStart(@Nonnull EntityPlayer player)
 	{
-		return canPlayerContinue(player) && !player.isDead && (player.capabilities.isCreativeMode || (player.experienceLevel > 0 && (!DiscarnateConfig.requirePumpkinToStart || isWearingPumpkin(player))));
+		return canPlayerContinue(player) && !player.isDead && (player.capabilities.isCreativeMode || (player.experienceLevel >= DiscarnateConfig.minExpLevel && player.experienceLevel >= DiscarnateConfig.expLevelCost && (!DiscarnateConfig.requirePumpkinToStart || isWearingPumpkin(player))));
 	}
 	
 	protected boolean canPlayerContinue(@Nonnull EntityPlayer player)
@@ -207,7 +207,7 @@ public class TileEntitySpiritChanneler extends TileEntity
 	
 	protected void onPlayerStart(@Nonnull EntityPlayer player)
 	{
-		player.addExperienceLevel(-1);
+		player.addExperienceLevel(-DiscarnateConfig.expLevelCost);
 	}
 	
 	@ObjectHolder(Discarnate.MOD_ID + ":reset_channeler_task")

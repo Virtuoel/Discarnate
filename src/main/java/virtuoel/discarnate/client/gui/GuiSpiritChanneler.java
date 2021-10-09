@@ -15,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.inventory.ContainerSpiritChanneler;
 import virtuoel.discarnate.network.CPacketActivateChanneler;
+import virtuoel.discarnate.reference.DiscarnateConfig;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 @SideOnly(Side.CLIENT)
@@ -43,7 +44,7 @@ public class GuiSpiritChanneler extends GuiContainer
 		super.initGui();
 		this.active = tileEntity.isActive();
 		this.confirmButton = new GuiButton(1, this.guiLeft + 124, this.guiTop + 52, 40, 20, I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start"));
-		this.confirmButton.enabled = this.active || this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
+		this.confirmButton.enabled = this.active || (this.mc.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.mc.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.mc.player.capabilities.isCreativeMode;
 		this.buttonList.add(this.confirmButton);
 	}
 	
@@ -55,7 +56,7 @@ public class GuiSpiritChanneler extends GuiContainer
 		this.active = tileEntity.isActive();
 		
 		this.confirmButton.displayString = I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start");
-		this.confirmButton.enabled = this.active || this.mc.player.experienceLevel > 0 || this.mc.player.capabilities.isCreativeMode;
+		this.confirmButton.enabled = this.active || (this.mc.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.mc.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.mc.player.capabilities.isCreativeMode;
 	}
 	
 	@Override

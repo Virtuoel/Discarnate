@@ -13,6 +13,10 @@ public class DiscarnateConfig
 	public static boolean ignoreMissingTasks = true;
 	public static boolean requirePumpkinToStart = true;
 	public static boolean requirePumpkinToContinue = false;
+	@Config.RangeInt(min = 0)
+	public static int minExpLevel = 1;
+	@Config.RangeInt(min = 0)
+	public static int expLevelCost = 1;
 	
 	@EventBusSubscriber(modid = Discarnate.MOD_ID)
 	private static class EventHandler
