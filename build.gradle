@@ -1,373 +1,417 @@
-buildscript {
-	repositories {
-		jcenter()
-		maven {
-			name = "forge"
-			url = "https://files.minecraftforge.net/maven"
-		}
-		maven {
-			name = "gradle"
-			url "https://plugins.gradle.org/m2/"
-		}
-		maven {
-			name = "sonatype"
-			url = "https://oss.sonatype.org/content/groups/public"
-		}
-	}
-	dependencies {
-		classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
-	}
-}
 plugins {
-	id "com.matthewprenger.cursegradle" version "1.0.10"
+	id "fabric-loom" version "0.10.+"
+	id "eclipse"
+	id "maven-publish"
+	id "com.github.breadmoirai.github-release" version "2.2.12"
+	id "com.matthewprenger.cursegradle" version "1.4.0"
+	id "com.modrinth.minotaur" version "1.2.1"
 }
-apply plugin: "net.minecraftforge.gradle.forge"
-apply plugin: "com.matthewprenger.cursegradle"
-apply plugin: "maven"
 
 repositories {
+	mavenLocal()
+	maven {
+		name = "Fabric"
+		url = "https://maven.fabricmc.net/"
+	}
+	maven {
+		name = "TerraformersMC"
+		url = "https://maven.terraformersmc.com/"
+	}
 	maven {
 		name = "CurseForge"
-		url = "https://minecraft.curseforge.com/api/maven/"
+		url = "https://minecraft.curseforge.com/api/maven"
 	}
 	maven {
 		name = "JitPack"
 		url = "https://jitpack.io"
+		content {
+			includeGroup "com.github.Virtuoel"
+		}
 	}
 	maven {
-		url = "http://dvs1.progwml6.com/files/maven"
+		name = "GitHub"
+		url = "https://maven.pkg.github.com"
 	}
 }
 
-version = "${project.mc_version}-${project.version_major}.${project.version_minor}.${project.version_patch}.${project.version_revision}"
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
-compileJava {
-	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
-	options.encoding = "UTF-8"
-}
+def ENV = System.getenv()
 
-minecraft {
-	version = "${project.mc_version}-${project.forge_version}"
-	runDir = "run"
-	mappings = project.mcp_mappings
-	makeObfSourceJar = true
-	
-	replace "@VERSION@", project.version
-	
-	if(project.hasProperty("signSHA1"))
-	{
-		replace "@FINGERPRINT@", project.findProperty("signSHA1")
-	}
-	else
-	{
-		replace "@FINGERPRINT@", ""
-	}
-	
-	if(project.hasProperty("core_plugin"))
-	{
-		clientJvmArgs += "-Dfml.coreMods.load=" + project.core_plugin
-		serverJvmArgs += "-Dfml.coreMods.load=" + project.core_plugin
-	}
-	
-	serverJvmArgs += "-Dfml.doNotBackup=true"
-	serverJvmArgs += "-Dfml.queryResult=confirm"
-	
-	clientJvmArgs += "-Dlog4j.skipJansi=true"
-	serverJvmArgs += "-Dlog4j.skipJansi=true"
-}
+group = project.maven_group
+archivesBaseName = project.archives_base_name
+version = project.mod_version + "+" + (ENV.BUILD_NUMBER ? "build.${ENV.BUILD_NUMBER}-" : "") + (project.hasProperty("metadata_minecraft_versions") ? project.metadata_minecraft_versions : project.minecraft_version)
 
-dependencies
-{
-	if (using_jei.toBoolean()) {
-		if (using_jei_as_api.toBoolean()) {
-			deobfCompile "mezz.jei:jei_${jei_mc_version}:${jei_version}:api"
-			runtime "mezz.jei:jei_${jei_mc_version}:${jei_version}"
-		}
-		else {
-			deobfCompile "mezz.jei:jei_${jei_mc_version}:${jei_version}"
+if(project.hasProperty("forge_version")) {
+	version += "-forge"
+	
+	loom {
+		forge {
+			mixinConfig "${archives_base_name.replaceAll( /([A-Z])/, /_$1/ ).toLowerCase().replaceAll( /^_/, '' )}.mixins.json"
 		}
 	}
 }
 
-extractAnnotationsJar.enabled = false
-
-eclipse.project {
-	buildCommand 'org.eclipse.buildship.core.gradleprojectbuilder'
-	natures 'org.eclipse.buildship.core.gradleprojectnature'
-}
-
-if(JavaVersion.current().isJava8Compatible())
-{
-	allprojects
-	{
-		tasks.withType(Javadoc)
-		{
-			options.addStringOption("Xdoclint:none", "-quiet")
-		}
+loom {
+	mixin {
+		defaultRefmapName = "${archives_base_name}-refmap.json"
 	}
 }
 
-if(project.hasProperty("core_plugin"))
-{
-	if(!project.hasProperty("core_jar_in_jar"))
-	{
-		project.ext."core_jar_in_jar" = false
-	}
-	else if(project.core_jar_in_jar != true)
-	{
-		project.core_jar_in_jar = false
-	}
-}
-else
-{
-	project.ext."core_jar_in_jar" = false
+if(project.hasProperty("loader_version")) {
+	ext.fabric_loader_version = project.loader_version
 }
 
-task apiJar(type: Jar) {
-	from sourceSets.main.output
-	from sourceSets.main.allJava
-	include "${project.group}/${project.mod_id}/api/**"
-	manifest.mainAttributes(
-		"Built-On-Java": "${System.getProperty("java.vm.version")} + (${System.getProperty("java.vm.vendor")})",
-		"Implementation-Title": project.name + "-api",
-		"Implementation-Version": project.version,
-		"Maven-Artifact": "${project.group}:${project.archivesBaseName}:${project.version}:api",
-		"Built-On": "${project.mc_version}-${project.forge_version}"
-	)
-	classifier = "api"
+if(project.hasProperty("fabric_version")) {
+	ext.fabric_api_version = project.fabric_version
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	from javadoc.destinationDir
-	manifest.mainAttributes(
-		"Built-On-Java": "${System.getProperty("java.vm.version")} + (${System.getProperty("java.vm.vendor")})",
-		"Implementation-Title": project.name + "-javadoc",
-		"Implementation-Version": project.version,
-		"Maven-Artifact": "${project.group}:${project.archivesBaseName}:${project.version}:javadoc",
-		"Built-On": "${project.mc_version}-${project.forge_version}"
-	)
-	classifier = "javadoc"
-}
-
-task deobfJar(type: Jar) {
-	from sourceSets.main.output
-	manifest
-	{
-		attributes "Built-On-Java": "${System.getProperty("java.vm.version")} + (${System.getProperty("java.vm.vendor")})"
-		attributes "Implementation-Title": project.name + "-deobf"
-		attributes "Implementation-Version": project.version
-		attributes "Maven-Artifact": "${project.group}:${project.archivesBaseName}:${project.version}:deobf"
-		attributes "Built-On": "${project.mc_version}-${project.forge_version}"
-		attributes "FMLAT": "${project.mod_id}_at.cfg"
-		if(project.hasProperty("core_plugin"))
-		{
-			attributes "FMLCorePlugin": project.core_plugin
-		}
-	}
-	classifier = "deobf"
-}
-
-task signDeobfJar(type: SignJar) {
-	onlyIf
-	{
-		project.hasProperty("keyStore")
-	}
+dependencies {
+	minecraft "com.mojang:minecraft:${minecraft_version}"
+	mappings "net.fabricmc:yarn:${yarn_mappings}:v2"
 	
-	if(project.hasProperty("keyStore"))
-	{
-		keyStore = project.findProperty("keyStore")
-		alias = project.findProperty("keyStoreAlias")
-		storePass = project.findProperty("keyStorePass")
-		keyPass = project.findProperty("keyStoreKeyPass")
+	if(project.hasProperty("forge_version")) {
+		forge "net.minecraftforge:forge:${forge_version}"
+	}
+	else if(project.hasProperty("fabric_loader_version")) {
+		modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
 		
-		inputFile = deobfJar.archivePath
-		outputFile = deobfJar.archivePath
-	}
-}
-
-task coreJar(type: Jar) {
-	onlyIf
-	{
-		project.hasProperty("core_plugin")
-	}
-	
-	if(project.hasProperty("core_plugin"))
-	{
-		from(sourceSets.main.output)
-		{
-			include "${project.group}/${project.mod_id}/asm/**"
-		}
-		manifest
-		{
-			attributes "Built-On-Java": "${System.getProperty("java.vm.version")} + (${System.getProperty("java.vm.vendor")})"
-			attributes "Implementation-Title": project.name + "-corePlugin"
-			attributes "Implementation-Version": project.version
-			attributes "Maven-Artifact": "${project.group}:${project.archivesBaseName}:${project.version}:corePlugin"
-			attributes "Built-On": "${project.mc_version}-${project.forge_version}"
-			attributes "FMLAT": "${project.mod_id}_at.cfg"
-			attributes "FMLCorePlugin": project.core_plugin
-		}
-		classifier = "corePlugin"
-		group = "build"
-	}
-}
-
-reobf
-{
-	coreJar
-	{
-		mappingType = "SEARGE"
-	}
-}
-
-task signCoreJar(type: SignJar) {
-	onlyIf
-	{
-		project.hasProperty("core_plugin")
-	}
-	
-	if(project.hasProperty("core_plugin"))
-	{
-		onlyIf
-		{
-			project.hasProperty("keyStore")
+		def excludeLoader = { exclude group: "net.fabricmc", module: "fabric-loader" }
+		def excludeApi = { exclude group: "net.fabricmc.fabric-api" }
+		def excludeFabric = {
+			exclude group: "net.fabricmc", module: "fabric-loader"
+			exclude group: "net.fabricmc.fabric-api"
 		}
 		
-		if(project.hasProperty("keyStore"))
-		{
-			keyStore = project.findProperty("keyStore")
-			alias = project.findProperty("keyStoreAlias")
-			storePass = project.findProperty("keyStorePass")
-			keyPass = project.findProperty("keyStoreKeyPass")
+		if(project.hasProperty("fabric_api_version")) {
+			if(!project.hasProperty("fabric_modules") && !project.hasProperty("api_fabric_modules") && !project.hasProperty("impl_fabric_modules")) {
+				modCompileOnly "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}", excludeLoader
+				modRuntime "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}", excludeLoader
+			}
 			
-			inputFile = coreJar.archivePath
-			outputFile = coreJar.archivePath
-		}
-		
-		dependsOn reobfCoreJar
-	}
-}
-
-jar {
-	if(project.core_jar_in_jar)
-	{
-		dependsOn signCoreJar
-		from(coreJar.archivePath.absolutePath)
-		{
-			include "*"
-		}
-		exclude "${project.group}/${project.mod_id}/asm/**"
-	}
-	
-	manifest
-	{
-		attributes "Built-On-Java": "${System.getProperty("java.vm.version")} + (${System.getProperty("java.vm.vendor")})"
-		attributes "Implementation-Title": project.name
-		attributes "Implementation-Version": project.version
-		attributes "Maven-Artifact": "${project.group}:${project.archivesBaseName}:${project.version}"
-		attributes "Built-On": "${project.mc_version}-${project.forge_version}"
-		attributes "FMLAT": "${project.mod_id}_at.cfg"
-		if(project.hasProperty("core_plugin"))
-		{
-			if(project.core_jar_in_jar)
-			{
-				attributes "ContainedDeps": coreJar.archivePath.name
+			if(project.hasProperty("fabric_modules")) {
+				project.fabric_modules.split(", ").each { String module ->
+					modCompileOnly fabricApi.module(module, project.fabric_api_version), excludeLoader
+					modRuntime fabricApi.module(module, project.fabric_api_version), excludeLoader
+				}
 			}
-			else
-			{
-				attributes "FMLCorePlugin": project.core_plugin
+			
+			if(project.hasProperty("api_fabric_modules")) {
+				project.api_fabric_modules.split(", ").each { String module ->
+					modApi fabricApi.module(module, project.fabric_api_version), excludeLoader
+				}
+			}
+			
+			if(project.hasProperty("impl_fabric_modules")) {
+				project.impl_fabric_modules.split(", ").each { String module ->
+					modImplementation fabricApi.module(module, project.fabric_api_version), excludeLoader
+				}
+			}
+			
+			if(project.hasProperty("included_fabric_modules")) {
+				project.included_fabric_modules.split(", ").each { String module ->
+					include fabricApi.module(module, project.fabric_api_version)
+				}
 			}
 		}
-	}
-	classifier ""
-}
-
-task signJar(type: SignJar, dependsOn: reobfJar) {
-	onlyIf
-	{
-		project.hasProperty("keyStore")
-	}
-	
-	if(project.hasProperty("keyStore"))
-	{
-		keyStore = project.findProperty("keyStore")
-		alias = project.findProperty("keyStoreAlias")
-		storePass = project.findProperty("keyStorePass")
-		keyPass = project.findProperty("keyStoreKeyPass")
 		
-		inputFile = jar.archivePath
-		outputFile = jar.archivePath
-	}
-}
-
-artifacts {
-	archives apiJar
-	archives deobfJar
-	archives javadocJar
-}
-
-sourceSets {
-	main {
-		java {
-			srcDir "src/main/java"
+		if(project.hasProperty("modmenu_version")) {
+			modCompileOnly "com.terraformersmc:modmenu:${modmenu_version}", excludeFabric
+			modRuntime "com.terraformersmc:modmenu:${modmenu_version}", excludeFabric
 		}
-		resources {
-			srcDir "src/main/resources"
+		
+		if(project.hasProperty("kanos_config_tag")) {
+			include modApi("com.github.Virtuoel:KanosConfig:${kanos_config_tag}", excludeFabric)
 		}
 	}
 }
 
 processResources {
 	inputs.property "version", project.version
-	inputs.property "mcversion", project.minecraft.version
 	
-	from(sourceSets.main.resources.srcDirs) {
-		include "mcmod.info"
-		
-		expand "version": project.version, "mcversion": project.minecraft.version
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
 	}
 	
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "mcmod.info"
+	filesMatching("META-INF/mods.toml") {
+		expand "version": project.version
 	}
 }
 
-tasks.build.dependsOn signJar, apiJar, signDeobfJar, javadocJar
-
-def curseRelations = {
-	optionalLibrary "jei"
+def proj = project
+eclipse {
+	project {
+		name = archives_base_name
+		buildCommand "org.eclipse.buildship.core.gradleprojectbuilder"
+		natures "org.eclipse.buildship.core.gradleprojectnature"
+	}
+	if(!proj.hasProperty("forge_version") || ((minecraft_version.split(/\./, -1)[1] as Integer) >= 17)) {
+		jdt {
+			javaRuntimeName = "JavaSE-16"
+		}
+	}
 }
 
-curseforge {
-	if(project.hasProperty("curse_key"))
-		apiKey = project.curse_key
-	
-	
-	if(project.hasProperty("curse_id"))
+tasks.withType(JavaCompile) {
+	options.encoding = "UTF-8"
+}
+
+jar {
+	from "LICENSE"
+	manifest
 	{
-		project
-		{
-			id = project.curse_id
-		//	changelogType = "markdown"
-		//	changelog = getChangelogText()
-			releaseType = project.release_type
-			
-			relations curseRelations
-			
-			//no such jars for now
-			//addArtifact javadocJar
-			//addArtifact sourceJar
-			//addArtifact apiJar
-			
-			//addGameVersion "1.12.2" //automatically determined by the CurseGradle plugin
-			
-			mainArtifact(jar)
-			{
-				displayName = "${project.mod_name} v${project.version} MC${mc_version}"
+		attributes "Implementation-Title": project.archivesBaseName
+		attributes "Implementation-Version": project.version
+		attributes "Maven-Artifact": "${project.group}:${project.archivesBaseName}:${project.version}"
+		attributes "Built-On-Minecraft": "${project.minecraft_version}"
+		attributes "Built-On-Java": "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
+	}
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+	classifier = "sources"
+	from sourceSets.main.allSource
+	exclude "fabric.mod.json"
+	exclude "META-INF/mods.toml"
+	manifest
+	{
+		attributes "Implementation-Title": project.archivesBaseName + "-sources"
+		attributes "Implementation-Version": project.version
+		attributes "Maven-Artifact": "${project.group}:${project.archivesBaseName}:${project.version}:sources"
+		attributes "Built-On-Minecraft": "${project.minecraft_version}"
+		attributes "Built-On-Java": "${System.getProperty("java.vm.version")} (${System.getProperty("java.vm.vendor")})"
+	}
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifact(remapJar) {
+				builtBy remapJar
+			}
+			artifact(sourcesJar) {
+				classifier = "sources"
+				builtBy remapSourcesJar
+			}
+		}
+	}
+	
+	repositories {
+		mavenLocal()
+		if(project.hasProperty("github_maven_owner")) {
+			maven {
+				url = "https://maven.pkg.github.com/${github_maven_owner}"
+				
+				credentials {
+					username project.properties.github_username
+					password project.properties.github_packages_token
+				}
 			}
 		}
 	}
 }
 
-tasks.curseforge.dependsOn build
+githubRelease {
+	token project.hasProperty("github_releases_token") ? project.github_releases_token : ""
+	if(project.hasProperty("github_repository_owner")) {
+		owner project.github_repository_owner
+	}
+	if(project.hasProperty("github_repository")) {
+		repo project.github_repository
+	}
+	
+	if(project.hasProperty("forge_version")) {
+		tagName project.mod_version + "-forge"
+	}
+	
+	if(project.hasProperty("loader_version")) {
+		tagName project.mod_version
+	}
+	
+	if(project.hasProperty("github_branch")) {
+		targetCommitish project.github_branch
+	}
+	
+	releaseName project.version
+	
+	releaseAssets = files("${project.buildDir}/libs/${archivesBaseName}-${version}.jar", "${project.buildDir}/libs/${archivesBaseName}-${version}-sources.jar").files
+}
+
+if(project.hasProperty("fabric_api_version")) {
+	ext.changelog_fabric_api_version = project.fabric_api_version
+}
+
+String generateHTMLChangelog() {
+	String changelog_text = ""
+	
+	File file = file("changelog.txt")
+	if(file.exists())
+	{
+		file.eachLine { String line ->
+			if(!line.isAllWhitespace())
+			{
+				changelog_text += "<p>${line.stripIndent()}</p>\n"
+			}
+		}
+		changelog_text += "<p>&nbsp;</p>\n"
+	}
+	
+	changelog_text += "<p>Last successfully tested on:</p>\n"
+	changelog_text += "<p>Minecraft version <code>${minecraft_version}</code></p>\n"
+	
+	if(project.hasProperty("forge_version")) {
+		changelog_text += "<p>Forge <code>${forge_version}</code></p>\n"
+	}
+	
+	if(project.hasProperty("fabric_loader_version")) {
+		changelog_text += "<p>Fabric Loader <code>${fabric_loader_version}</code></p>\n"
+	}
+	
+	changelog_text += "<p>Yarn mappings <code>${yarn_mappings}</code></p>\n"
+	
+	if(project.hasProperty("changelog_fabric_api_version")) {
+		changelog_text += "<p><a href=\"https://www.curseforge.com/minecraft/mc-mods/fabric-api/files/all\" rel=\"nofollow\">Fabric API <code>${changelog_fabric_api_version}</code></a></p>\n"
+	}
+	
+	return changelog_text
+}
+
+curseforge {
+	if(project.hasProperty("curseforge_api_key")) {
+		apiKey = project.properties.curseforge_api_key
+	}
+	
+	if(project.hasProperty("curseforge_id")) {
+		project {
+			id = project.curseforge_id
+			
+			releaseType = project.curseforge_release_type
+			
+			if(project.hasProperty("curseforge_mod_loaders")) {
+				project.curseforge_mod_loaders.split(", ").each { String loader ->
+					addGameVersion loader
+				}
+			}
+			
+			def display_name_prefix = ""
+			if(project.hasProperty("curseforge_release_versions")) {
+				def game_versions = project.curseforge_release_versions.split(", ")
+				display_name_prefix = "[${game_versions[0]} - ${game_versions[-1].split("-")[0]}] "
+				if(game_versions[0] == game_versions[-1].split("-")[0]) {
+					display_name_prefix = "[${game_versions[0]}]"
+				}
+				game_versions.each { String gameVersion ->
+					addGameVersion gameVersion
+				}
+			}
+			
+			if(project.hasProperty("forge_version")) {
+				display_name_prefix += " [Forge] "
+			}
+			
+			mainArtifact(remapJar) {
+				displayName = "${display_name_prefix}${archives_base_name} ${project.mod_version}"
+				
+				if(project.hasProperty("curseforge_required_dep_slugs") || project.hasProperty("curseforge_embedded_lib_slugs") || project.hasProperty("curseforge_optional_dep_slugs") || project.hasProperty("curseforge_compatible_tool_slugs") || project.hasProperty("curseforge_incompatible_slugs")) {
+					relations {
+						if(project.hasProperty("curseforge_required_dep_slugs")) {
+							project.curseforge_required_dep_slugs.split(", ").each { String slug ->
+								requiredDependency slug
+							}
+						}
+						
+						if(project.hasProperty("curseforge_embedded_lib_slugs")) {
+							project.curseforge_embedded_lib_slugs.split(", ").each { String slug ->
+								embeddedLibrary slug
+							}
+						}
+						
+						if(project.hasProperty("curseforge_optional_dep_slugs")) {
+							project.curseforge_optional_dep_slugs.split(", ").each { String slug ->
+								optionalDependency slug
+							}
+						}
+						
+						if(project.hasProperty("curseforge_compatible_tool_slugs")) {
+							project.curseforge_compatible_tool_slugs.split(", ").each { String slug ->
+								tool slug
+							}
+						}
+						
+						if(project.hasProperty("curseforge_incompatible_slugs")) {
+							project.curseforge_incompatible_slugs.split(", ").each { String slug ->
+								incompatible slug
+							}
+						}
+					}
+				}
+				
+				changelogType = "html"
+				changelog = project.generateHTMLChangelog()
+			}
+			
+			addArtifact(sourcesJar) {
+				displayName = "${archives_base_name} ${project.mod_version} Source Code"
+			}
+			
+			afterEvaluate {
+				uploadTask.dependsOn remapSourcesJar
+			}
+		}
+		options {
+			forgeGradleIntegration = false
+		}
+	}
+}
+
+import com.modrinth.minotaur.TaskModrinthUpload
+
+task publishModrinth (type: TaskModrinthUpload) {
+	if(project.hasProperty("modrinth_token")) {
+		token = project.properties.modrinth_token
+	}
+	
+	if(project.hasProperty("modrinth_id")) {
+		projectId = project.modrinth_id
+		
+		versionType = project.modrinth_version_type
+		
+		if(project.hasProperty("modrinth_mod_loaders")) {
+			project.modrinth_mod_loaders.split(", ").each { String loader ->
+				addLoader loader
+			}
+		}
+		
+		if(project.hasProperty("modrinth_release_versions")) {
+			project.modrinth_release_versions.split(", ").each { String gameVersion ->
+				addGameVersion gameVersion
+			}
+		}
+		
+		if(project.hasProperty("modrinth_required_dep_ids")) {
+			project.modrinth_required_dep_ids.split(", ").each { String slug ->
+				addDependency(slug, "required")
+			}
+		}
+		
+		if(project.hasProperty("modrinth_optional_dep_ids")) {
+			project.modrinth_optional_dep_ids.split(", ").each { String slug ->
+				addDependency(slug, "optional")
+			}
+		}
+		
+		if(project.hasProperty("modrinth_incompatible_dep_ids")) {
+			project.modrinth_incompatible_dep_ids.split(", ").each { String slug ->
+				addDependency(slug, "incompatible")
+			}
+		}
+		
+		versionName = "${archives_base_name} ${project.mod_version}"
+		
+		versionNumber = project.version
+		
+		uploadFile = remapJar
+		addFile sourcesJar
+	}
+}

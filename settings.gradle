@@ -1,0 +1,16 @@
+pluginManagement {
+	repositories {
+		mavenLocal()
+		maven {
+			name = "Fabric"
+			url = "https://maven.fabricmc.net/"
+		}
+		maven {
+			name = "ajoberstar-backup"
+			url = "https://ajoberstar.org/bintray-backup/"
+		}
+		gradlePluginPortal()
+	}
+}
+
+rootProject.name = archives_base_name

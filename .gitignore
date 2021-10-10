@@ -1,4 +1,32 @@
+# gradle
+
+.gradle/
+build/
+out/
+classes/
+
+# idea
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+
+.settings/
+.vscode/
+bin/
+.classpath
+.project
+
+# fabric
+
+run/
+remappedSrc/
+
 # eclipse
+
 bin
 *.launch
 .settings
@@ -6,20 +34,9 @@ bin
 .classpath
 .project
 
-# idea
-out
-*.ipr
-*.iws
-*.iml
-.idea
-
-# gradle
-build
-.gradle
-
 # other
-eclipse
-run
 
-# misc
+.mixin.out
+libs
 *.kate-swp
+changelog.txt
