@@ -1,5 +1,6 @@
 package virtuoel.discarnate.tileentity;
 
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
@@ -91,6 +92,13 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 				
 				taskThread = new Thread(() ->
 				{
+					try
+					{
+						Thread.sleep(50);
+					}
+					catch(InterruptedException e)
+					{}
+					
 					for(int i = 0; i < inventory.size(); i++)
 					{
 						if(player != null && canPlayerContinue(player) && isActive())
@@ -150,14 +158,14 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 	{
 		synchronized(this)
 		{
+			if(marker != null)
+			{
+				marker = null;
+			}
+			
 			World w = getWorld();
 			if(w != null)
 			{
-				if(marker != null)
-				{
-					marker = null;
-				}
-				
 				BlockPos pos = getPos();
 				if(w.isChunkLoaded(pos))
 				{
@@ -212,11 +220,7 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 	
 	protected void setupMarkerVex(VexEntity marker, @NotNull World w, BlockPos pos, PlayerEntity player)
 	{
-		MobEntityAccessor m = (MobEntityAccessor) marker;
-		GoalSelector selector = m.getGoalSelector();
-		
-		selector.clear();
-		selector.add(0, new Goal()
+		final Goal visuals = new Goal()
 		{
 			@Override
 			public boolean canStart()
@@ -244,9 +248,9 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 					marker.setCharging(marker.getMoveControl().isMoving());
 				}
 			}
-		});
+		};
 		
-		Goal follow = new Goal()
+		final Goal follow = new Goal()
 		{
 			@Override
 			public boolean canStart()
@@ -262,20 +266,29 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 					marker.lookAtEntity(player, 360, 360);
 					marker.setHeadYaw(player.getHeadYaw());
 					double yaw = -Math.toRadians(player.getHeadYaw() + 180D);
+					marker.getNavigation().stop();
 					marker.getNavigation().startMovingTo(player.getX() + (Math.sin(yaw) * 1.25 * player.getWidth()), player.getY() + player.getStandingEyeHeight() + 0.5D, player.getZ() + (Math.cos(yaw) * 1.25 * player.getWidth()), 1.0D);
 				}
 			}
 		};
+		follow.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.TARGET));
 		
-		selector.add(1, follow);
+		MobEntityAccessor m = (MobEntityAccessor) marker;
+		GoalSelector selector = m.getGoalSelector();
+		
 		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, true));
 		marker.setHealth(0.1F);
 		final Vec3d vel = marker.getVelocity();
 		marker.setVelocity(vel.getX(), 0.25D, vel.getZ());
 		marker.refreshPositionAndAngles(pos, 0.0F, 0.0F);
 		m.callInitEquipment(w.getLocalDifficulty(pos));
-		m.getTargetSelector().getGoals().clear();
 		marker.setBounds(pos.up());
+		
+		m.getTargetSelector().getGoals().clear();
+		
+		selector.clear();
+		selector.add(0, visuals);
+		selector.add(1, follow);
 	}
 	
 	public boolean isActive()
