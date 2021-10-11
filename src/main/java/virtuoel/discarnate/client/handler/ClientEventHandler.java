@@ -19,7 +19,7 @@ public class ClientEventHandler
 	{
 		new Thread(() ->
 		{
-			synchronized(key)
+			synchronized (key)
 			{
 				try
 				{
@@ -27,7 +27,7 @@ public class ClientEventHandler
 					key.setPressed(mc.currentScreen == null || mc.currentScreen.passEvents);
 					Thread.sleep(millis);
 				}
-				catch(InterruptedException e)
+				catch (InterruptedException e)
 				{
 					
 				}
@@ -43,7 +43,7 @@ public class ClientEventHandler
 	{
 		new Thread(() ->
 		{
-			synchronized(key)
+			synchronized (key)
 			{
 				key.setPressed(false);
 			}
@@ -65,13 +65,13 @@ public class ClientEventHandler
 	
 	public static void onInputUpdate(Input input, Screen currentScreen)
 	{
-		synchronized(ClientEventHandler.class)
+		synchronized (ClientEventHandler.class)
 		{
 			boolean allowInput = currentScreen == null || currentScreen.passEvents;
 			
-			if(forwardTicks > 0)
+			if (forwardTicks > 0)
 			{
-				if(allowInput && !input.pressingForward)
+				if (allowInput && !input.pressingForward)
 				{
 					input.movementForward++;
 					input.pressingForward = true;
@@ -79,9 +79,9 @@ public class ClientEventHandler
 				forwardTicks--;
 			}
 			
-			if(backwardTicks > 0)
+			if (backwardTicks > 0)
 			{
-				if(allowInput && !input.pressingBack)
+				if (allowInput && !input.pressingBack)
 				{
 					input.movementForward--;
 					input.pressingBack = true;
@@ -89,9 +89,9 @@ public class ClientEventHandler
 				backwardTicks--;
 			}
 			
-			if(leftTicks > 0)
+			if (leftTicks > 0)
 			{
-				if(allowInput && !input.pressingLeft)
+				if (allowInput && !input.pressingLeft)
 				{
 					input.movementSideways++;
 					input.pressingLeft = true;
@@ -99,9 +99,9 @@ public class ClientEventHandler
 				leftTicks--;
 			}
 			
-			if(rightTicks > 0)
+			if (rightTicks > 0)
 			{
-				if(allowInput && !input.pressingRight)
+				if (allowInput && !input.pressingRight)
 				{
 					input.movementSideways--;
 					input.pressingRight = true;
@@ -109,18 +109,18 @@ public class ClientEventHandler
 				rightTicks--;
 			}
 			
-			if(jumpTicks > 0)
+			if (jumpTicks > 0)
 			{
-				if(allowInput && !input.jumping)
+				if (allowInput && !input.jumping)
 				{
 					input.jumping = true;
 				}
 				jumpTicks--;
 			}
 			
-			if(sneakTicks > 0)
+			if (sneakTicks > 0)
 			{
-				if(allowInput && !input.sneaking)
+				if (allowInput && !input.sneaking)
 				{
 					input.sneaking = true;
 					input.movementSideways = (float) (input.movementSideways * 0.3D);

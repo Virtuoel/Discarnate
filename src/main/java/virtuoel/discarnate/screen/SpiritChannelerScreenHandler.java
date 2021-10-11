@@ -62,9 +62,9 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		final int hotbarSlotsHorizontal = 9;
 		final int hotbarSeparation = 4;
 		
-		for(int row = 0; row < inventorySlotsVertical; row++)
+		for (int row = 0; row < inventorySlotsVertical; row++)
 		{
-			for(int col = 0; col < inventorySlotsHorizontal; col++)
+			for (int col = 0; col < inventorySlotsHorizontal; col++)
 			{
 				int x = xOffset + col * (slotWidth + (slotBorder * 2));
 				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
@@ -73,7 +73,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		}
 		
 		int hotbarY = (inventorySlotsVertical * (slotHeight + (slotBorder * 2))) + hotbarSeparation + yOffset;
-		for(int col = 0; col < inventorySlotsHorizontal; col++)
+		for (int col = 0; col < inventorySlotsHorizontal; col++)
 		{
 			int x = xOffset + col * (slotWidth + (slotBorder * 2));
 			addSlot(new Slot(playerInventory, col, x, hotbarY));
@@ -90,18 +90,18 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		final int inventorySlotsVertical = 5;
 		final int inventorySlotsHorizontal = 5;
 		
-		for(int row = 0; row < inventorySlotsVertical; row++)
+		for (int row = 0; row < inventorySlotsVertical; row++)
 		{
-			for(int col = 0; col < inventorySlotsHorizontal; col++)
+			for (int col = 0; col < inventorySlotsHorizontal; col++)
 			{
 				int x = xOffset + col * (slotWidth + (slotBorder * 2));
 				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
 				this.addSlot(new Slot(inventory, col + row * inventorySlotsHorizontal, x, y)
 				{
 					@Override
-					public boolean canTakeItems(PlayerEntity playerIn)
+					public boolean canTakeItems(PlayerEntity player)
 					{
-						return blockEntity != null && !blockEntity.isActive() && super.canTakeItems(playerIn);
+						return blockEntity != null && !blockEntity.isActive() && super.canTakeItems(player);
 					}
 					
 					@Override
@@ -115,9 +115,9 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	}
 	
 	@Override
-	public boolean canUse(PlayerEntity playerIn)
+	public boolean canUse(PlayerEntity player)
 	{
-		return blockEntity != null && blockEntity.canPlayerUse(playerIn);
+		return blockEntity != null && blockEntity.canPlayerUse(player);
 	}
 	
 	@Override
@@ -127,39 +127,39 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = slots.get(index);
 		
-		if(slot != null && slot.hasStack())
+		if (slot != null && slot.hasStack())
 		{
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 			
 			int containerSlots = slots.size() - player.getInventory().main.size();
 			
-			if(index < containerSlots)
+			if (index < containerSlots)
 			{
-				if(!this.insertItem(itemstack1, containerSlots, slots.size(), false))
+				if (!this.insertItem(itemstack1, containerSlots, slots.size(), false))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if((blockEntity != null && blockEntity.isActive()) || !this.insertItem(itemstack1, 0, containerSlots, false))
+			else if ((blockEntity != null && blockEntity.isActive()) || !this.insertItem(itemstack1, 0, containerSlots, false))
 			{
-				if(index < containerSlots + 27)
+				if (index < containerSlots + 27)
 				{
-					if(!this.insertItem(itemstack1, containerSlots + 27, slots.size(), false))
+					if (!this.insertItem(itemstack1, containerSlots + 27, slots.size(), false))
 					{
 						return ItemStack.EMPTY;
 					}
 				}
 				else
 				{
-					if(!this.insertItem(itemstack1, containerSlots, containerSlots + 27, false))
+					if (!this.insertItem(itemstack1, containerSlots, containerSlots + 27, false))
 					{
 						return ItemStack.EMPTY;
 					}
 				}
 			}
 			
-			if(itemstack1.isEmpty())
+			if (itemstack1.isEmpty())
 			{
 				slot.setStack(ItemStack.EMPTY);
 			}
@@ -168,7 +168,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 				slot.markDirty();
 			}
 			
-			if(itemstack1.getCount() == itemstack.getCount())
+			if (itemstack1.getCount() == itemstack.getCount())
 			{
 				return ItemStack.EMPTY;
 			}

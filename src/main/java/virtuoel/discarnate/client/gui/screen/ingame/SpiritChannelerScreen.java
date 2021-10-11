@@ -42,7 +42,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	
 	ButtonWidget confirmButton;
 	boolean active = false;
-
+	
 	private static final Text START_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.start");
 	private static final Text STOP_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.stop");
 	
@@ -76,7 +76,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 			buffer.writeBlockPos(blockEntity.getPos());
 			buffer.writeBoolean(!active);
 			ClientPlayNetworking.send(Discarnate.ACTIVATE_PACKET, buffer);
-			if(!active)
+			if (!active)
 			{
 				Optional.ofNullable(this.client.player).ifPresent(ClientPlayerEntity::closeHandledScreen);
 			}

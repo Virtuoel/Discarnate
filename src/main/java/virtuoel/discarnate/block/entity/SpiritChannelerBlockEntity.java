@@ -55,7 +55,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	{
 		super.cancelRemoval();
 		World w = getWorld();
-		if(w != null && !w.isClient)
+		if (w != null && !w.isClient)
 		{
 	//		deactivate();
 		}
@@ -78,12 +78,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public boolean activate(PlayerEntity player)
 	{
-		synchronized(this)
+		synchronized (this)
 		{
-			if(taskThread == null)
+			if (taskThread == null)
 			{
 				World w = getWorld();
-				if(player == null || !canPlayerStart(player))
+				if (player == null || !canPlayerStart(player))
 				{
 					w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					return false;
@@ -96,15 +96,17 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					{
 						Thread.sleep(50);
 					}
-					catch(InterruptedException e)
-					{}
-					
-					for(int i = 0; i < inventory.size(); i++)
+					catch (InterruptedException e)
 					{
-						if(player != null && canPlayerContinue(player) && isActive())
+						
+					}
+					
+					for (int i = 0; i < inventory.size(); i++)
+					{
+						if (player != null && canPlayerContinue(player) && isActive())
 						{
 							ItemStack stack = inventory.get(i);
-							if(!stack.isEmpty())
+							if (!stack.isEmpty())
 							{
 								TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).ifPresent(task -> task.accept(stack, player, this));
 							}
@@ -117,7 +119,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					
 					onPlayerStop(player);
 					
-					if(w != null)
+					if (w != null)
 					{
 						Optional.ofNullable(w.getServer()).ifPresent(s ->
 						{
@@ -129,17 +131,17 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					}
 				}, "SpiritChannelerTasks");
 				
-				if(w != null)
+				if (w != null)
 				{
 					marker = EntityType.VEX.create(w);
 					setupMarkerVex(marker, w, getPos(), player);
 					w.spawnEntity(marker);
 					
 					BlockPos pos = getPos();
-					if(w.isChunkLoaded(pos))
+					if (w.isChunkLoaded(pos))
 					{
 						BlockState state = w.getBlockState(pos);
-						if(state.contains(SpiritChannelerBlock.ACTIVE) && !state.get(SpiritChannelerBlock.ACTIVE))
+						if (state.contains(SpiritChannelerBlock.ACTIVE) && !state.get(SpiritChannelerBlock.ACTIVE))
 						{
 							w.setBlockState(getPos(), state.with(SpiritChannelerBlock.ACTIVE, true));
 						}
@@ -156,28 +158,28 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public boolean deactivate()
 	{
-		synchronized(this)
+		synchronized (this)
 		{
-			if(marker != null)
+			if (marker != null)
 			{
 				marker = null;
 			}
 			
 			World w = getWorld();
-			if(w != null)
+			if (w != null)
 			{
 				BlockPos pos = getPos();
-				if(w.isChunkLoaded(pos))
+				if (w.isChunkLoaded(pos))
 				{
 					BlockState state = w.getBlockState(pos);
-					if(state.contains(SpiritChannelerBlock.ACTIVE) && state.get(SpiritChannelerBlock.ACTIVE))
+					if (state.contains(SpiritChannelerBlock.ACTIVE) && state.get(SpiritChannelerBlock.ACTIVE))
 					{
 						w.setBlockState(getPos(), state.with(SpiritChannelerBlock.ACTIVE, false));
 					}
 				}
 			}
 			
-			if(taskThread != null)
+			if (taskThread != null)
 			{
 				taskThread.interrupt();
 				taskThread = null;
@@ -206,11 +208,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	protected void onPlayerStop(@NotNull PlayerEntity player)
 	{
-		if(RESET_CHANNELER_TASK != null)
+		if (RESET_CHANNELER_TASK != null)
 		{
 			RESET_CHANNELER_TASK.accept(ItemStack.EMPTY, player, this);
 		}
-		
 	}
 	
 	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)
@@ -231,14 +232,14 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			@Override
 			public void start()
 			{
-				if(marker != null)
+				if (marker != null)
 				{
-					if(marker.hasPassengers())
+					if (marker.hasPassengers())
 					{
 						marker.removeAllPassengers();;
 					}
 					
-					if(marker.hasVehicle())
+					if (marker.hasVehicle())
 					{
 						marker.dismountVehicle();
 					}
@@ -261,7 +262,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			@Override
 			public void tick()
 			{
-				if(player != null && marker != null)
+				if (player != null && marker != null)
 				{
 					marker.lookAtEntity(player, 360, 360);
 					marker.setHeadYaw(player.getHeadYaw());
@@ -293,7 +294,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public boolean isActive()
 	{
-		synchronized(this)
+		synchronized (this)
 		{
 			return isActive(getWorld(), getPos());
 		}
@@ -301,12 +302,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public static boolean isActive(@Nullable World w, BlockPos pos)
 	{
-		if(w != null)
+		if (w != null)
 		{
-			if(w.isChunkLoaded(pos))
+			if (w.isChunkLoaded(pos))
 			{
 				BlockState state = w.getBlockState(pos);
-				if(state.contains(SpiritChannelerBlock.ACTIVE))
+				if (state.contains(SpiritChannelerBlock.ACTIVE))
 				{
 					return state.get(SpiritChannelerBlock.ACTIVE);
 				}
@@ -315,9 +316,9 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		return false;
 	}
 	
-	private static final int[] NO_SLOTS = new int[]{};
+	private static final int[] NO_SLOTS = new int[0];
 	private DefaultedList<ItemStack> inventory;
-
+	
 	public SpiritChannelerBlockEntity(BlockPos blockPos, BlockState blockState)
 	{
 		super(BlockEntityRegistrar.SPIRIT_CHANNELER, blockPos, blockState);
@@ -325,99 +326,121 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	}
 	
 	@Override
-	protected Text getContainerName() {
+	protected Text getContainerName()
+	{
 		return new TranslatableText("container." + Discarnate.MOD_ID + ".spirit_channeler");
 	}
-
+	
 	@Override
-	public int size() {
+	public int size()
+	{
 		return this.inventory.size();
 	}
-
+	
 	@Override
-	public boolean isEmpty() {
+	public boolean isEmpty()
+	{
 		Iterator<ItemStack> var1 = this.inventory.iterator();
-
+		
 		ItemStack itemStack;
-		do {
-			if (!var1.hasNext()) {
+		do
+		{
+			if (!var1.hasNext())
+			{
 				return true;
 			}
-
-			itemStack = (ItemStack)var1.next();
-		} while(itemStack.isEmpty());
-
+			
+			itemStack = (ItemStack) var1.next();
+		}
+		while (itemStack.isEmpty());
+		
 		return false;
 	}
-
+	
 	@Override
-	public void readNbt(NbtCompound nbt) {
+	public void readNbt(NbtCompound nbt)
+	{
 		super.readNbt(nbt);
 		this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
 		Inventories.readNbt(nbt, this.inventory);
 	}
-
+	
 	@Override
-	public NbtCompound writeNbt(NbtCompound nbt) {
+	public NbtCompound writeNbt(NbtCompound nbt)
+	{
 		super.writeNbt(nbt);
 		Inventories.writeNbt(nbt, this.inventory);
 		return nbt;
 	}
-
+	
 	@Override
-	public ItemStack getStack(int slot) {
+	public ItemStack getStack(int slot)
+	{
 		return slot >= 0 && slot < this.inventory.size() ? this.inventory.get(slot) : ItemStack.EMPTY;
 	}
-
+	
 	@Override
-	public ItemStack removeStack(int slot, int amount) {
+	public ItemStack removeStack(int slot, int amount)
+	{
 		return Inventories.splitStack(this.inventory, slot, amount);
 	}
-
+	
 	@Override
-	public ItemStack removeStack(int slot) {
+	public ItemStack removeStack(int slot)
+	{
 		return Inventories.removeStack(this.inventory, slot);
 	}
-
+	
 	@Override
-	public void setStack(int slot, ItemStack stack) {
-		if (slot >= 0 && slot < this.inventory.size()) {
+	public void setStack(int slot, ItemStack stack)
+	{
+		if (slot >= 0 && slot < this.inventory.size())
+		{
 			this.inventory.set(slot, stack);
 		}
-
+		
 	}
-
+	
 	@Override
-	public boolean canPlayerUse(PlayerEntity player) {
-		if (this.world.getBlockEntity(this.pos) != this) {
+	public boolean canPlayerUse(PlayerEntity player)
+	{
+		if (this.world.getBlockEntity(this.pos) != this)
+		{
 			return false;
-		} else {
-			return !(player.squaredDistanceTo((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) > 64.0D);
+		}
+		else
+		{
+			return !(player.squaredDistanceTo((double) this.pos.getX() + 0.5D, (double) this.pos.getY() + 0.5D, (double) this.pos.getZ() + 0.5D) > 64.0D);
 		}
 	}
-
+	
 	@Override
-	public boolean isValid(int slot, ItemStack stack) {
+	public boolean isValid(int slot, ItemStack stack)
+	{
 		return false;
 	}
-
+	
 	@Override
-	public int[] getAvailableSlots(Direction side) {
+	public int[] getAvailableSlots(Direction side)
+	{
 		return NO_SLOTS;
 	}
-
+	
 	@Override
-	public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+	public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir)
+	{
 		return false;
 	}
-
+	
 	@Override
-	public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+	public boolean canExtract(int slot, ItemStack stack, Direction dir)
+	{
 		return false;
 	}
-
+	
 	@Override
-	public void clear() {
+	public void clear()
+	{
 		this.inventory.clear();
 	}
 	
@@ -428,7 +451,8 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	}
 	
 	@Override
-	protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+	protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory)
+	{
 		return new SpiritChannelerScreenHandler(syncId, playerInventory, this);
 	}
 }

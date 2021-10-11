@@ -46,20 +46,20 @@ public class Discarnate implements ModInitializer
 				boolean activating = buf.readBoolean();
 				server.execute(() ->
 				{
-					if(player.world.isChunkLoaded(pos))
+					if (player.world.isChunkLoaded(pos))
 					{
 						BlockEntity be = player.world.getBlockEntity(pos);
-						if(be instanceof SpiritChannelerBlockEntity)
+						if (be instanceof SpiritChannelerBlockEntity)
 						{
 							SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
-							if(activating)
+							if (activating)
 							{
-								if(!channeler.isActive())
+								if (!channeler.isActive())
 								{
 									channeler.activate(player);
 								}
 							}
-							else if(channeler.isActive())
+							else if (channeler.isActive())
 							{
 								channeler.deactivate();
 							}

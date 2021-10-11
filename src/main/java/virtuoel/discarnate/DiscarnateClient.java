@@ -45,15 +45,15 @@ public class DiscarnateClient implements ClientModInitializer
 		client.execute(() ->
 		{
 			ClientWorld w = client.world;
-			if((slot != -1 || !stack.isEmpty()) && w != null && w.getDimension() == dimension)
+			if ((slot != -1 || !stack.isEmpty()) && w != null && w.getDimension() == dimension)
 			{
-				if(w.isChunkLoaded(pos))
+				if (w.isChunkLoaded(pos))
 				{
 					BlockEntity be = w.getBlockEntity(pos);
-					if(be != null)
+					if (be != null)
 					{
 						PlayerEntity player = (PlayerEntity) (Object) client.player;
-						if(slot != -1 && be instanceof Inventory)
+						if (slot != -1 && be instanceof Inventory)
 						{
 							task.accept(((Inventory) be).getStack(slot), player, be);
 						}

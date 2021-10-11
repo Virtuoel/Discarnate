@@ -34,7 +34,9 @@ public class TaskRegistrar
 	private TaskRegistrar()
 	{
 		registerTask((i, p, t) ->
-		{}, ItemRegistrar.BLANK_TASK);
+		{
+			
+		}, ItemRegistrar.BLANK_TASK);
 		
 		registerTask((i, p, t) ->
 		{
@@ -47,8 +49,10 @@ public class TaskRegistrar
 			{
 				Thread.sleep(i.getCount() * 50);
 			}
-			catch(InterruptedException e)
-			{}
+			catch (InterruptedException e)
+			{
+				
+			}
 		}, ItemRegistrar.WAIT_TASK);
 		
 		registerTask((i, p, t) ->
@@ -63,7 +67,7 @@ public class TaskRegistrar
 		
 		registerTask((i, p, t) ->
 		{
-			if(!p.isSpectator())
+			if (!p.isSpectator())
 			{
 				ItemStack itemStack = p.getStackInHand(Hand.OFF_HAND);
 				p.setStackInHand(Hand.OFF_HAND, p.getStackInHand(Hand.MAIN_HAND));
@@ -189,7 +193,7 @@ public class TaskRegistrar
 		
 		registerTask((i, p, t) ->
 		{
-			if(t instanceof SpiritChannelerBlockEntity)
+			if (t instanceof SpiritChannelerBlockEntity)
 			{
 				((SpiritChannelerBlockEntity) t).deactivate();
 			}
@@ -199,22 +203,22 @@ public class TaskRegistrar
 		{
 			NbtCompound nbttagcompound = i.getNbt();
 			
-			if(nbttagcompound != null && nbttagcompound.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
+			if (nbttagcompound != null && nbttagcompound.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
 			{
 				NbtCompound nbttagcompound1 = nbttagcompound.getCompound("BlockEntityTag");
 				
-				if(nbttagcompound1.contains("Items", NbtElement.LIST_TYPE))
+				if (nbttagcompound1.contains("Items", NbtElement.LIST_TYPE))
 				{
 					DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
 					Inventories.readNbt(nbttagcompound1, stacks);
 					
-					if(stacks.stream().anyMatch(s -> s.getItem() == Item.fromBlock(BlockRegistrar.SPIRIT_CHANNELER)))
+					if (stacks.stream().anyMatch(s -> s.getItem() == Item.fromBlock(BlockRegistrar.SPIRIT_CHANNELER)))
 					{
-						for(ItemStack stack : stacks)
+						for (ItemStack stack : stacks)
 						{
-							if(p != null && !p.isDead() && SpiritChannelerBlockEntity.isActive(t.getWorld(), t.getPos()))
+							if (p != null && !p.isDead() && SpiritChannelerBlockEntity.isActive(t.getWorld(), t.getPos()))
 							{
-								if(!stack.isEmpty())
+								if (!stack.isEmpty())
 								{
 									REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).ifPresent(task -> task.accept(stack, p, t));
 								}
@@ -230,7 +234,7 @@ public class TaskRegistrar
 		};
 		
 		registerTask((i, p, t) -> shulkerTask.accept(i, p, t), ShulkerBoxBlock.get(null));
-		for(DyeColor color : DyeColor.values())
+		for (DyeColor color : DyeColor.values())
 		{
 			registerTask((i, p, t) -> shulkerTask.accept(i, p, t), ShulkerBoxBlock.get(color));
 		}

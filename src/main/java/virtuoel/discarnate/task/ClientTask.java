@@ -32,7 +32,7 @@ public class ClientTask implements Task
 	@Override
 	public void accept(@NotNull ItemStack s, @Nullable PlayerEntity p, @Nullable BlockEntity b)
 	{
-		if(p instanceof ServerPlayerEntity && !p.getEntityWorld().isClient)
+		if (p instanceof ServerPlayerEntity && !p.getEntityWorld().isClient)
 		{
 			final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			final BlockPos pos = getPosFromBlockEntity(b);
@@ -42,7 +42,7 @@ public class ClientTask implements Task
 			buf.writeInt(pos.getZ());
 			int slot = getSlotForStack(s, b);
 			buf.writeInt(slot);
-			if(slot == -1)
+			if (slot == -1)
 			{
 				buf.writeItemStack(s);
 			}
@@ -73,12 +73,12 @@ public class ClientTask implements Task
 	
 	private static int getSlotForStack(ItemStack stack, BlockEntity te)
 	{
-		if(te instanceof Inventory)
+		if (te instanceof Inventory)
 		{
 			Inventory handler = (Inventory) te;
-			for(int i = 0; i < handler.size(); i++)
+			for (int i = 0; i < handler.size(); i++)
 			{
-				if(stack == handler.getStack(i))
+				if (stack == handler.getStack(i))
 				{
 					return i;
 				}
