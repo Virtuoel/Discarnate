@@ -42,7 +42,7 @@ public class Discarnate implements ModInitializer
 			ACTIVATE_PACKET,
 			(server, player, handler, buf, responseSender) ->
 			{
-				BlockPos pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
+				BlockPos pos = buf.readBlockPos();
 				boolean activating = buf.readBoolean();
 				server.execute(() ->
 				{

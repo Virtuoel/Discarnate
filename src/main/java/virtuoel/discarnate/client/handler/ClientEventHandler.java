@@ -1,8 +1,10 @@
 package virtuoel.discarnate.client.handler;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.input.Input;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.world.ClientWorld;
 
 public class ClientEventHandler
 {
@@ -48,15 +50,24 @@ public class ClientEventHandler
 		}).start();
 	}
 	
+	public static void onInputUpdate(ClientWorld w)
+	{
+		onInputUpdate(MinecraftClient.getInstance());
+	}
+	
 	public static void onInputUpdate(MinecraftClient mc)
+	{
+		if (mc.player != null)
+		{
+			onInputUpdate(mc.player.input, mc.currentScreen);
+		}
+	}
+	
+	public static void onInputUpdate(Input input, Screen currentScreen)
 	{
 		synchronized(ClientEventHandler.class)
 		{
-			if (mc.player == null) return;
-			
-			Input input = mc.player.input;
-			
-			boolean allowInput = mc.currentScreen == null || mc.currentScreen.passEvents;
+			boolean allowInput = currentScreen == null || currentScreen.passEvents;
 			
 			if(forwardTicks > 0)
 			{

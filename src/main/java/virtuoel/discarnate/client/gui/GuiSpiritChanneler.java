@@ -18,7 +18,6 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.inventory.ContainerSpiritChanneler;
 import virtuoel.discarnate.reference.DiscarnateConfig;
@@ -51,7 +50,7 @@ public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 	public void init()
 	{
 		super.init();
-		this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
+		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
 		this.active = tileEntity.isActive();
 		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
 		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
@@ -74,10 +73,7 @@ public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 		if (button.active)
 		{
 			final PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
-			final BlockPos pos = tileEntity.getPos();
-			buffer.writeInt(pos.getX());
-			buffer.writeInt(pos.getY());
-			buffer.writeInt(pos.getZ());
+			buffer.writeBlockPos(tileEntity.getPos());
 			buffer.writeBoolean(!active);
 			ClientPlayNetworking.send(Discarnate.ACTIVATE_PACKET, buffer);
 			if(!active)

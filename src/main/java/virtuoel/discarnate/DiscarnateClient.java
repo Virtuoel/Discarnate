@@ -27,7 +27,7 @@ public class DiscarnateClient implements ClientModInitializer
 	@Override
 	public void onInitializeClient()
 	{
-		ClientTickEvents.START_CLIENT_TICK.register(ClientEventHandler::onInputUpdate);
+		ClientTickEvents.START_WORLD_TICK.register(ClientEventHandler::onInputUpdate);
 		
 		ClientPlayNetworking.registerGlobalReceiver(Discarnate.TASK_PACKET, DiscarnateClient::handleTaskPacket);
 		
