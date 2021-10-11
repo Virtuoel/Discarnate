@@ -1,0 +1,9 @@
+{
+	"parent": "block/cube_column",
+	"textures":
+	{
+		"particle": "discarnate:blocks/spirit_channeler_end",
+		"side": "discarnate:blocks/spirit_channeler_side",
+		"end": "discarnate:blocks/spirit_channeler_end"
+	}
+}

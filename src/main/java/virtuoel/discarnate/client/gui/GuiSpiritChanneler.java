@@ -2,102 +2,104 @@ package virtuoel.discarnate.client.gui;
 
 import java.util.Optional;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.blaze3d.systems.RenderSystem;
+
+import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.inventory.ContainerSpiritChanneler;
-import virtuoel.discarnate.network.CPacketActivateChanneler;
 import virtuoel.discarnate.reference.DiscarnateConfig;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
-@SideOnly(Side.CLIENT)
-public class GuiSpiritChanneler extends GuiContainer
+@Environment(EnvType.CLIENT)
+public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 {
-	private static final ResourceLocation TEXTURE = new ResourceLocation(Discarnate.MOD_ID, "textures/gui/container/spirit_channeler.png");
+	private static final Identifier TEXTURE = Discarnate.id("textures/gui/container/spirit_channeler.png");
 	
-	private IInventory playerInventory;
 	private TileEntitySpiritChanneler tileEntity;
 	
-	public GuiSpiritChanneler(EntityPlayer player, TileEntitySpiritChanneler tileEntity)
+	public GuiSpiritChanneler(ContainerSpiritChanneler screenHandler, PlayerInventory playerInventory, Text text)
 	{
-		super(new ContainerSpiritChanneler(player, tileEntity));
-		this.playerInventory = player.inventory;
-		this.tileEntity = tileEntity;
-		this.xSize = 176;
-		this.ySize = 204;
+		super(screenHandler, playerInventory, text);
+		this.tileEntity = handler.tileEntity;
+		this.width = 176;
+		this.height = 204;
+		this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
 	}
 	
-	GuiButton confirmButton;
+	ButtonWidget confirmButton;
 	boolean active = false;
+
+	private static final Text START_TEXT = new TranslatableText("discarnate.spirit_channeler.start");
+	private static final Text STOP_TEXT = new TranslatableText("discarnate.spirit_channeler.stop");
 	
 	@Override
-	public void initGui()
+	public void init()
 	{
-		super.initGui();
+		super.init();
 		this.active = tileEntity.isActive();
-		this.confirmButton = new GuiButton(1, this.guiLeft + 124, this.guiTop + 52, 40, 20, I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start"));
-		this.confirmButton.enabled = this.active || (this.mc.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.mc.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.mc.player.capabilities.isCreativeMode;
-		this.buttonList.add(this.confirmButton);
+		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
+		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
 	}
 	
 	@Override
-	public void updateScreen()
+	public void handledScreenTick()
 	{
-		super.updateScreen();
+		super.handledScreenTick();
 		
 		this.active = tileEntity.isActive();
 		
-		this.confirmButton.displayString = I18n.format(active ? "discarnate.spirit_channeler.stop" : "discarnate.spirit_channeler.start");
-		this.confirmButton.enabled = this.active || (this.mc.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.mc.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.mc.player.capabilities.isCreativeMode;
+		this.confirmButton.setMessage(active ? STOP_TEXT : START_TEXT);
+		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
 	}
 	
-	@Override
-	protected void actionPerformed(GuiButton button)
+	private void confirmAction(ButtonWidget button)
 	{
-		if(button.enabled)
+		if (button.active)
 		{
-			if(button.id == 1)
+			final PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
+			final BlockPos pos = tileEntity.getPos();
+			buffer.writeInt(pos.getX());
+			buffer.writeInt(pos.getY());
+			buffer.writeInt(pos.getZ());
+			buffer.writeBoolean(!active);
+			ClientPlayNetworking.send(Discarnate.ACTIVATE_PACKET, buffer);
+			if(!active)
 			{
-				Discarnate.NETWORK.sendToServer(new CPacketActivateChanneler(tileEntity.getPos(), !active));
-				if(!active)
-				{
-					Optional.ofNullable(this.mc.player).ifPresent(EntityPlayerSP::closeScreen);
-				}
+				Optional.ofNullable(this.client.player).ifPresent(ClientPlayerEntity::closeHandledScreen);
 			}
 		}
 	}
 	
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks)
+	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta)
 	{
-		this.drawDefaultBackground();
-		super.drawScreen(mouseX, mouseY, partialTicks);
-		this.renderHoveredToolTip(mouseX, mouseY);
+		this.renderBackground(matrices);
+		super.render(matrices, mouseX, mouseY, delta);
+		this.drawMouseoverTooltip(matrices, mouseX, mouseY);
 	}
 	
 	@Override
-	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
+	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY)
 	{
-		String s = this.tileEntity.getDisplayName().getUnformattedText();
-		this.fontRenderer.drawString(s, this.xSize / 2 - this.fontRenderer.getStringWidth(s) / 2 - 26, 6, 0x404040);
-		this.fontRenderer.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 0x404040);
-	}
-	
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
-	{
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(TEXTURE);
-		int i = (this.width - this.xSize) / 2;
-		int j = (this.height - this.ySize) / 2;
-		this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
+		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		RenderSystem.setShaderTexture(0, TEXTURE);
+		int i = (this.width - this.backgroundWidth) / 2;
+		int j = (this.height - this.backgroundHeight) / 2;
+		this.drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 }

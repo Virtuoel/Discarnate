@@ -3,65 +3,83 @@ package virtuoel.discarnate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import net.minecraft.creativetab.CreativeTabs;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import virtuoel.discarnate.init.BlockRegistrar;
-import virtuoel.discarnate.network.CPacketActivateChanneler;
-import virtuoel.discarnate.network.SPacketBuiltinClientTask;
-import virtuoel.discarnate.proxy.GuiProxy;
+import virtuoel.discarnate.init.ItemRegistrar;
+import virtuoel.discarnate.init.ScreenHandlerRegistrar;
+import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.init.TileEntityRegistrar;
+import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
-@Mod(modid = Discarnate.MOD_ID, version = "@VERSION@", certificateFingerprint = "@FINGERPRINT@")
-public class Discarnate
+public class Discarnate implements ModInitializer
 {
 	public static final String MOD_ID = "discarnate";
 	
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	
-	public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
+	public static final ItemGroup ITEM_GROUP = FabricItemGroupBuilder.create(
+		id("general"))
+		.icon(() -> new ItemStack(BlockRegistrar.SPIRIT_CHANNELER))
+		.build();
 	
-	public static final CreativeTabs CREATIVE_TAB = new CreativeTabs(MOD_ID)
+	@Override
+	public void onInitialize()
 	{
-		@Override
-		@SideOnly(Side.CLIENT)
-		public ItemStack createIcon()
-		{
-			return new ItemStack(BlockRegistrar.SPIRIT_CHANNELER);
-		}
-	};
-	
-	static
-	{
-		NETWORK.registerMessage(CPacketActivateChanneler.Handler.class, CPacketActivateChanneler.class, 0, Side.SERVER);
-		NETWORK.registerMessage(SPacketBuiltinClientTask.Handler.class, SPacketBuiltinClientTask.class, 1, Side.CLIENT);
+		BlockRegistrar.INSTANCE.getClass();
+		ItemRegistrar.INSTANCE.getClass();
+		ScreenHandlerRegistrar.INSTANCE.getClass();
+		TaskRegistrar.INSTANCE.getClass();
+		TileEntityRegistrar.INSTANCE.getClass();
+		
+		ServerPlayNetworking.registerGlobalReceiver(
+			ACTIVATE_PACKET,
+			(server, player, handler, buf, responseSender) ->
+			{
+				BlockPos pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
+				boolean activating = buf.readBoolean();
+				server.execute(() ->
+				{
+					if(player.world.isChunkLoaded(pos))
+					{
+						BlockEntity te = player.world.getBlockEntity(pos);
+						if(te instanceof TileEntitySpiritChanneler)
+						{
+							TileEntitySpiritChanneler channeler = ((TileEntitySpiritChanneler) te);
+							if(activating)
+							{
+								if(!channeler.isActive())
+								{
+									channeler.activate(player);
+								}
+							}
+							else if(channeler.isActive())
+							{
+								channeler.deactivate();
+							}
+						}
+					}
+				});
+			}
+		);
 	}
 	
-	@Mod.EventHandler
-	public void init(FMLInitializationEvent event)
+	public static Identifier id(String path)
 	{
-		NetworkRegistry.INSTANCE.registerGuiHandler(instance(), new GuiProxy());
+		return new Identifier(MOD_ID, path);
 	}
 	
-	@Mod.EventHandler
-	public void onFingerprintViolation(FMLFingerprintViolationEvent event)
+	public static Identifier id(String path, String... paths)
 	{
-		LOGGER.error("Expecting signature {}, however there is no signature matching that description. The file {} may have been tampered with. This version will NOT be supported by the author!", event.getExpectedFingerprint(), event.getSource().getName());
+		return id(paths.length == 0 ? path : path + "/" + String.join("/", paths));
 	}
 	
-	private static final class InstanceHolder
-	{
-		private static final Discarnate INSTANCE = new Discarnate();
-	}
-	
-	@Mod.InstanceFactory
-	public static Discarnate instance()
-	{
-		return InstanceHolder.INSTANCE;
-	}
+	public static final Identifier ACTIVATE_PACKET = id("activate");
+	public static final Identifier TASK_PACKET = id("task");
 }

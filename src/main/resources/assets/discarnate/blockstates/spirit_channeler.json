@@ -1,24 +1,7 @@
 {
-	"forge_marker": 1,
-	"defaults":
-	{
-		"textures":
-		{
-			"particle": "discarnate:blocks/spirit_channeler_end",
-			"side": "discarnate:blocks/spirit_channeler_side",
-			"end": "discarnate:blocks/spirit_channeler_end"
-		},
-		"model": "cube_column",
-		"transform": "forge:default-block"
-	},
 	"variants":
 	{
-		"normal": [{}],
-		"inventory": [{}],
-		"active":
-		{
-			"true": { "textures": { "side": "discarnate:blocks/spirit_channeler_side_active" } },
-			"false": { }
-		}
+		"active=false": { "model": "discarnate:block/spirit_channeler" },
+		"active=true": { "model": "discarnate:block/active_spirit_channeler" }
 	}
 }

@@ -1,17 +1,9 @@
 package virtuoel.discarnate.client.handler;
 
-import org.lwjgl.input.Keyboard;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.input.Input;
+import net.minecraft.client.option.KeyBinding;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.MovementInput;
-import net.minecraftforge.client.event.InputUpdateEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import virtuoel.discarnate.Discarnate;
-
-@EventBusSubscriber(modid = Discarnate.MOD_ID, value = Side.CLIENT)
 public class ClientEventHandler
 {
 	private static int forwardTicks = 0;
@@ -27,17 +19,19 @@ public class ClientEventHandler
 		{
 			synchronized(key)
 			{
-				int keyCode = key.getKeyCode();
 				try
 				{
-					KeyBinding.setKeyBindState(keyCode, Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput);
+					MinecraftClient mc = MinecraftClient.getInstance();
+					key.setPressed(mc.currentScreen == null || mc.currentScreen.passEvents);
 					Thread.sleep(millis);
 				}
 				catch(InterruptedException e)
-				{}
+				{
+					
+				}
 				finally
 				{
-					tryReleaseKey(keyCode);
+					key.setPressed(false);
 				}
 			}
 		}).start();
@@ -49,81 +43,77 @@ public class ClientEventHandler
 		{
 			synchronized(key)
 			{
-				tryReleaseKey(key.getKeyCode());
+				key.setPressed(false);
 			}
 		}).start();
 	}
 	
-	public static void tryReleaseKey(int keyCode)
+	public static void onInputUpdate(MinecraftClient mc)
 	{
-		KeyBinding.setKeyBindState(keyCode, keyCode >= 0 && keyCode < 256 && Keyboard.isKeyDown(keyCode));
-	}
-	
-	@SubscribeEvent
-	public static void onInputUpdate(InputUpdateEvent event)
-	{
-		MovementInput input = event.getMovementInput();
-		
 		synchronized(ClientEventHandler.class)
 		{
-			boolean allowInput = Minecraft.getMinecraft().currentScreen == null || Minecraft.getMinecraft().currentScreen.allowUserInput;
+			if (mc.player == null) return;
+			
+			Input input = mc.player.input;
+			
+			boolean allowInput = mc.currentScreen == null || mc.currentScreen.passEvents;
 			
 			if(forwardTicks > 0)
 			{
-				if(allowInput && !input.forwardKeyDown)
+				if(allowInput && !input.pressingForward)
 				{
-					input.moveForward++;
-					input.forwardKeyDown = true;
+					input.movementForward++;
+					input.pressingForward = true;
 				}
 				forwardTicks--;
 			}
 			
 			if(backwardTicks > 0)
 			{
-				if(allowInput && !input.backKeyDown)
+				if(allowInput && !input.pressingBack)
 				{
-					input.moveForward--;
-					input.backKeyDown = true;
+					input.movementForward--;
+					input.pressingBack = true;
 				}
 				backwardTicks--;
 			}
 			
 			if(leftTicks > 0)
 			{
-				if(allowInput && !input.leftKeyDown)
+				if(allowInput && !input.pressingLeft)
 				{
-					input.moveStrafe++;
-					input.leftKeyDown = true;
+					input.movementSideways++;
+					input.pressingLeft = true;
 				}
 				leftTicks--;
 			}
 			
 			if(rightTicks > 0)
 			{
-				if(allowInput && !input.rightKeyDown)
+				if(allowInput && !input.pressingRight)
 				{
-					input.moveStrafe--;
-					input.rightKeyDown = true;
+					input.movementSideways--;
+					input.pressingRight = true;
 				}
 				rightTicks--;
 			}
 			
 			if(jumpTicks > 0)
 			{
-				if(allowInput && !input.jump)
+				if(allowInput && !input.jumping)
 				{
-					input.jump = true;
+					input.jumping = true;
 				}
 				jumpTicks--;
 			}
 			
 			if(sneakTicks > 0)
 			{
-				if(allowInput && !input.sneak)
+				if(allowInput && !input.sneaking)
 				{
-					input.sneak = true;
-					input.moveStrafe = (float) (input.moveStrafe * 0.3D);
-					input.moveForward = (float) (input.moveForward * 0.3D);
+					input.sneaking = true;
+					input.movementSideways = (float) (input.movementSideways * 0.3D);
+					input.movementForward = (float) (input.movementForward * 0.3D);
 				}
 				sneakTicks--;
 			}

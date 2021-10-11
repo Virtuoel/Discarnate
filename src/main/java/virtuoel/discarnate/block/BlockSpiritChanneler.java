@@ -9,6 +9,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.StateManager.Builder;
 import net.minecraft.state.property.BooleanProperty;
@@ -88,5 +89,13 @@ public class BlockSpiritChanneler extends Block implements BlockEntityProvider
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
 	{
 		return TileEntityRegistrar.SPIRIT_CHANNELER.instantiate(pos, state);
+	}
+	
+	@Override
+	@Nullable
+	public NamedScreenHandlerFactory createScreenHandlerFactory(BlockState state, World world, BlockPos pos)
+	{
+		BlockEntity blockEntity = world.getBlockEntity(pos);
+		return blockEntity instanceof NamedScreenHandlerFactory ? (NamedScreenHandlerFactory) blockEntity : null;
 	}
 }

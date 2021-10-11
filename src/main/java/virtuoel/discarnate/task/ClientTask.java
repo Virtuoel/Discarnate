@@ -1,20 +1,24 @@
 package virtuoel.discarnate.task;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.DimensionType;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.api.ITask;
 import virtuoel.discarnate.api.Task;
-import virtuoel.discarnate.network.SPacketBuiltinClientTask;
+import virtuoel.discarnate.init.TaskRegistrar;
 
 public class ClientTask implements Task
 {
@@ -28,9 +32,23 @@ public class ClientTask implements Task
 	@Override
 	public void accept(@NotNull ItemStack s, @Nullable PlayerEntity p, @Nullable BlockEntity b)
 	{
-		if(p instanceof EntityPlayerMP && !p.getEntityWorld().isRemote)
+		if(p instanceof ServerPlayerEntity && !p.getEntityWorld().isClient)
 		{
-			Discarnate.NETWORK.sendTo(new SPacketBuiltinClientTask(this, getPosFromTileEntity(t), s, getSlotForStack(s, b), getDimensionFromTileEntity(b)), (EntityPlayerMP) p);
+			final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+			final BlockPos pos = getPosFromTileEntity(b);
+			buf.writeIdentifier(TaskRegistrar.REGISTRY.getId(this));
+			buf.writeInt(pos.getX());
+			buf.writeInt(pos.getY());
+			buf.writeInt(pos.getZ());
+			int slot = getSlotForStack(s, b);
+			buf.writeInt(slot);
+			if(slot == -1)
+			{
+				buf.writeItemStack(s);
+			}
+			buf.writeIdentifier(getDimensionFromTileEntity(b));
+			
+			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.ACTIVATE_PACKET, buf);
 		}
 		else
 		{
@@ -38,32 +56,35 @@ public class ClientTask implements Task
 		}
 	}
 	
-	private static BlockPos getPosFromTileEntity(TileEntity te)
+	private static BlockPos getPosFromTileEntity(BlockEntity te)
 	{
 		return te != null ? te.getPos() : BlockPos.ORIGIN;
 	}
 	
-	private static int getDimensionFromTileEntity(TileEntity te)
+	private static Identifier getDimensionFromTileEntity(BlockEntity te)
 	{
-		return te != null ? te.getWorld().provider.getDimension() : DimensionType.OVERWORLD.getId();
+		if (te != null)
+		{
+			World w = te.getWorld();
+			return w.getRegistryManager().get(Registry.DIMENSION_TYPE_KEY).getId(w.getDimension());
+		}
+		return DimensionType.OVERWORLD_ID;
 	}
 	
-	private static int getSlotForStack(ItemStack stack, TileEntity te)
+	private static int getSlotForStack(ItemStack stack, BlockEntity te)
 	{
-		if(te != null)
+		if(te instanceof Inventory)
 		{
-			if(te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+			Inventory handler = (Inventory) te;
+			for(int i = 0; i < handler.size(); i++)
 			{
-				IItemHandler handler = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-				for(int i = 0; i < handler.getSlots(); i++)
+				if(stack == handler.getStack(i))
 				{
-					if(stack == handler.getStackInSlot(i))
-					{
-						return i;
-					}
+					return i;
 				}
 			}
 		}
+		
 		return -1;
 	}
 }

@@ -159,12 +159,14 @@ public class TaskRegistrar
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.tryHoldKey(MinecraftClient.getInstance().options.keyAttack, i.getCount() * 50);
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keyAttack, i.getCount() * 50);
 		}, ItemRegistrar.SWING_ITEM_TASK);
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.tryHoldKey(MinecraftClient.getInstance().options.keyUse, i.getCount() * 50);
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keyUse, i.getCount() * 50);
 		}, ItemRegistrar.USE_ITEM_TASK);
 		
 		registerClientTask((i, p, t) ->
@@ -180,8 +182,9 @@ public class TaskRegistrar
 			ClientEventHandler.setRightTicks(0);
 			ClientEventHandler.setSneakTicks(0);
 			ClientEventHandler.setJumpTicks(0);
-			ClientEventHandler.tryReleaseKey(MinecraftClient.getInstance().options.keyAttack);
-			ClientEventHandler.tryReleaseKey(MinecraftClient.getInstance().options.keyUse);
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryReleaseKey(mc.options.keyAttack);
+			ClientEventHandler.tryReleaseKey(mc.options.keyUse);
 		}), Discarnate.id("reset_channeler_task"));
 		
 		registerTask((i, p, t) ->
@@ -246,5 +249,12 @@ public class TaskRegistrar
 	public static Task registerClientTask(Task task, ItemConvertible item)
 	{
 		return registerTask(new ClientTask(task), item);
+	}
+	
+	public static final TaskRegistrar INSTANCE = new TaskRegistrar();
+	
+	private TaskRegistrar()
+	{
+		
 	}
 }

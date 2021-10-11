@@ -7,6 +7,7 @@ import java.util.Random;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
@@ -24,8 +25,9 @@ import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.BrewingStandScreenHandler;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -41,10 +43,11 @@ import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.init.TileEntityRegistrar;
+import virtuoel.discarnate.inventory.ContainerSpiritChanneler;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.reference.DiscarnateConfig;
 
-public class TileEntitySpiritChanneler extends LockableContainerBlockEntity implements SidedInventory
+public class TileEntitySpiritChanneler extends LockableContainerBlockEntity implements SidedInventory, ExtendedScreenHandlerFactory
 {
 	@Override
 	public void cancelRemoval()
@@ -403,9 +406,15 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 	public void clear() {
 		this.inventory.clear();
 	}
-
+	
+	@Override
+	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf)
+	{
+		buf.writeBlockPos(getPos());
+	}
+	
 	@Override
 	protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-		return new BrewingStandScreenHandler(syncId, playerInventory, this, null);
+		return new ContainerSpiritChanneler(syncId, playerInventory, this);
 	}
 }

@@ -1,37 +1,57 @@
 package virtuoel.discarnate.inventory;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.SlotItemHandler;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
-public class ContainerSpiritChanneler extends Container
+public class ContainerSpiritChanneler extends ScreenHandler
 {
-	protected TileEntitySpiritChanneler tileEntity;
+	public final TileEntitySpiritChanneler tileEntity;
 	
-	public ContainerSpiritChanneler(EntityPlayer player, final TileEntitySpiritChanneler tileEntity)
+	public ContainerSpiritChanneler(int syncId, PlayerInventory playerInventory, final PacketByteBuf buffer)
 	{
-		this.tileEntity = tileEntity;
-		onContainerOpened(player);
+		this(syncId, playerInventory, getAtPos(playerInventory.player.world, buffer.readBlockPos()));
 	}
 	
-	public void onContainerOpened(EntityPlayer player)
+	private static TileEntitySpiritChanneler getAtPos(World world, BlockPos pos)
 	{
-		if(tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+		if (world.isChunkLoaded(pos))
 		{
-			IItemHandler inventory = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			addTileEntitySlots(inventory, tileEntity);
+			BlockEntity be = world.getBlockEntity(pos);
+			if (be instanceof TileEntitySpiritChanneler)
+			{
+				return (TileEntitySpiritChanneler) be;
+			}
 		}
-		
+		return null;
+	}
+	
+	public ContainerSpiritChanneler(int syncId, PlayerInventory playerInventory, final TileEntitySpiritChanneler tileEntity)
+	{
+		super(ScreenHandlerRegistrar.SPIRIT_CHANNELER, syncId);
+		this.tileEntity = tileEntity;
+		if (this.tileEntity != null)
+		{
+			addTileEntitySlots(this.tileEntity);
+		}
+		addPlayerSlots(playerInventory);
+	}
+	
+	public void addPlayerSlots(Inventory playerInventory)
+	{
 		final int xOffset = 8;
 		final int yOffset = 122;
 		final int slotBorder = 1;
@@ -42,15 +62,13 @@ public class ContainerSpiritChanneler extends Container
 		final int hotbarSlotsHorizontal = 9;
 		final int hotbarSeparation = 4;
 		
-		IInventory playerInventory = player.inventory;
-		
 		for(int row = 0; row < inventorySlotsVertical; row++)
 		{
 			for(int col = 0; col < inventorySlotsHorizontal; col++)
 			{
 				int x = xOffset + col * (slotWidth + (slotBorder * 2));
 				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
-				addSlotToContainer(new Slot(playerInventory, col + row * inventorySlotsHorizontal + hotbarSlotsHorizontal, x, y));
+				addSlot(new Slot(playerInventory, col + row * inventorySlotsHorizontal + hotbarSlotsHorizontal, x, y));
 			}
 		}
 		
@@ -58,11 +76,11 @@ public class ContainerSpiritChanneler extends Container
 		for(int col = 0; col < inventorySlotsHorizontal; col++)
 		{
 			int x = xOffset + col * (slotWidth + (slotBorder * 2));
-			addSlotToContainer(new Slot(playerInventory, col, x, hotbarY));
+			addSlot(new Slot(playerInventory, col, x, hotbarY));
 		}
 	}
 	
-	public void addTileEntitySlots(IItemHandler inventory, TileEntitySpiritChanneler tileEntity)
+	public void addTileEntitySlots(Inventory inventory)
 	{
 		final int xOffset = 17;
 		final int yOffset = 18;
@@ -78,24 +96,18 @@ public class ContainerSpiritChanneler extends Container
 			{
 				int x = xOffset + col * (slotWidth + (slotBorder * 2));
 				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
-				this.addSlotToContainer(new SlotItemHandler(inventory, col + row * inventorySlotsHorizontal, x, y)
+				this.addSlot(new Slot(inventory, col + row * inventorySlotsHorizontal, x, y)
 				{
 					@Override
-					public boolean canTakeStack(EntityPlayer playerIn)
+					public boolean canTakeItems(PlayerEntity playerIn)
 					{
-						return !tileEntity.isActive() && super.canTakeStack(playerIn);
+						return tileEntity != null && !tileEntity.isActive() && super.canTakeItems(playerIn);
 					}
 					
 					@Override
-					public boolean isItemValid(ItemStack stack)
+					public boolean canInsert(ItemStack stack)
 					{
-						return TaskRegistrar.REGISTRY.getValue(stack.getItem().getRegistryName()) != null;
-					}
-					
-					@Override
-					public void onSlotChanged()
-					{
-						tileEntity.markDirty();
+						return TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).isPresent();
 					}
 				});
 			}
@@ -103,49 +115,44 @@ public class ContainerSpiritChanneler extends Container
 	}
 	
 	@Override
-	public boolean canInteractWith(EntityPlayer playerIn)
+	public boolean canUse(PlayerEntity playerIn)
 	{
-		if(tileEntity != null && tileEntity.getWorld() != null)
-		{
-			BlockPos pos = tileEntity.getPos();
-			return tileEntity.getWorld().getTileEntity(pos) == tileEntity && playerIn.getDistanceSq(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= 64.0D;
-		}
-		return false;
+		return tileEntity != null && tileEntity.canPlayerUse(playerIn);
 	}
 	
 	@Override
-	@Nonnull
-	public ItemStack transferStackInSlot(EntityPlayer player, int index)
+	@NotNull
+	public ItemStack transferSlot(PlayerEntity player, int index)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = inventorySlots.get(index);
+		Slot slot = slots.get(index);
 		
-		if(slot != null && slot.getHasStack())
+		if(slot != null && slot.hasStack())
 		{
 			ItemStack itemstack1 = slot.getStack();
 			itemstack = itemstack1.copy();
 			
-			int containerSlots = inventorySlots.size() - player.inventory.mainInventory.size();
+			int containerSlots = slots.size() - player.getInventory().main.size();
 			
 			if(index < containerSlots)
 			{
-				if(!this.mergeItemStack(itemstack1, containerSlots, inventorySlots.size(), false))
+				if(!this.insertItem(itemstack1, containerSlots, slots.size(), false))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if(tileEntity.isActive() || !this.mergeItemStack(itemstack1, 0, containerSlots, false))
+			else if((tileEntity != null && tileEntity.isActive()) || !this.insertItem(itemstack1, 0, containerSlots, false))
 			{
 				if(index < containerSlots + 27)
 				{
-					if(!this.mergeItemStack(itemstack1, containerSlots + 27, inventorySlots.size(), false))
+					if(!this.insertItem(itemstack1, containerSlots + 27, slots.size(), false))
 					{
 						return ItemStack.EMPTY;
 					}
 				}
 				else
 				{
-					if(!this.mergeItemStack(itemstack1, containerSlots, containerSlots + 27, false))
+					if(!this.insertItem(itemstack1, containerSlots, containerSlots + 27, false))
 					{
 						return ItemStack.EMPTY;
 					}
@@ -154,11 +161,11 @@ public class ContainerSpiritChanneler extends Container
 			
 			if(itemstack1.isEmpty())
 			{
-				slot.putStack(ItemStack.EMPTY);
+				slot.setStack(ItemStack.EMPTY);
 			}
 			else
 			{
-				slot.onSlotChanged();
+				slot.markDirty();
 			}
 			
 			if(itemstack1.getCount() == itemstack.getCount())
@@ -166,7 +173,7 @@ public class ContainerSpiritChanneler extends Container
 				return ItemStack.EMPTY;
 			}
 			
-			slot.onTake(player, itemstack1);
+			slot.onTakeItem(player, itemstack1);
 		}
 		
 		return itemstack;
