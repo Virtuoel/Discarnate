@@ -1,0 +1,45 @@
+{
+	"parent": "minecraft:recipes/root",
+	"rewards":
+	{
+		"recipes":
+		[
+			"discarnate:end_task"
+		]
+	},
+	"criteria":
+	{
+		"has_ingredient":
+		{
+			"trigger": "minecraft:inventory_changed",
+			"conditions":
+			{
+				"items":
+				[
+					{
+						"item": "minecraft:emerald",
+						"items":
+						[
+							"minecraft:emerald"
+						]
+					}
+				]
+			}
+		},
+		"has_the_recipe":
+		{
+			"trigger": "minecraft:recipe_unlocked",
+			"conditions":
+			{
+				"recipe": "discarnate:end_task"
+			}
+		}
+	},
+	"requirements":
+	[
+		[
+			"has_ingredient",
+			"has_the_recipe"
+		]
+	]
+}
