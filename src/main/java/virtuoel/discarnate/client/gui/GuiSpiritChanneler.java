@@ -37,22 +37,25 @@ public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 		this.tileEntity = handler.tileEntity;
 		this.width = 176;
 		this.height = 204;
-		this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
+		this.backgroundHeight = 204;
+		this.playerInventoryTitleY = this.backgroundHeight - 94;
 	}
 	
 	ButtonWidget confirmButton;
 	boolean active = false;
 
-	private static final Text START_TEXT = new TranslatableText("discarnate.spirit_channeler.start");
-	private static final Text STOP_TEXT = new TranslatableText("discarnate.spirit_channeler.stop");
+	private static final Text START_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.start");
+	private static final Text STOP_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.stop");
 	
 	@Override
 	public void init()
 	{
 		super.init();
+		this.titleX = (this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2;
 		this.active = tileEntity.isActive();
 		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
 		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
+		this.addDrawableChild(confirmButton);
 	}
 	
 	@Override
@@ -81,6 +84,16 @@ public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 			{
 				Optional.ofNullable(this.client.player).ifPresent(ClientPlayerEntity::closeHandledScreen);
 			}
+		}
+	}
+	
+	@Override
+	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY)
+	{
+		super.drawForeground(matrices, mouseX, mouseY);
+		if (confirmButton.isHovered() && !confirmButton.isFocused())
+		{
+			confirmButton.renderTooltip(matrices, mouseX - this.x, mouseY - this.y);
 		}
 	}
 	

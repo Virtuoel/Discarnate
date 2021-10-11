@@ -1,0 +1,32 @@
+{
+	"block.discarnate.spirit_channeler": "Spirit Channeler",
+	
+	"item.discarnate.blank_task": "Task: None",
+	"item.discarnate.info_task": "Task: Info",
+	"item.discarnate.wait_task": "Task: Wait",
+	"item.discarnate.drop_task": "Task: Drop Held Item",
+	"item.discarnate.swap_task": "Task: Swap Held Items",
+	"item.discarnate.move_forward_task": "Task: Move Forward",
+	"item.discarnate.move_backward_task": "Task: Move Backward",
+	"item.discarnate.strafe_left_task": "Task: Strafe Left",
+	"item.discarnate.strafe_right_task": "Task: Strafe Right",
+	"item.discarnate.cancel_movement_task": "Task: Cancel Movement",
+	"item.discarnate.look_up_task": "Task: Look Up",
+	"item.discarnate.look_down_task": "Task: Look Down",
+	"item.discarnate.look_left_task": "Task: Look Left",
+	"item.discarnate.look_right_task": "Task: Look Right",
+	"item.discarnate.face_horizon_task": "Task: Face Horizon",
+	"item.discarnate.face_cardinal_task": "Task: Face Cardinal Direction",
+	"item.discarnate.sneak_task": "Task: Sneak",
+	"item.discarnate.jump_task": "Task: Jump",
+	"item.discarnate.swing_item_task": "Task: Swing Held Item",
+	"item.discarnate.use_item_task": "Task: Use Held Item",
+	"item.discarnate.switch_slot_task": "Task: Switch Hotbar Slot",
+	"item.discarnate.end_task": "Task: Terminate",
+	
+	"container.discarnate.spirit_channeler": "Spirit Channeler",
+	"gui.discarnate.spirit_channeler.start": "Start",
+	"gui.discarnate.spirit_channeler.stop": "Stop",
+	
+	"itemGroup.discarnate.general": "Discarnate"
+}

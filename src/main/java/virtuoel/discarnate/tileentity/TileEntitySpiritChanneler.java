@@ -54,9 +54,9 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 	{
 		super.cancelRemoval();
 		World w = getWorld();
-		if(!w.isClient)
+		if(w != null && !w.isClient)
 		{
-			deactivate();
+	//		deactivate();
 		}
 	}
 	
@@ -207,7 +207,7 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 	
 	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)
 	{
-		return player.getEquippedStack(EquipmentSlot.HEAD).getItem() == Item.fromBlock(Blocks.PUMPKIN);
+		return player.getEquippedStack(EquipmentSlot.HEAD).getItem() == Item.fromBlock(Blocks.CARVED_PUMPKIN);
 	}
 	
 	protected void setupMarkerVex(VexEntity marker, @NotNull World w, BlockPos pos, PlayerEntity player)
@@ -215,6 +215,7 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 		MobEntityAccessor m = (MobEntityAccessor) marker;
 		GoalSelector selector = m.getGoalSelector();
 		
+		selector.clear();
 		selector.add(0, new Goal()
 		{
 			@Override

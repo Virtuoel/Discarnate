@@ -31,7 +31,7 @@ public class TaskRegistrar
 		Registry.ITEM.getId(ItemRegistrar.BLANK_TASK)
 	).attribute(RegistryAttribute.SYNCED).buildAndRegister();
 	
-	public static void registerTasks()
+	private TaskRegistrar()
 	{
 		registerTask((i, p, t) ->
 		{}, ItemRegistrar.BLANK_TASK);
@@ -252,9 +252,4 @@ public class TaskRegistrar
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();
-	
-	private TaskRegistrar()
-	{
-		
-	}
 }

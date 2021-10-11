@@ -48,7 +48,7 @@ public class ClientTask implements Task
 			}
 			buf.writeIdentifier(getDimensionFromTileEntity(b));
 			
-			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.ACTIVATE_PACKET, buf);
+			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.TASK_PACKET, buf);
 		}
 		else
 		{
