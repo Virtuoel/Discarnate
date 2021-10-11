@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "discarnate",
+	"name": "Discarnate",
+	"version": "${version}",
+	"description": "A mod where you let spirits control your body to do tasks",
+	"authors":
+	[
+		"Virtuoel"
+	],
+	"contact":
+	{
+		"homepage": "https://www.curseforge.com/minecraft/mc-mods/discarnate",
+		"issues": "https://github.com/Virtuoel/Discarnate/issues",
+		"sources": "https://github.com/Virtuoel/Discarnate"
+	},
+	"license": "MIT",
+	"icon": "assets/discarnate/icon.png",
+	"environment": "*",
+	"depends":
+	{
+		"fabricloader": ">=0.11.7",
+		"fabric-api-base": "*"
+	},
+	"entrypoints":
+	{
+		"main":
+		[
+			"virtuoel.discarnate.Discarnate"
+		],
+		"client":
+		[
+			"virtuoel.discarnate.DiscarnateClient"
+		]
+	},
+	"mixins":
+	[
+		"discarnate.mixins.json"
+	]
+}

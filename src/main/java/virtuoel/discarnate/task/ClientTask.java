@@ -13,25 +13,28 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.ITask;
+import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.network.SPacketBuiltinClientTask;
 
-public class ClientTask extends CommonTask
+public class ClientTask implements Task
 {
-	public ClientTask(ITask task)
+	Task task;
+	
+	public ClientTask(Task task)
 	{
-		super(task);
+		this.task = task;
 	}
 	
 	@Override
-	public void accept(@Nonnull ItemStack s, @Nullable EntityPlayer p, @Nullable TileEntity t)
+	public void accept(@NotNull ItemStack s, @Nullable PlayerEntity p, @Nullable BlockEntity b)
 	{
 		if(p instanceof EntityPlayerMP && !p.getEntityWorld().isRemote)
 		{
-			Discarnate.NETWORK.sendTo(new SPacketBuiltinClientTask(this, getPosFromTileEntity(t), s, getSlotForStack(s, t), getDimensionFromTileEntity(t)), (EntityPlayerMP) p);
+			Discarnate.NETWORK.sendTo(new SPacketBuiltinClientTask(this, getPosFromTileEntity(t), s, getSlotForStack(s, b), getDimensionFromTileEntity(b)), (EntityPlayerMP) p);
 		}
 		else
 		{
-			super.accept(s, p, t);
+			task.accept(s, p, b);
 		}
 	}
 	

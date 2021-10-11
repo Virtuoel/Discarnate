@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "virtuoel.discarnate.mixin",
+	"compatibilityLevel": "JAVA_8",
+	"mixins":
+	[
+		"MobEntityAccessor"
+	],
+	"injectors":
+	{
+		"defaultRequire": 1
+	}
+}
