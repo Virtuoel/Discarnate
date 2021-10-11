@@ -35,7 +35,7 @@ public class ClientTask implements Task
 		if(p instanceof ServerPlayerEntity && !p.getEntityWorld().isClient)
 		{
 			final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			final BlockPos pos = getPosFromTileEntity(b);
+			final BlockPos pos = getPosFromBlockEntity(b);
 			buf.writeIdentifier(TaskRegistrar.REGISTRY.getId(this));
 			buf.writeInt(pos.getX());
 			buf.writeInt(pos.getY());
@@ -46,7 +46,7 @@ public class ClientTask implements Task
 			{
 				buf.writeItemStack(s);
 			}
-			buf.writeIdentifier(getDimensionFromTileEntity(b));
+			buf.writeIdentifier(getDimensionFromBlockEntity(b));
 			
 			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.TASK_PACKET, buf);
 		}
@@ -56,16 +56,16 @@ public class ClientTask implements Task
 		}
 	}
 	
-	private static BlockPos getPosFromTileEntity(BlockEntity te)
+	private static BlockPos getPosFromBlockEntity(BlockEntity be)
 	{
-		return te != null ? te.getPos() : BlockPos.ORIGIN;
+		return be != null ? be.getPos() : BlockPos.ORIGIN;
 	}
 	
-	private static Identifier getDimensionFromTileEntity(BlockEntity te)
+	private static Identifier getDimensionFromBlockEntity(BlockEntity be)
 	{
-		if (te != null)
+		if (be != null)
 		{
-			World w = te.getWorld();
+			World w = be.getWorld();
 			return w.getRegistryManager().get(Registry.DIMENSION_TYPE_KEY).getId(w.getDimension());
 		}
 		return DimensionType.OVERWORLD_ID;

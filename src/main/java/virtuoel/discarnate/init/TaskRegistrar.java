@@ -19,9 +19,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
+import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.client.handler.ClientEventHandler;
 import virtuoel.discarnate.task.ClientTask;
-import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 public class TaskRegistrar
 {
@@ -189,9 +189,9 @@ public class TaskRegistrar
 		
 		registerTask((i, p, t) ->
 		{
-			if(t instanceof TileEntitySpiritChanneler)
+			if(t instanceof SpiritChannelerBlockEntity)
 			{
-				((TileEntitySpiritChanneler) t).deactivate();
+				((SpiritChannelerBlockEntity) t).deactivate();
 			}
 		}, ItemRegistrar.END_TASK);
 		
@@ -212,7 +212,7 @@ public class TaskRegistrar
 					{
 						for(ItemStack stack : stacks)
 						{
-							if(p != null && !p.isDead() && TileEntitySpiritChanneler.isActive(t.getWorld(), t.getPos()))
+							if(p != null && !p.isDead() && SpiritChannelerBlockEntity.isActive(t.getWorld(), t.getPos()))
 							{
 								if(!stack.isEmpty())
 								{

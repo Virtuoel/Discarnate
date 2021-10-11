@@ -1,4 +1,4 @@
-package virtuoel.discarnate.inventory;
+package virtuoel.discarnate.screen;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -13,39 +13,39 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
+import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
-import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
-public class ContainerSpiritChanneler extends ScreenHandler
+public class SpiritChannelerScreenHandler extends ScreenHandler
 {
-	public final TileEntitySpiritChanneler tileEntity;
+	public final SpiritChannelerBlockEntity blockEntity;
 	
-	public ContainerSpiritChanneler(int syncId, PlayerInventory playerInventory, final PacketByteBuf buffer)
+	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory, final PacketByteBuf buffer)
 	{
 		this(syncId, playerInventory, getAtPos(playerInventory.player.world, buffer.readBlockPos()));
 	}
 	
-	private static TileEntitySpiritChanneler getAtPos(World world, BlockPos pos)
+	private static SpiritChannelerBlockEntity getAtPos(World world, BlockPos pos)
 	{
 		if (world.isChunkLoaded(pos))
 		{
 			BlockEntity be = world.getBlockEntity(pos);
-			if (be instanceof TileEntitySpiritChanneler)
+			if (be instanceof SpiritChannelerBlockEntity)
 			{
-				return (TileEntitySpiritChanneler) be;
+				return (SpiritChannelerBlockEntity) be;
 			}
 		}
 		return null;
 	}
 	
-	public ContainerSpiritChanneler(int syncId, PlayerInventory playerInventory, final TileEntitySpiritChanneler tileEntity)
+	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory, final SpiritChannelerBlockEntity blockEntity)
 	{
 		super(ScreenHandlerRegistrar.SPIRIT_CHANNELER, syncId);
-		this.tileEntity = tileEntity;
-		if (this.tileEntity != null)
+		this.blockEntity = blockEntity;
+		if (this.blockEntity != null)
 		{
-			addTileEntitySlots(this.tileEntity);
+			addBlockEntitySlots(this.blockEntity);
 		}
 		addPlayerSlots(playerInventory);
 	}
@@ -80,7 +80,7 @@ public class ContainerSpiritChanneler extends ScreenHandler
 		}
 	}
 	
-	public void addTileEntitySlots(Inventory inventory)
+	public void addBlockEntitySlots(Inventory inventory)
 	{
 		final int xOffset = 17;
 		final int yOffset = 18;
@@ -101,7 +101,7 @@ public class ContainerSpiritChanneler extends ScreenHandler
 					@Override
 					public boolean canTakeItems(PlayerEntity playerIn)
 					{
-						return tileEntity != null && !tileEntity.isActive() && super.canTakeItems(playerIn);
+						return blockEntity != null && !blockEntity.isActive() && super.canTakeItems(playerIn);
 					}
 					
 					@Override
@@ -117,7 +117,7 @@ public class ContainerSpiritChanneler extends ScreenHandler
 	@Override
 	public boolean canUse(PlayerEntity playerIn)
 	{
-		return tileEntity != null && tileEntity.canPlayerUse(playerIn);
+		return blockEntity != null && blockEntity.canPlayerUse(playerIn);
 	}
 	
 	@Override
@@ -141,7 +141,7 @@ public class ContainerSpiritChanneler extends ScreenHandler
 					return ItemStack.EMPTY;
 				}
 			}
-			else if((tileEntity != null && tileEntity.isActive()) || !this.insertItem(itemstack1, 0, containerSlots, false))
+			else if((blockEntity != null && blockEntity.isActive()) || !this.insertItem(itemstack1, 0, containerSlots, false))
 			{
 				if(index < containerSlots + 27)
 				{

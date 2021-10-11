@@ -16,13 +16,13 @@ import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.block.BlockSpiritChanneler;
+import virtuoel.discarnate.block.SpiritChannelerBlock;
 
 public class BlockRegistrar
 {
 	public static final Block SPIRIT_CHANNELER = registerBlock(
 		Discarnate.id("spirit_channeler"),
-		BlockSpiritChanneler::new,
+		SpiritChannelerBlock::new,
 		FabricBlockSettings.of(Material.METAL, MapColor.BROWN)
 		.strength(5.0F, 10.0F)
 		.sounds(BlockSoundGroup.METAL)

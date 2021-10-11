@@ -1,4 +1,4 @@
-package virtuoel.discarnate.client.gui;
+package virtuoel.discarnate.client.gui.screen.ingame;
 
 import java.util.Optional;
 
@@ -19,21 +19,21 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.inventory.ContainerSpiritChanneler;
+import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.reference.DiscarnateConfig;
-import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
+import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
 @Environment(EnvType.CLIENT)
-public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
+public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHandler>
 {
 	private static final Identifier TEXTURE = Discarnate.id("textures/gui/container/spirit_channeler.png");
 	
-	private TileEntitySpiritChanneler tileEntity;
+	private SpiritChannelerBlockEntity blockEntity;
 	
-	public GuiSpiritChanneler(ContainerSpiritChanneler screenHandler, PlayerInventory playerInventory, Text text)
+	public SpiritChannelerScreen(SpiritChannelerScreenHandler screenHandler, PlayerInventory playerInventory, Text text)
 	{
 		super(screenHandler, playerInventory, text);
-		this.tileEntity = handler.tileEntity;
+		this.blockEntity = handler.blockEntity;
 		this.width = 176;
 		this.height = 204;
 		this.backgroundHeight = 204;
@@ -51,7 +51,7 @@ public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 	{
 		super.init();
 		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
-		this.active = tileEntity.isActive();
+		this.active = blockEntity.isActive();
 		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
 		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
 		this.addDrawableChild(confirmButton);
@@ -62,7 +62,7 @@ public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 	{
 		super.handledScreenTick();
 		
-		this.active = tileEntity.isActive();
+		this.active = blockEntity.isActive();
 		
 		this.confirmButton.setMessage(active ? STOP_TEXT : START_TEXT);
 		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
@@ -73,7 +73,7 @@ public class GuiSpiritChanneler extends HandledScreen<ContainerSpiritChanneler>
 		if (button.active)
 		{
 			final PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
-			buffer.writeBlockPos(tileEntity.getPos());
+			buffer.writeBlockPos(blockEntity.getPos());
 			buffer.writeBoolean(!active);
 			ClientPlayNetworking.send(Discarnate.ACTIVATE_PACKET, buffer);
 			if(!active)

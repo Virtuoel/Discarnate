@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.dimension.DimensionType;
 import virtuoel.discarnate.api.Task;
-import virtuoel.discarnate.client.gui.GuiSpiritChanneler;
+import virtuoel.discarnate.client.gui.screen.ingame.SpiritChannelerScreen;
 import virtuoel.discarnate.client.handler.ClientEventHandler;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -31,7 +31,7 @@ public class DiscarnateClient implements ClientModInitializer
 		
 		ClientPlayNetworking.registerGlobalReceiver(Discarnate.TASK_PACKET, DiscarnateClient::handleTaskPacket);
 		
-		ScreenRegistry.register(ScreenHandlerRegistrar.SPIRIT_CHANNELER, GuiSpiritChanneler::new);
+		ScreenRegistry.register(ScreenHandlerRegistrar.SPIRIT_CHANNELER, SpiritChannelerScreen::new);
 	}
 	
 	private static void handleTaskPacket(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender)
@@ -49,17 +49,17 @@ public class DiscarnateClient implements ClientModInitializer
 			{
 				if(w.isChunkLoaded(pos))
 				{
-					BlockEntity te = w.getBlockEntity(pos);
-					if(te != null)
+					BlockEntity be = w.getBlockEntity(pos);
+					if(be != null)
 					{
 						PlayerEntity player = (PlayerEntity) (Object) client.player;
-						if(slot != -1 && te instanceof Inventory)
+						if(slot != -1 && be instanceof Inventory)
 						{
-							task.accept(((Inventory) te).getStack(slot), player, te);
+							task.accept(((Inventory) be).getStack(slot), player, be);
 						}
 						else
 						{
-							task.accept(stack, player, te);
+							task.accept(stack, player, be);
 						}
 					}
 				}

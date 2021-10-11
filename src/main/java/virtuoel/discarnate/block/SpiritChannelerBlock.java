@@ -19,13 +19,13 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import virtuoel.discarnate.init.TileEntityRegistrar;
+import virtuoel.discarnate.init.BlockEntityRegistrar;
 
-public class BlockSpiritChanneler extends Block implements BlockEntityProvider
+public class SpiritChannelerBlock extends Block implements BlockEntityProvider
 {
 	public static final BooleanProperty ACTIVE = BooleanProperty.of("active");
 	
-	public BlockSpiritChanneler(Block.Settings settings)
+	public SpiritChannelerBlock(Block.Settings settings)
 	{
 		super(settings);
 		
@@ -88,7 +88,7 @@ public class BlockSpiritChanneler extends Block implements BlockEntityProvider
 	@Nullable
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
 	{
-		return TileEntityRegistrar.SPIRIT_CHANNELER.instantiate(pos, state);
+		return BlockEntityRegistrar.SPIRIT_CHANNELER.instantiate(pos, state);
 	}
 	
 	@Override

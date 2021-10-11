@@ -11,12 +11,12 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
+import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.BlockRegistrar;
 import virtuoel.discarnate.init.ItemRegistrar;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
-import virtuoel.discarnate.init.TileEntityRegistrar;
-import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
 public class Discarnate implements ModInitializer
 {
@@ -36,7 +36,7 @@ public class Discarnate implements ModInitializer
 		ItemRegistrar.INSTANCE.getClass();
 		ScreenHandlerRegistrar.INSTANCE.getClass();
 		TaskRegistrar.INSTANCE.getClass();
-		TileEntityRegistrar.INSTANCE.getClass();
+		BlockEntityRegistrar.INSTANCE.getClass();
 		
 		ServerPlayNetworking.registerGlobalReceiver(
 			ACTIVATE_PACKET,
@@ -48,10 +48,10 @@ public class Discarnate implements ModInitializer
 				{
 					if(player.world.isChunkLoaded(pos))
 					{
-						BlockEntity te = player.world.getBlockEntity(pos);
-						if(te instanceof TileEntitySpiritChanneler)
+						BlockEntity be = player.world.getBlockEntity(pos);
+						if(be instanceof SpiritChannelerBlockEntity)
 						{
-							TileEntitySpiritChanneler channeler = ((TileEntitySpiritChanneler) te);
+							SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
 							if(activating)
 							{
 								if(!channeler.isActive())

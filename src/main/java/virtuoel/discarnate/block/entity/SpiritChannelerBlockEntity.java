@@ -1,4 +1,4 @@
-package virtuoel.discarnate.tileentity;
+package virtuoel.discarnate.block.entity;
 
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -41,14 +41,14 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
-import virtuoel.discarnate.block.BlockSpiritChanneler;
+import virtuoel.discarnate.block.SpiritChannelerBlock;
+import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
-import virtuoel.discarnate.init.TileEntityRegistrar;
-import virtuoel.discarnate.inventory.ContainerSpiritChanneler;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.reference.DiscarnateConfig;
+import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
-public class TileEntitySpiritChanneler extends LockableContainerBlockEntity implements SidedInventory, ExtendedScreenHandlerFactory
+public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ExtendedScreenHandlerFactory
 {
 	@Override
 	public void cancelRemoval()
@@ -139,9 +139,9 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 					if(w.isChunkLoaded(pos))
 					{
 						BlockState state = w.getBlockState(pos);
-						if(state.contains(BlockSpiritChanneler.ACTIVE) && !state.get(BlockSpiritChanneler.ACTIVE))
+						if(state.contains(SpiritChannelerBlock.ACTIVE) && !state.get(SpiritChannelerBlock.ACTIVE))
 						{
-							w.setBlockState(getPos(), state.with(BlockSpiritChanneler.ACTIVE, true));
+							w.setBlockState(getPos(), state.with(SpiritChannelerBlock.ACTIVE, true));
 						}
 						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
@@ -170,9 +170,9 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 				if(w.isChunkLoaded(pos))
 				{
 					BlockState state = w.getBlockState(pos);
-					if(state.contains(BlockSpiritChanneler.ACTIVE) && state.get(BlockSpiritChanneler.ACTIVE))
+					if(state.contains(SpiritChannelerBlock.ACTIVE) && state.get(SpiritChannelerBlock.ACTIVE))
 					{
-						w.setBlockState(getPos(), state.with(BlockSpiritChanneler.ACTIVE, false));
+						w.setBlockState(getPos(), state.with(SpiritChannelerBlock.ACTIVE, false));
 					}
 				}
 			}
@@ -225,7 +225,7 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 			@Override
 			public boolean canStart()
 			{
-				return TileEntitySpiritChanneler.this.marker != null;
+				return SpiritChannelerBlockEntity.this.marker != null;
 			}
 			
 			@Override
@@ -306,9 +306,9 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 			if(w.isChunkLoaded(pos))
 			{
 				BlockState state = w.getBlockState(pos);
-				if(state.contains(BlockSpiritChanneler.ACTIVE))
+				if(state.contains(SpiritChannelerBlock.ACTIVE))
 				{
-					return state.get(BlockSpiritChanneler.ACTIVE);
+					return state.get(SpiritChannelerBlock.ACTIVE);
 				}
 			}
 		}
@@ -318,9 +318,9 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 	private static final int[] NO_SLOTS = new int[]{};
 	private DefaultedList<ItemStack> inventory;
 
-	public TileEntitySpiritChanneler(BlockPos blockPos, BlockState blockState)
+	public SpiritChannelerBlockEntity(BlockPos blockPos, BlockState blockState)
 	{
-		super(TileEntityRegistrar.SPIRIT_CHANNELER, blockPos, blockState);
+		super(BlockEntityRegistrar.SPIRIT_CHANNELER, blockPos, blockState);
 		this.inventory = DefaultedList.ofSize(25, ItemStack.EMPTY);
 	}
 	
@@ -429,6 +429,6 @@ public class TileEntitySpiritChanneler extends LockableContainerBlockEntity impl
 	
 	@Override
 	protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
-		return new ContainerSpiritChanneler(syncId, playerInventory, this);
+		return new SpiritChannelerScreenHandler(syncId, playerInventory, this);
 	}
 }
