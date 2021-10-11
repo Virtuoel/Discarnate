@@ -1,9 +1,10 @@
 {
 	"type": "minecraft:crafting_shapeless",
+	"group": "discarnate:convert_task",
 	"result":
 	{
 		"item": "discarnate:look_right_task",
-		"count": 2
+		"count": 1
 	},
 	"ingredients":
 	[

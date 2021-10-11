@@ -1,0 +1,28 @@
+{
+	"replace": false,
+	"values":
+	[
+		"discarnate:blank_task",
+		"discarnate:info_task",
+		"discarnate:wait_task",
+		"discarnate:drop_task",
+		"discarnate:swap_task",
+		"discarnate:move_forward_task",
+		"discarnate:move_backward_task",
+		"discarnate:strafe_left_task",
+		"discarnate:strafe_right_task",
+		"discarnate:cancel_movement_task",
+		"discarnate:look_up_task",
+		"discarnate:look_down_task",
+		"discarnate:look_left_task",
+		"discarnate:look_right_task",
+		"discarnate:face_horizon_task",
+		"discarnate:face_cardinal_task",
+		"discarnate:sneak_task",
+		"discarnate:jump_task",
+		"discarnate:swing_item_task",
+		"discarnate:use_item_task",
+		"discarnate:switch_slot_task",
+		"discarnate:end_task"
+	]
+}

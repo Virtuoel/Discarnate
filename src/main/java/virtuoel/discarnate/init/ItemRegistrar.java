@@ -72,11 +72,11 @@ public class ItemRegistrar
 	);
 	
 	public static final Item FACE_HORIZON_TASK = register("face_horizon_task",
-		new Item(new Item.Settings().group(Discarnate.ITEM_GROUP).maxCount(1))
+		new Item(new Item.Settings().recipeRemainder(LOOK_UP_TASK).group(Discarnate.ITEM_GROUP).maxCount(1))
 	);
 	
 	public static final Item FACE_CARDINAL_TASK = register("face_cardinal_task",
-		new Item(new Item.Settings().group(Discarnate.ITEM_GROUP).maxCount(1))
+		new Item(new Item.Settings().recipeRemainder(LOOK_LEFT_TASK).group(Discarnate.ITEM_GROUP).maxCount(1))
 	);
 	
 	public static final Item SNEAK_TASK = register("sneak_task",

@@ -1,5 +1,6 @@
 {
 	"type": "minecraft:crafting_shapeless",
+	"group": "discarnate:convert_task",
 	"result":
 	{
 		"item": "discarnate:look_left_task",
