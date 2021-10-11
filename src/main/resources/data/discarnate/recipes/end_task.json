@@ -1,5 +1,5 @@
 {
-	"type": "forge:ore_shaped",
+	"type": "minecraft:crafting_shaped",
 	"result":
 	{
 		"item": "discarnate:end_task",
@@ -14,6 +14,6 @@
 	"key":
 	{
 		"T": { "item": "discarnate:blank_task" },
-		"B": { "type": "forge:ore_dict", "ore": "bone" }
+		"B": { "item": "minecraft:bone" }
 	}
 }

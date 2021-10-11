@@ -1,5 +1,5 @@
 {
-	"type": "forge:ore_shapeless",
+	"type": "minecraft:crafting_shapeless",
 	"result":
 	{
 		"item": "discarnate:switch_slot_task",
@@ -10,6 +10,6 @@
 		{ "item": "discarnate:blank_task" },
 		{ "item": "discarnate:blank_task" },
 		{ "item": "discarnate:blank_task" },
-		{ "item": "minecraft:wooden_button" }
+		{ "tag": "minecraft:wooden_buttons" }
 	]
 }

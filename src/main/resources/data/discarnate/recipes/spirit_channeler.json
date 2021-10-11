@@ -1,5 +1,5 @@
 {
-	"type": "forge:ore_shaped",
+	"type": "minecraft:crafting_shaped",
 	"result":
 	{
 		"item": "discarnate:spirit_channeler",
@@ -15,7 +15,7 @@
 	{
 		"B": { "item": "discarnate:blank_task" },
 		"T": { "item": "minecraft:totem_of_undying" },
-		"E": { "type": "forge:ore_dict", "ore": "gemEmerald" },
+		"E": { "item": "minecraft:emerald" },
 		"C": { "item": "minecraft:cauldron" }
 	}
 }

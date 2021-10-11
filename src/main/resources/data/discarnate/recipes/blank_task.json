@@ -1,5 +1,5 @@
 {
-	"type": "forge:ore_shaped",
+	"type": "minecraft:crafting_shaped",
 	"result":
 	{
 		"item": "discarnate:blank_task",
@@ -13,8 +13,8 @@
 	],
 	"key":
 	{
-		"B": { "type": "forge:ore_dict", "ore": "barsIron" },
-		"E": { "type": "forge:ore_dict", "ore": "gemEmerald" },
+		"B": { "item": "minecraft:iron_bars" },
+		"E": { "item": "minecraft:emerald" },
 		"J": { "item": "minecraft:jukebox" },
 		"M": { "item": "minecraft:map" }
 	}
