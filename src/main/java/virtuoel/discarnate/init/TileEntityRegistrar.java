@@ -1,20 +1,27 @@
 package virtuoel.discarnate.init;
 
-import net.minecraft.block.Block;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
 
-@EventBusSubscriber(modid = Discarnate.MOD_ID)
 public class TileEntityRegistrar
 {
-	@SubscribeEvent
-	public static void registerTileEntities(RegistryEvent.Register<Block> event)
+	public static final BlockEntityType<?> SPIRIT_CHANNELER = register("spirit_channeler",
+		FabricBlockEntityTypeBuilder.create(TileEntitySpiritChanneler::new, BlockRegistrar.SPIRIT_CHANNELER)
+	);
+	
+	public static <T extends BlockEntity> BlockEntityType<T> register(String name, FabricBlockEntityTypeBuilder<T> builder)
 	{
-		GameRegistry.registerTileEntity(TileEntitySpiritChanneler.class, new ResourceLocation(Discarnate.MOD_ID, "spirit_channeler"));
+		return Registry.register(Registry.BLOCK_ENTITY_TYPE, Discarnate.id(name), builder.build());
+	}
+	
+	public static final TileEntityRegistrar INSTANCE = new TileEntityRegistrar();
+	
+	private TileEntityRegistrar()
+	{
+		
 	}
 }

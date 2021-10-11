@@ -1,97 +1,78 @@
 package virtuoel.discarnate.tileentity;
 
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityMoveHelper.Action;
-import net.minecraft.entity.monster.EntityVex;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.MobEffects;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.LockableContainerBlockEntity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.GoalSelector;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.VexEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.BrewingStandScreenHandler;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
 import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.init.TileEntityRegistrar;
+import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.reference.DiscarnateConfig;
 
-public class TileEntitySpiritChanneler extends TileEntity
+public class TileEntitySpiritChanneler extends LockableContainerBlockEntity implements SidedInventory
 {
-	IItemHandlerModifiable itemHandler;
-	
-	public TileEntitySpiritChanneler(int inventorySize)
-	{
-		itemHandler = new ItemStackHandler(inventorySize)
-		{
-			@Override
-			protected void onContentsChanged(int slot)
-			{
-				super.onContentsChanged(slot);
-				TileEntitySpiritChanneler.this.markDirty();
-				
-				World world = getWorld();
-				if(world != null)
-				{
-					IBlockState state = world.getBlockState(getPos());
-					world.notifyBlockUpdate(getPos(), state, state, 3);
-				}
-			}
-		};
-	}
-	
-	public TileEntitySpiritChanneler()
-	{
-		this(25);
-	}
-	
 	@Override
-	public void onLoad()
+	public void cancelRemoval()
 	{
-		if(!getWorld().isRemote)
+		super.cancelRemoval();
+		World w = getWorld();
+		if(!w.isClient)
 		{
 			deactivate();
 		}
 	}
 	
 	@Override
-	public void invalidate()
+	public void markRemoved()
 	{
 		deactivate();
-		super.invalidate();
+		super.markRemoved();
 	}
 	
 	private static final Random RAND = new Random();
 	
 	@Nullable
-	EntityVex marker = null;
+	VexEntity marker = null;
 	
 	@Nullable
 	Thread taskThread = null;
 	
-	public boolean activate(EntityPlayer player)
+	public boolean activate(PlayerEntity player)
 	{
 		synchronized(this)
 		{
@@ -100,21 +81,21 @@ public class TileEntitySpiritChanneler extends TileEntity
 				World w = getWorld();
 				if(player == null || !canPlayerStart(player))
 				{
-					w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+					w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					return false;
 				}
 				onPlayerStart(player);
 				
 				taskThread = new Thread(() ->
 				{
-					for(int i = 0; i < itemHandler.getSlots(); i++)
+					for(int i = 0; i < inventory.size(); i++)
 					{
 						if(player != null && canPlayerContinue(player) && isActive())
 						{
-							ItemStack stack = itemHandler.getStackInSlot(i);
+							ItemStack stack = inventory.get(i);
 							if(!stack.isEmpty())
 							{
-								Optional.ofNullable(TaskRegistrar.REGISTRY.getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, player, this));
+								TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).ifPresent(task -> task.accept(stack, player, this));
 							}
 						}
 						else
@@ -127,9 +108,9 @@ public class TileEntitySpiritChanneler extends TileEntity
 					
 					if(w != null)
 					{
-						Optional.ofNullable(w.getMinecraftServer()).ifPresent(s ->
+						Optional.ofNullable(w.getServer()).ifPresent(s ->
 						{
-							s.addScheduledTask(() ->
+							s.execute(() ->
 							{
 								deactivate();
 							});
@@ -139,19 +120,19 @@ public class TileEntitySpiritChanneler extends TileEntity
 				
 				if(w != null)
 				{
-					marker = new EntityVex(w);
+					marker = EntityType.VEX.create(w);
 					setupMarkerVex(marker, w, getPos(), player);
 					w.spawnEntity(marker);
 					
 					BlockPos pos = getPos();
-					if(w.isBlockLoaded(pos))
+					if(w.isChunkLoaded(pos))
 					{
-						IBlockState state = w.getBlockState(pos);
-						if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE) && !state.getValue(BlockSpiritChanneler.ACTIVE))
+						BlockState state = w.getBlockState(pos);
+						if(state.contains(BlockSpiritChanneler.ACTIVE) && !state.get(BlockSpiritChanneler.ACTIVE))
 						{
-							w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, true));
+							w.setBlockState(getPos(), state.with(BlockSpiritChanneler.ACTIVE, true));
 						}
-						w.playSound(null, player == null ? getPos() : player.getPosition(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
 				}
 				
@@ -175,12 +156,12 @@ public class TileEntitySpiritChanneler extends TileEntity
 				}
 				
 				BlockPos pos = getPos();
-				if(w.isBlockLoaded(pos))
+				if(w.isChunkLoaded(pos))
 				{
-					IBlockState state = w.getBlockState(pos);
-					if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE) && state.getValue(BlockSpiritChanneler.ACTIVE))
+					BlockState state = w.getBlockState(pos);
+					if(state.contains(BlockSpiritChanneler.ACTIVE) && state.get(BlockSpiritChanneler.ACTIVE))
 					{
-						w.setBlockState(getPos(), state.withProperty(BlockSpiritChanneler.ACTIVE, false));
+						w.setBlockState(getPos(), state.with(BlockSpiritChanneler.ACTIVE, false));
 					}
 				}
 			}
@@ -195,25 +176,24 @@ public class TileEntitySpiritChanneler extends TileEntity
 		}
 	}
 	
-	protected boolean canPlayerStart(@Nonnull EntityPlayer player)
+	protected boolean canPlayerStart(@NotNull PlayerEntity player)
 	{
-		return canPlayerContinue(player) && !player.isDead && (player.capabilities.isCreativeMode || (player.experienceLevel >= DiscarnateConfig.minExpLevel && player.experienceLevel >= DiscarnateConfig.expLevelCost && (!DiscarnateConfig.requirePumpkinToStart || isWearingPumpkin(player))));
+		return canPlayerContinue(player) && !player.isDead() && (player.isCreative() || (player.experienceLevel >= DiscarnateConfig.minExpLevel && player.experienceLevel >= DiscarnateConfig.expLevelCost && (!DiscarnateConfig.requirePumpkinToStart || isWearingPumpkin(player))));
 	}
 	
-	protected boolean canPlayerContinue(@Nonnull EntityPlayer player)
+	protected boolean canPlayerContinue(@NotNull PlayerEntity player)
 	{
-		return !player.isDead && (player.capabilities.isCreativeMode || !DiscarnateConfig.requirePumpkinToContinue || isWearingPumpkin(player));
+		return !player.isDead() && (player.isCreative() || !DiscarnateConfig.requirePumpkinToContinue || isWearingPumpkin(player));
 	}
 	
-	protected void onPlayerStart(@Nonnull EntityPlayer player)
+	protected void onPlayerStart(@NotNull PlayerEntity player)
 	{
-		player.addExperienceLevel(-DiscarnateConfig.expLevelCost);
+		player.addExperienceLevels(-DiscarnateConfig.expLevelCost);
 	}
 	
-	@ObjectHolder(Discarnate.MOD_ID + ":reset_channeler_task")
-	private static final Task RESET_CHANNELER_TASK = null;
+	private static final Task RESET_CHANNELER_TASK = TaskRegistrar.REGISTRY.get(Discarnate.id("reset_channeler_task"));
 	
-	protected void onPlayerStop(@Nonnull EntityPlayer player)
+	protected void onPlayerStop(@NotNull PlayerEntity player)
 	{
 		if(RESET_CHANNELER_TASK != null)
 		{
@@ -222,73 +202,76 @@ public class TileEntitySpiritChanneler extends TileEntity
 		
 	}
 	
-	protected static boolean isWearingPumpkin(@Nonnull EntityPlayer player)
+	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)
 	{
-		return player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == Item.getItemFromBlock(Blocks.PUMPKIN);
+		return player.getEquippedStack(EquipmentSlot.HEAD).getItem() == Item.fromBlock(Blocks.PUMPKIN);
 	}
 	
-	protected void setupMarkerVex(EntityVex marker, @Nonnull World w, BlockPos pos, EntityPlayer player)
+	protected void setupMarkerVex(VexEntity marker, @NotNull World w, BlockPos pos, PlayerEntity player)
 	{
-		marker.tasks.addTask(0, new EntityAIBase()
+		MobEntityAccessor m = (MobEntityAccessor) marker;
+		GoalSelector selector = m.getGoalSelector();
+		
+		selector.add(0, new Goal()
 		{
 			@Override
-			public boolean shouldExecute()
+			public boolean canStart()
 			{
 				return TileEntitySpiritChanneler.this.marker != null;
 			}
 			
 			@Override
-			public void updateTask()
+			public void start()
 			{
 				if(marker != null)
 				{
-					if(marker.isBeingRidden())
+					if(marker.hasPassengers())
 					{
-						marker.removePassengers();
+						marker.removeAllPassengers();;
 					}
 					
-					if(marker.isRiding())
+					if(marker.hasVehicle())
 					{
-						marker.dismountRidingEntity();
+						marker.dismountVehicle();
 					}
 					
-					marker.setLimitedLife(2);
-					marker.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 1, 5, false, false));
-					marker.setCharging(marker.getMoveHelper().action == Action.MOVE_TO);
+					marker.setLifeTicks(2);
+					marker.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1, 5, false, false));
+					marker.setCharging(marker.getMoveControl().isMoving());
 				}
 			}
 		});
 		
-		EntityAIBase follow = new EntityAIBase()
+		Goal follow = new Goal()
 		{
 			@Override
-			public boolean shouldExecute()
+			public boolean canStart()
 			{
 				return player != null;
 			}
 			
 			@Override
-			public void updateTask()
+			public void tick()
 			{
 				if(player != null && marker != null)
 				{
-					marker.faceEntity(player, 360, 360);
-					marker.rotationYawHead = player.rotationYawHead;
-					double yaw = -Math.toRadians(player.rotationYaw + 180D);
-					marker.getMoveHelper().setMoveTo(player.posX + (Math.sin(yaw) * 1.25 * player.width), player.posY + player.eyeHeight + 0.5D, player.posZ + (Math.cos(yaw) * 1.25 * player.width), 1.0D);
+					marker.lookAtEntity(player, 360, 360);
+					marker.setHeadYaw(player.getHeadYaw());
+					double yaw = -Math.toRadians(player.getHeadYaw() + 180D);
+					marker.getNavigation().startMovingTo(player.getX() + (Math.sin(yaw) * 1.25 * player.getWidth()), player.getY() + player.getStandingEyeHeight() + 0.5D, player.getZ() + (Math.cos(yaw) * 1.25 * player.getWidth()), 1.0D);
 				}
 			}
 		};
 		
-		follow.setMutexBits(3);
-		marker.tasks.addTask(1, follow);
-		marker.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 1000000, 0, true, true));
+		selector.add(1, follow);
+		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, true));
 		marker.setHealth(0.1F);
-		marker.motionY = 0.25D;
-		marker.moveToBlockPosAndAngles(pos, 0.0F, 0.0F);
-		marker.onInitialSpawn(w.getDifficultyForLocation(pos), null);
-		marker.targetTasks.taskEntries.clear();
-		marker.setBoundOrigin(pos.up());
+		final Vec3d vel = marker.getVelocity();
+		marker.setVelocity(vel.getX(), 0.25D, vel.getZ());
+		marker.refreshPositionAndAngles(pos, 0.0F, 0.0F);
+		m.callInitEquipment(w.getLocalDifficulty(pos));
+		m.getTargetSelector().getGoals().clear();
+		marker.setBounds(pos.up());
 	}
 	
 	public boolean isActive()
@@ -303,64 +286,126 @@ public class TileEntitySpiritChanneler extends TileEntity
 	{
 		if(w != null)
 		{
-			if(w.isBlockLoaded(pos))
+			if(w.isChunkLoaded(pos))
 			{
-				IBlockState state = w.getBlockState(pos);
-				if(state.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
+				BlockState state = w.getBlockState(pos);
+				if(state.contains(BlockSpiritChanneler.ACTIVE))
 				{
-					return state.getValue(BlockSpiritChanneler.ACTIVE);
+					return state.get(BlockSpiritChanneler.ACTIVE);
 				}
 			}
 		}
 		return false;
 	}
 	
-	@Override
-	public ITextComponent getDisplayName()
+	private static final int[] NO_SLOTS = new int[]{};
+	private DefaultedList<ItemStack> inventory;
+
+	public TileEntitySpiritChanneler(BlockPos blockPos, BlockState blockState)
 	{
-		return new TextComponentTranslation(Discarnate.MOD_ID + ".spirit_channeler");
+		super(TileEntityRegistrar.SPIRIT_CHANNELER, blockPos, blockState);
+		this.inventory = DefaultedList.ofSize(25, ItemStack.EMPTY);
 	}
 	
 	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newState)
-	{
-		return oldState.getBlock() != newState.getBlock();
+	protected Text getContainerName() {
+		return new TranslatableText("container." + Discarnate.MOD_ID + ".spirit_channeler");
 	}
-	
+
 	@Override
-	public void readFromNBT(NBTTagCompound compound)
-	{
-		super.readFromNBT(compound);
-		
-		if(compound.hasKey("Items"))
-		{
-			CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(itemHandler, null, compound.getTagList("Items", Constants.NBT.TAG_COMPOUND));
+	public int size() {
+		return this.inventory.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		Iterator<ItemStack> var1 = this.inventory.iterator();
+
+		ItemStack itemStack;
+		do {
+			if (!var1.hasNext()) {
+				return true;
+			}
+
+			itemStack = (ItemStack)var1.next();
+		} while(itemStack.isEmpty());
+
+		return false;
+	}
+
+	@Override
+	public void readNbt(NbtCompound nbt) {
+		super.readNbt(nbt);
+		this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
+		Inventories.readNbt(nbt, this.inventory);
+	}
+
+	@Override
+	public NbtCompound writeNbt(NbtCompound nbt) {
+		super.writeNbt(nbt);
+		Inventories.writeNbt(nbt, this.inventory);
+		return nbt;
+	}
+
+	@Override
+	public ItemStack getStack(int slot) {
+		return slot >= 0 && slot < this.inventory.size() ? this.inventory.get(slot) : ItemStack.EMPTY;
+	}
+
+	@Override
+	public ItemStack removeStack(int slot, int amount) {
+		return Inventories.splitStack(this.inventory, slot, amount);
+	}
+
+	@Override
+	public ItemStack removeStack(int slot) {
+		return Inventories.removeStack(this.inventory, slot);
+	}
+
+	@Override
+	public void setStack(int slot, ItemStack stack) {
+		if (slot >= 0 && slot < this.inventory.size()) {
+			this.inventory.set(slot, stack);
+		}
+
+	}
+
+	@Override
+	public boolean canPlayerUse(PlayerEntity player) {
+		if (this.world.getBlockEntity(this.pos) != this) {
+			return false;
+		} else {
+			return !(player.squaredDistanceTo((double)this.pos.getX() + 0.5D, (double)this.pos.getY() + 0.5D, (double)this.pos.getZ() + 0.5D) > 64.0D);
 		}
 	}
-	
+
 	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound compound)
-	{
-		compound = super.writeToNBT(compound);
-		
-		compound.setTag("Items", CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(itemHandler, null));
-		
-		return compound;
+	public boolean isValid(int slot, ItemStack stack) {
+		return false;
 	}
-	
+
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
-	{
-		return (facing == null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) || super.hasCapability(capability, facing);
+	public int[] getAvailableSlots(Direction side) {
+		return NO_SLOTS;
 	}
-	
+
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
-	{
-		if(facing == null && capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-		{
-			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(itemHandler);
-		}
-		return super.getCapability(capability, facing);
+	public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
+		return false;
+	}
+
+	@Override
+	public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+		return false;
+	}
+
+	@Override
+	public void clear() {
+		this.inventory.clear();
+	}
+
+	@Override
+	protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory) {
+		return new BrewingStandScreenHandler(syncId, playerInventory, this, null);
 	}
 }

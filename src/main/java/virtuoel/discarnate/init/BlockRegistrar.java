@@ -1,97 +1,63 @@
 package virtuoel.discarnate.init;
 
-import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.Block;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
+import net.minecraft.block.MapColor;
+import net.minecraft.block.Material;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.block.BlockSpiritChanneler;
 
-@EventBusSubscriber(modid = Discarnate.MOD_ID)
-@ObjectHolder(Discarnate.MOD_ID)
 public class BlockRegistrar
 {
-	public static final Block SPIRIT_CHANNELER = Blocks.AIR;
+	public static final Block SPIRIT_CHANNELER = registerBlock(
+		Discarnate.id("spirit_channeler"),
+		BlockSpiritChanneler::new,
+		FabricBlockSettings.of(Material.METAL, MapColor.BROWN)
+		.strength(5.0F, 10.0F)
+		.sounds(BlockSoundGroup.METAL)
+		.breakByTool(FabricToolTags.PICKAXES, 1),
+		s -> s.group(Discarnate.ITEM_GROUP)
+	);
 	
-	@SubscribeEvent
-	public static void registerBlocks(RegistryEvent.Register<Block> event)
+	public static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, UnaryOperator<Item.Settings> itemSettings)
 	{
-		Stream.of(
-			setRegistryNameAndTranslationKey(setHarvestLevel(
-				new BlockSpiritChanneler(Material.IRON, MapColor.BROWN)
-				.setHardness(5.0F)
-				.setResistance(10.0F)
-				.setSoundType(SoundType.METAL)
-				.setCreativeTab(Discarnate.CREATIVE_TAB),
-				"pickaxe", 1),
-				"spirit_channeler"),
-		null).filter(Objects::nonNull)
-		.forEach(event.getRegistry()::register);
+		return registerBlock(name, blockFunc, blockSettings, BlockItem::new, itemSettings);
 	}
 	
-	@SubscribeEvent
-	public static void registerItemBlocks(RegistryEvent.Register<Item> event)
+	public static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, BiFunction<Block, Item.Settings, BlockItem> itemFunc, UnaryOperator<Item.Settings> itemSettings)
 	{
-		final Function<Block, Item> makeItemBlock = block -> new ItemBlock(block).setRegistryName(block.getRegistryName());
+		final Block block = registerBlock(name, blockFunc, blockSettings);
 		
-		Stream.of(
-			SPIRIT_CHANNELER,
-		null).filter(b -> b != null && b != Blocks.AIR)
-		.map(makeItemBlock)
-		.forEach(event.getRegistry()::register);
-	}
-	
-	@EventBusSubscriber(modid = Discarnate.MOD_ID, value = Side.CLIENT)
-	public static class Client
-	{
-		@SubscribeEvent
-		public static void registerItemBlockModels(ModelRegistryEvent event)
-		{
-			final Consumer<Item> setItemModel = item ->
-			{
-				ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-			};
-			
-			Stream.of(
-				SPIRIT_CHANNELER,
-			null).filter(b -> b != null && b != Blocks.AIR)
-			.map(Item::getItemFromBlock)
-			.filter(i -> i != null && i != Items.AIR)
-			.forEach(setItemModel);
-		}
-	}
-	
-	public static <T extends Block> T setRegistryNameAndTranslationKey(T entry, String name, String key)
-	{
-		entry.setRegistryName(name).setTranslationKey(entry.getRegistryName().getNamespace() + "." + key);
-		return entry;
-	}
-	
-	public static <T extends Block> T setRegistryNameAndTranslationKey(T entry, String name)
-	{
-		return setRegistryNameAndTranslationKey(entry, name, name);
-	}
-	
-	public static <T extends Block> T setHarvestLevel(T block, String toolClass, int level)
-	{
-		block.setHarvestLevel(toolClass, level);
+		Registry.register(Registry.ITEM, name, itemFunc.apply(block, itemSettings.apply(new Item.Settings())));
+		
 		return block;
+	}
+	
+	public static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings)
+	{
+		return registerBlock(name, () -> blockFunc.apply(blockSettings));
+	}
+	
+	public static Block registerBlock(Identifier name, Supplier<Block> blockSupplier)
+	{
+		return Registry.register(Registry.BLOCK, name, blockSupplier.get());
+	}
+	
+	public static final BlockRegistrar INSTANCE = new BlockRegistrar();
+	
+	private BlockRegistrar()
+	{
+		
 	}
 }

@@ -1,120 +1,92 @@
 package virtuoel.discarnate.block;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.block.Block;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.state.StateManager.Builder;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.ItemScatterer;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.proxy.GuiProxy;
-import virtuoel.discarnate.tileentity.TileEntitySpiritChanneler;
+import virtuoel.discarnate.init.TileEntityRegistrar;
 
-public class BlockSpiritChanneler extends Block
+public class BlockSpiritChanneler extends Block implements BlockEntityProvider
 {
-	public static final PropertyBool ACTIVE = PropertyBool.create("active");
+	public static final BooleanProperty ACTIVE = BooleanProperty.of("active");
 	
-	public BlockSpiritChanneler(Material blockMaterialIn, MapColor blockMapColorIn)
+	public BlockSpiritChanneler(Block.Settings settings)
 	{
-		super(blockMaterialIn, blockMapColorIn);
-		setDefaultState(getBlockState().getBaseState().withProperty(ACTIVE, false));
-	}
-	
-	public BlockSpiritChanneler(Material materialIn)
-	{
-		this(materialIn, materialIn.getMaterialMapColor());
+		super(settings);
+		
+		setDefaultState(getDefaultState().with(ACTIVE, false));
 	}
 	
 	@Override
-	protected BlockStateContainer createBlockState()
+	protected void appendProperties(Builder<Block, BlockState> builder)
 	{
-		return new BlockStateContainer(this, ACTIVE);
+		builder.add(ACTIVE);
 	}
 	
 	@Override
-	public IBlockState getStateFromMeta(int meta)
+	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit)
 	{
-		return getDefaultState().withProperty(ACTIVE, meta == 1);
-	}
-	
-	@Override
-	public int getMetaFromState(IBlockState state)
-	{
-		return state.getValue(ACTIVE) ? 1 : 0;
-	}
-	
-	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-	{
-		playerIn.openGui(Discarnate.instance(), GuiProxy.SPIRIT_CHANNELER, worldIn, pos.getX(), pos.getY(), pos.getZ());
-		return true;
-	}
-	
-	@Override
-	public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
-	{
-		TileEntity te = worldIn.getTileEntity(pos);
-		if(te != null && te.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null))
+		if (!world.isClient)
 		{
-			IItemHandler inventory = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			for(int i = 0; i < inventory.getSlots(); i++)
+			player.openHandledScreen(state.createScreenHandlerFactory(world, pos));
+			return ActionResult.CONSUME;
+		}
+		
+		return ActionResult.SUCCESS;
+	}
+	
+	@Override
+	public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved)
+	{
+		if (!state.isOf(newState.getBlock()))
+		{
+			final BlockEntity blockEntity = world.getBlockEntity(pos);
+			if (blockEntity instanceof Inventory)
 			{
-				ItemStack itemstack = inventory.getStackInSlot(i);
-				
-				if(!itemstack.isEmpty())
-				{
-					InventoryHelper.spawnItemStack(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemstack);
-				}
+				ItemScatterer.spawn(world, pos, (Inventory) blockEntity);
+				world.updateComparators(pos, this);
 			}
+			
+			super.onStateReplaced(state, world, pos, newState, moved);
 		}
-		super.breakBlock(worldIn, pos, state);
 	}
 	
 	@Override
-	public boolean hasComparatorInputOverride(IBlockState state)
+	public boolean hasComparatorOutput(BlockState state)
 	{
 		return true;
 	}
 	
 	@Override
-	public int getComparatorInputOverride(IBlockState blockState, World worldIn, BlockPos pos)
+	public int getComparatorOutput(BlockState state, World world, BlockPos pos)
 	{
-		if(blockState.getPropertyKeys().contains(BlockSpiritChanneler.ACTIVE))
-		{
-			return blockState.getValue(BlockSpiritChanneler.ACTIVE) ? 15 : 0;
-		}
-		return 0;
+		return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
 	}
 	
 	@Override
-	@SideOnly(Side.CLIENT)
-	public BlockRenderLayer getRenderLayer()
+	public BlockRenderType getRenderType(BlockState state)
 	{
-		return BlockRenderLayer.CUTOUT;
+		return BlockRenderType.MODEL;
 	}
 	
 	@Override
-	public boolean hasTileEntity(IBlockState state)
+	@Nullable
+	public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
 	{
-		return true;
-	}
-	
-	@Override
-	public TileEntity createTileEntity(World world, IBlockState state)
-	{
-		return new TileEntitySpiritChanneler();
+		return TileEntityRegistrar.SPIRIT_CHANNELER.instantiate(pos, state);
 	}
 }
