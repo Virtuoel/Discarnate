@@ -1,6 +1,5 @@
 package virtuoel.discarnate.block.entity;
 
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
@@ -51,17 +50,6 @@ import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ExtendedScreenHandlerFactory
 {
 	@Override
-	public void cancelRemoval()
-	{
-		super.cancelRemoval();
-		World w = getWorld();
-		if (w != null && !w.isClient)
-		{
-	//		deactivate();
-		}
-	}
-	
-	@Override
 	public void markRemoved()
 	{
 		deactivate();
@@ -85,7 +73,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				World w = getWorld();
 				if (player == null || !canPlayerStart(player))
 				{
-					w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+					if (w != null)
+					{
+						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+					}
 					return false;
 				}
 				onPlayerStart(player);
@@ -230,7 +221,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			}
 			
 			@Override
-			public void start()
+			public void tick()
 			{
 				if (marker != null)
 				{
@@ -267,12 +258,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					marker.lookAtEntity(player, 360, 360);
 					marker.setHeadYaw(player.getHeadYaw());
 					double yaw = -Math.toRadians(player.getHeadYaw() + 180D);
-					marker.getNavigation().stop();
-					marker.getNavigation().startMovingTo(player.getX() + (Math.sin(yaw) * 1.25 * player.getWidth()), player.getY() + player.getStandingEyeHeight() + 0.5D, player.getZ() + (Math.cos(yaw) * 1.25 * player.getWidth()), 1.0D);
+					marker.getMoveControl().moveTo(player.getX() + (Math.sin(yaw) * 1.25 * player.getWidth()), player.getY() + player.getStandingEyeHeight() + 0.5D, player.getZ() + (Math.cos(yaw) * 1.25 * player.getWidth()), 1.0D);
 				}
 			}
 		};
-		follow.setControls(EnumSet.of(Goal.Control.MOVE, Goal.Control.LOOK, Goal.Control.TARGET));
 		
 		MobEntityAccessor m = (MobEntityAccessor) marker;
 		GoalSelector selector = m.getGoalSelector();
