@@ -1,4 +1,4 @@
-package virtuoel.discarnate.client.handler;
+package virtuoel.discarnate.client.option;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 
-public class ClientEventHandler
+public class KeyBindingUtils
 {
 	private static final Map<KeyBinding, Thread> KEY_THREAD_MAP = new HashMap<>();
 	
