@@ -1,7 +1,6 @@
 package virtuoel.discarnate;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -18,7 +17,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.dimension.DimensionType;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.client.gui.screen.ingame.SpiritChannelerScreen;
-import virtuoel.discarnate.client.handler.ClientEventHandler;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 
@@ -27,8 +25,6 @@ public class DiscarnateClient implements ClientModInitializer
 	@Override
 	public void onInitializeClient()
 	{
-		ClientTickEvents.START_WORLD_TICK.register(ClientEventHandler::onInputUpdate);
-		
 		ClientPlayNetworking.registerGlobalReceiver(Discarnate.TASK_PACKET, DiscarnateClient::handleTaskPacket);
 		
 		ScreenRegistry.register(ScreenHandlerRegistrar.SPIRIT_CHANNELER, SpiritChannelerScreen::new);

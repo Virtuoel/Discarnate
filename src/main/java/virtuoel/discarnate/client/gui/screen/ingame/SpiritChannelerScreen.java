@@ -1,7 +1,5 @@
 package virtuoel.discarnate.client.gui.screen.ingame;
 
-import java.util.Optional;
-
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import io.netty.buffer.Unpooled;
@@ -10,7 +8,6 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
@@ -80,10 +77,6 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 			buffer.writeBlockPos(blockEntity.getPos());
 			buffer.writeBoolean(!active);
 			ClientPlayNetworking.send(Discarnate.ACTIVATE_PACKET, buffer);
-			if (!active)
-			{
-				Optional.ofNullable(this.client.player).ifPresent(ClientPlayerEntity::closeHandledScreen);
-			}
 		}
 	}
 	

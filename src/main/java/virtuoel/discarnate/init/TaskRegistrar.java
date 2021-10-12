@@ -78,42 +78,49 @@ public class TaskRegistrar
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.addForwardTicks(i.getCount());
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keyForward, i.getCount() * 50);
 		}, ItemRegistrar.MOVE_FORWARD_TASK);
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.addBackwardTicks(i.getCount());
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keyBack, i.getCount() * 50);
 		}, ItemRegistrar.MOVE_BACKWARD_TASK);
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.addLeftTicks(i.getCount());
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keyLeft, i.getCount() * 50);
 		}, ItemRegistrar.STRAFE_LEFT_TASK);
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.addRightTicks(i.getCount());
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keyRight, i.getCount() * 50);
 		}, ItemRegistrar.STRAFE_RIGHT_TASK);
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.addSneakTicks(i.getCount());
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keySneak, i.getCount() * 50);
 		}, ItemRegistrar.SNEAK_TASK);
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.addJumpTicks(i.getCount());
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryHoldKey(mc.options.keyJump, i.getCount() * 50);
 		}, ItemRegistrar.JUMP_TASK);
 		
 		registerClientTask((i, p, t) ->
 		{
-			ClientEventHandler.setForwardTicks(0);
-			ClientEventHandler.setBackwardTicks(0);
-			ClientEventHandler.setLeftTicks(0);
-			ClientEventHandler.setRightTicks(0);
-			ClientEventHandler.setSneakTicks(0);
-			ClientEventHandler.setJumpTicks(0);
+			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryReleaseKey(mc.options.keyForward);
+			ClientEventHandler.tryReleaseKey(mc.options.keyBack);
+			ClientEventHandler.tryReleaseKey(mc.options.keyLeft);
+			ClientEventHandler.tryReleaseKey(mc.options.keyRight);
+			ClientEventHandler.tryReleaseKey(mc.options.keySneak);
+			ClientEventHandler.tryReleaseKey(mc.options.keyJump);
 		}, ItemRegistrar.CANCEL_MOVEMENT_TASK);
 		
 		registerClientTask((i, p, t) ->
@@ -180,13 +187,13 @@ public class TaskRegistrar
 		
 		registerTask(new ClientTask((i, p, t) ->
 		{
-			ClientEventHandler.setForwardTicks(0);
-			ClientEventHandler.setBackwardTicks(0);
-			ClientEventHandler.setLeftTicks(0);
-			ClientEventHandler.setRightTicks(0);
-			ClientEventHandler.setSneakTicks(0);
-			ClientEventHandler.setJumpTicks(0);
 			MinecraftClient mc = MinecraftClient.getInstance();
+			ClientEventHandler.tryReleaseKey(mc.options.keyForward);
+			ClientEventHandler.tryReleaseKey(mc.options.keyBack);
+			ClientEventHandler.tryReleaseKey(mc.options.keyLeft);
+			ClientEventHandler.tryReleaseKey(mc.options.keyRight);
+			ClientEventHandler.tryReleaseKey(mc.options.keySneak);
+			ClientEventHandler.tryReleaseKey(mc.options.keyJump);
 			ClientEventHandler.tryReleaseKey(mc.options.keyAttack);
 			ClientEventHandler.tryReleaseKey(mc.options.keyUse);
 		}), Discarnate.id("reset_channeler_task"));

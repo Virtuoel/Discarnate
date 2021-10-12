@@ -186,6 +186,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public static void onPlayerStart(@NotNull PlayerEntity player)
 	{
+		if (player instanceof ServerPlayerEntity)
+		{
+			((ServerPlayerEntity) player).closeHandledScreen();
+		}
 		final GameRules r = player.getEntityWorld().getGameRules();
 		player.addExperienceLevels(-r.getInt(GameRuleRegistrar.LEVEL_COST));
 	}
