@@ -7,8 +7,10 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.state.StateManager.Builder;
@@ -19,6 +21,7 @@ import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
 
 public class SpiritChannelerBlock extends Block implements BlockEntityProvider
@@ -82,6 +85,19 @@ public class SpiritChannelerBlock extends Block implements BlockEntityProvider
 	public BlockRenderType getRenderType(BlockState state)
 	{
 		return BlockRenderType.MODEL;
+	}
+	
+	@Override
+	public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack)
+	{
+		if (itemStack.hasCustomName())
+		{
+			final BlockEntity blockEntity = world.getBlockEntity(pos);
+			if (blockEntity instanceof SpiritChannelerBlockEntity)
+			{
+				((SpiritChannelerBlockEntity) blockEntity).setCustomName(itemStack.getName());
+			}
+		}
 	}
 	
 	@Override
