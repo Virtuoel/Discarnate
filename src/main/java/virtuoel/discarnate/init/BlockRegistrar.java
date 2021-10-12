@@ -30,12 +30,12 @@ public class BlockRegistrar
 		s -> s.group(Discarnate.ITEM_GROUP)
 	);
 	
-	public static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, UnaryOperator<Item.Settings> itemSettings)
+	private static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, UnaryOperator<Item.Settings> itemSettings)
 	{
 		return registerBlock(name, blockFunc, blockSettings, BlockItem::new, itemSettings);
 	}
 	
-	public static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, BiFunction<Block, Item.Settings, BlockItem> itemFunc, UnaryOperator<Item.Settings> itemSettings)
+	private static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, BiFunction<Block, Item.Settings, BlockItem> itemFunc, UnaryOperator<Item.Settings> itemSettings)
 	{
 		final Block block = registerBlock(name, blockFunc, blockSettings);
 		
@@ -44,12 +44,12 @@ public class BlockRegistrar
 		return block;
 	}
 	
-	public static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings)
+	private static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings)
 	{
 		return registerBlock(name, () -> blockFunc.apply(blockSettings));
 	}
 	
-	public static Block registerBlock(Identifier name, Supplier<Block> blockSupplier)
+	private static Block registerBlock(Identifier name, Supplier<Block> blockSupplier)
 	{
 		return Registry.register(Registry.BLOCK, name, blockSupplier.get());
 	}

@@ -240,17 +240,17 @@ public class TaskRegistrar
 		}
 	}
 	
-	public static Task registerTask(Task task, Identifier id)
+	private static Task registerTask(Task task, Identifier id)
 	{
 		return Registry.register(REGISTRY, id, task);
 	}
 	
-	public static Task registerTask(Task task, ItemConvertible item)
+	private static Task registerTask(Task task, ItemConvertible item)
 	{
 		return registerTask(task, Registry.ITEM.getId(item.asItem()));
 	}
 	
-	public static Task registerClientTask(Task task, ItemConvertible item)
+	private static Task registerClientTask(Task task, ItemConvertible item)
 	{
 		return registerTask(new ClientTask(task), item);
 	}

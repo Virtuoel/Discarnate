@@ -111,7 +111,7 @@ public class ItemRegistrar
 		new Item(new Item.Settings().group(Discarnate.ITEM_GROUP).maxCount(1))
 	);
 	
-	public static Item register(String name, Item entry)
+	private static Item register(String name, Item entry)
 	{
 		return Registry.register(Registry.ITEM, Discarnate.id(name), entry);
 	}

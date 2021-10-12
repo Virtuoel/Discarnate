@@ -13,7 +13,7 @@ public class BlockEntityRegistrar
 		FabricBlockEntityTypeBuilder.create(SpiritChannelerBlockEntity::new, BlockRegistrar.SPIRIT_CHANNELER)
 	);
 	
-	public static <T extends BlockEntity> BlockEntityType<T> register(String name, FabricBlockEntityTypeBuilder<T> builder)
+	private static <T extends BlockEntity> BlockEntityType<T> register(String name, FabricBlockEntityTypeBuilder<T> builder)
 	{
 		return Registry.register(Registry.BLOCK_ENTITY_TYPE, Discarnate.id(name), builder.build());
 	}
