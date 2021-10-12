@@ -14,6 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.BlockRegistrar;
+import virtuoel.discarnate.init.GameRuleRegistrar;
 import virtuoel.discarnate.init.ItemRegistrar;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -37,6 +38,7 @@ public class Discarnate implements ModInitializer
 		ScreenHandlerRegistrar.INSTANCE.getClass();
 		TaskRegistrar.INSTANCE.getClass();
 		BlockEntityRegistrar.INSTANCE.getClass();
+		GameRuleRegistrar.INSTANCE.getClass();
 		
 		ServerPlayNetworking.registerGlobalReceiver(
 			ACTIVATE_PACKET,
