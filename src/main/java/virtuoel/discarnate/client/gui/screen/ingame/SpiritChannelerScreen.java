@@ -18,9 +18,10 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameRules;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
-import virtuoel.discarnate.reference.DiscarnateConfig;
+import virtuoel.discarnate.init.GameRuleRegistrar;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
 @Environment(EnvType.CLIENT)
@@ -50,10 +51,11 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	public void init()
 	{
 		super.init();
+		final GameRules r = blockEntity.getWorld().getGameRules();
 		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
 		this.active = blockEntity.isActive();
 		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
-		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
+		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
 		this.addDrawableChild(confirmButton);
 	}
 	
@@ -62,10 +64,12 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	{
 		super.handledScreenTick();
 		
+		final GameRules r = blockEntity.getWorld().getGameRules();
+		
 		this.active = blockEntity.isActive();
 		
 		this.confirmButton.setMessage(active ? STOP_TEXT : START_TEXT);
-		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= DiscarnateConfig.minExpLevel && this.client.player.experienceLevel >= DiscarnateConfig.expLevelCost) || this.client.player.isCreative();
+		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
 	}
 	
 	private void confirmAction(ButtonWidget button)

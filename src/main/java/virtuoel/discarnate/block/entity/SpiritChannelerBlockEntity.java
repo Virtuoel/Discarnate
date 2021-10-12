@@ -37,14 +37,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
+import virtuoel.discarnate.init.GameRuleRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
-import virtuoel.discarnate.reference.DiscarnateConfig;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
 public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ExtendedScreenHandlerFactory
@@ -182,17 +183,20 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	protected boolean canPlayerStart(@NotNull PlayerEntity player)
 	{
-		return canPlayerContinue(player) && !player.isDead() && (player.isCreative() || (player.experienceLevel >= DiscarnateConfig.minExpLevel && player.experienceLevel >= DiscarnateConfig.expLevelCost && (!DiscarnateConfig.requirePumpkinToStart || isWearingPumpkin(player))));
+		final GameRules r = player.getEntityWorld().getGameRules();
+		return canPlayerContinue(player) && !player.isDead() && (player.isCreative() || (player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST) && (!r.getBoolean(GameRuleRegistrar.PUMPKIN_TO_START) || isWearingPumpkin(player))));
 	}
 	
 	protected boolean canPlayerContinue(@NotNull PlayerEntity player)
 	{
-		return !player.isDead() && (player.isCreative() || !DiscarnateConfig.requirePumpkinToContinue || isWearingPumpkin(player));
+		final GameRules r = player.getEntityWorld().getGameRules();
+		return !player.isDead() && (player.isCreative() || !r.getBoolean(GameRuleRegistrar.PUMPKIN_TO_CONTINUE) || isWearingPumpkin(player));
 	}
 	
 	protected void onPlayerStart(@NotNull PlayerEntity player)
 	{
-		player.addExperienceLevels(-DiscarnateConfig.expLevelCost);
+		final GameRules r = player.getEntityWorld().getGameRules();
+		player.addExperienceLevels(-r.getInt(GameRuleRegistrar.LEVEL_COST));
 	}
 	
 	private static final Task RESET_CHANNELER_TASK = TaskRegistrar.REGISTRY.get(Discarnate.id("reset_channeler_task"));
