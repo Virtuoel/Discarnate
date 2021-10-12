@@ -13,6 +13,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.Goal;
 import net.minecraft.entity.ai.goal.GoalSelector;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -28,6 +29,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -72,9 +74,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			if (taskThread == null)
 			{
 				World w = getWorld();
+				boolean hasWorld = w != null;
 				if (player == null || !canPlayerStart(player))
 				{
-					if (w != null)
+					if (hasWorld)
 					{
 						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
@@ -82,8 +85,32 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				}
 				onPlayerStart(player);
 				
+				BlockPos pos = getPos();
+				
 				taskThread = new Thread(() ->
 				{
+					try
+					{
+						Thread.sleep(250);
+					}
+					catch (InterruptedException e)
+					{
+						
+					}
+					
+					if (hasWorld)
+					{
+						Optional.ofNullable(w.getServer()).ifPresent(s ->
+						{
+							s.execute(() ->
+							{
+								w.spawnEntity(marker = setupMarkerVex(EntityType.VEX.create(w), w, pos, player));
+								w.playSound(null, pos, SoundEvents.ENTITY_EVOKER_CAST_SPELL, SoundCategory.BLOCKS, 0.5F, 1.0F);
+								w.playSound(null, pos, SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+							});
+						});
+					}
+					
 					for (int i = 0; i < inventory.size(); i++)
 					{
 						if (player != null && canPlayerContinue(player) && isActive())
@@ -102,25 +129,18 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					
 					onPlayerStop(player);
 					
-					if (w != null)
+					if (hasWorld)
 					{
 						Optional.ofNullable(w.getServer()).ifPresent(s ->
 						{
-							s.execute(() ->
-							{
-								deactivate();
-							});
+							s.execute(this::deactivate);
 						});
 					}
 				}, "SpiritChannelerTasks");
 				
-				if (w != null)
+				if (hasWorld)
 				{
-					marker = EntityType.VEX.create(w);
-					setupMarkerVex(marker, w, getPos(), player);
-					w.spawnEntity(marker);
-					
-					BlockPos pos = getPos();
+					w.playSound(null, pos, SoundEvents.ENTITY_EVOKER_PREPARE_SUMMON, SoundCategory.BLOCKS, 0.5F, 1.0F);
 					if (w.isChunkLoaded(pos))
 					{
 						BlockState state = w.getBlockState(pos);
@@ -128,7 +148,6 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 						{
 							w.setBlockState(getPos(), state.with(SpiritChannelerBlock.ACTIVE, true));
 						}
-						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_VEX_CHARGE, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
 				}
 				
@@ -143,11 +162,6 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	{
 		synchronized (this)
 		{
-			if (marker != null)
-			{
-				marker = null;
-			}
-			
 			World w = getWorld();
 			if (w != null)
 			{
@@ -166,8 +180,14 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			{
 				taskThread.interrupt();
 				taskThread = null;
+				
+				marker = null;
+				
 				return true;
 			}
+			
+			marker = null;
+			
 			return false;
 		}
 	}
@@ -209,7 +229,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		return player.getEquippedStack(EquipmentSlot.HEAD).getItem() == Item.fromBlock(Blocks.CARVED_PUMPKIN);
 	}
 	
-	protected void setupMarkerVex(VexEntity marker, @NotNull World w, BlockPos pos, PlayerEntity player)
+	protected VexEntity setupMarkerVex(VexEntity marker, @NotNull World w, BlockPos pos, PlayerEntity player)
 	{
 		final Goal visuals = new Goal()
 		{
@@ -267,11 +287,15 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		
 		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, true));
 		marker.setHealth(0.1F);
+		marker.setLifeTicks(2);
 		m.setExperiencePoints(0);
 		final Vec3d vel = marker.getVelocity();
 		marker.setVelocity(vel.getX(), 0.25D, vel.getZ());
 		marker.refreshPositionAndAngles(pos, 0.0F, 0.0F);
-		m.callInitEquipment(w.getLocalDifficulty(pos));
+		if (w instanceof ServerWorld)
+		{
+			marker.initialize((ServerWorld) w, w.getLocalDifficulty(pos), SpawnReason.MOB_SUMMONED, null, null);
+		}
 		marker.setBounds(pos.up());
 		
 		m.getTargetSelector().getGoals().clear();
@@ -279,6 +303,8 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		selector.clear();
 		selector.add(0, visuals);
 		selector.add(1, follow);
+		
+		return marker;
 	}
 	
 	public boolean isActive()
