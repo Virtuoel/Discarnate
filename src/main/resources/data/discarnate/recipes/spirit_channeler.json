@@ -7,15 +7,15 @@
 	},
 	"pattern":
 	[
-		"BTB",
 		"BEB",
+		"BTB",
 		"BCB"
 	],
 	"key":
 	{
 		"B": { "item": "discarnate:blank_task" },
 		"T": { "item": "minecraft:totem_of_undying" },
-		"E": { "item": "minecraft:emerald" },
+		"E": { "item": "minecraft:emerald_block" },
 		"C": { "item": "minecraft:cauldron" }
 	}
 }

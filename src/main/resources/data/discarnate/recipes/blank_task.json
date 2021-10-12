@@ -16,7 +16,7 @@
 	{
 		"B": { "item": "minecraft:iron_bars" },
 		"E": { "item": "minecraft:emerald" },
-		"J": { "item": "minecraft:jukebox" },
-		"M": { "item": "minecraft:map" }
+		"J": { "item": "minecraft:note_block" },
+		"M": { "item": "minecraft:paper" }
 	}
 }
