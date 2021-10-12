@@ -84,15 +84,6 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				
 				taskThread = new Thread(() ->
 				{
-					try
-					{
-						Thread.sleep(50);
-					}
-					catch (InterruptedException e)
-					{
-						
-					}
-					
 					for (int i = 0; i < inventory.size(); i++)
 					{
 						if (player != null && canPlayerContinue(player) && isActive())
@@ -181,19 +172,19 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		}
 	}
 	
-	protected boolean canPlayerStart(@NotNull PlayerEntity player)
+	public static boolean canPlayerStart(@NotNull PlayerEntity player)
 	{
 		final GameRules r = player.getEntityWorld().getGameRules();
 		return canPlayerContinue(player) && !player.isDead() && (player.isCreative() || (player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST) && (!r.getBoolean(GameRuleRegistrar.PUMPKIN_TO_START) || isWearingPumpkin(player))));
 	}
 	
-	protected boolean canPlayerContinue(@NotNull PlayerEntity player)
+	public static boolean canPlayerContinue(@NotNull PlayerEntity player)
 	{
 		final GameRules r = player.getEntityWorld().getGameRules();
 		return !player.isDead() && (player.isCreative() || !r.getBoolean(GameRuleRegistrar.PUMPKIN_TO_CONTINUE) || isWearingPumpkin(player));
 	}
 	
-	protected void onPlayerStart(@NotNull PlayerEntity player)
+	public static void onPlayerStart(@NotNull PlayerEntity player)
 	{
 		final GameRules r = player.getEntityWorld().getGameRules();
 		player.addExperienceLevels(-r.getInt(GameRuleRegistrar.LEVEL_COST));

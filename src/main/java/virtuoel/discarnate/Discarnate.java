@@ -33,10 +33,10 @@ public class Discarnate implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
-		BlockRegistrar.INSTANCE.getClass();
 		ItemRegistrar.INSTANCE.getClass();
-		ScreenHandlerRegistrar.INSTANCE.getClass();
 		TaskRegistrar.INSTANCE.getClass();
+		BlockRegistrar.INSTANCE.getClass();
+		ScreenHandlerRegistrar.INSTANCE.getClass();
 		BlockEntityRegistrar.INSTANCE.getClass();
 		GameRuleRegistrar.INSTANCE.getClass();
 		

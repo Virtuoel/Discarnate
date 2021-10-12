@@ -201,22 +201,22 @@ public class TaskRegistrar
 		
 		Task shulkerTask = (i, p, t) ->
 		{
-			NbtCompound nbttagcompound = i.getNbt();
+			NbtCompound nbt = i.getNbt();
 			
-			if (nbttagcompound != null && nbttagcompound.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
+			if (nbt != null && nbt.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
 			{
-				NbtCompound nbttagcompound1 = nbttagcompound.getCompound("BlockEntityTag");
+				NbtCompound be = nbt.getCompound("BlockEntityTag");
 				
-				if (nbttagcompound1.contains("Items", NbtElement.LIST_TYPE))
+				if (be.contains("Items", NbtElement.LIST_TYPE))
 				{
 					DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
-					Inventories.readNbt(nbttagcompound1, stacks);
+					Inventories.readNbt(be, stacks);
 					
 					if (stacks.stream().anyMatch(s -> s.getItem() == Item.fromBlock(BlockRegistrar.SPIRIT_CHANNELER)))
 					{
 						for (ItemStack stack : stacks)
 						{
-							if (p != null && !p.isDead() && SpiritChannelerBlockEntity.isActive(t.getWorld(), t.getPos()))
+							if (p != null && SpiritChannelerBlockEntity.canPlayerContinue(p) && SpiritChannelerBlockEntity.isActive(t.getWorld(), t.getPos()))
 							{
 								if (!stack.isEmpty())
 								{
