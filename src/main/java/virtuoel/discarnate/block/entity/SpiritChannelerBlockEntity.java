@@ -236,7 +236,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					}
 					
 					marker.setLifeTicks(2);
-					marker.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1, 5, false, false));
+					marker.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1, 10, false, false));
 					marker.setCharging(marker.getMoveControl().isMoving());
 				}
 			}
@@ -268,6 +268,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		
 		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, true));
 		marker.setHealth(0.1F);
+		m.setExperiencePoints(0);
 		final Vec3d vel = marker.getVelocity();
 		marker.setVelocity(vel.getX(), 0.25D, vel.getZ());
 		marker.refreshPositionAndAngles(pos, 0.0F, 0.0F);

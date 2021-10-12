@@ -17,6 +17,9 @@ public interface MobEntityAccessor
 	@Accessor
 	GoalSelector getTargetSelector();
 	
+	@Accessor
+	void setExperiencePoints(int experience);
+	
 	@Invoker
 	void callInitEquipment(LocalDifficulty difficulty);
 }
