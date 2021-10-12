@@ -1,16 +1,7 @@
 package virtuoel.discarnate.init;
 
-import java.util.List;
-
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
 
 public class ItemRegistrar
@@ -89,14 +80,6 @@ public class ItemRegistrar
 	
 	public static final Item SWING_ITEM_TASK = register("swing_item_task",
 		new Item(new Item.Settings().group(Discarnate.ITEM_GROUP))
-		{
-			@Override
-			@Environment(EnvType.CLIENT)
-			public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context)
-			{
-				tooltip.add(new LiteralText("WIP"));
-			};
-		}
 	);
 	
 	public static final Item USE_ITEM_TASK = register("use_item_task",
