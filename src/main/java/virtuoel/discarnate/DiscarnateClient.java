@@ -9,7 +9,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
@@ -32,30 +31,22 @@ public class DiscarnateClient implements ClientModInitializer
 	private static void handleTaskPacket(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender)
 	{
 		Task task = TaskRegistrar.REGISTRY.get(buf.readIdentifier());
-		BlockPos pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-		int slot = buf.readInt();
-		ItemStack stack = slot == -1 ? buf.readItemStack() : ItemStack.EMPTY;
+		BlockPos pos = buf.readBlockPos();
+		ItemStack stack = buf.readItemStack();
 		Identifier id = buf.readIdentifier();
 		
 		client.execute(() ->
 		{
+			PlayerEntity p = (PlayerEntity) (Object) client.player;
 			ClientWorld w = client.world;
-			if ((slot != -1 || !stack.isEmpty()) && w != null && id.equals(w.getRegistryKey().getValue()))
+			if (p != null && w != null && !stack.isEmpty() && id.equals(w.getRegistryKey().getValue()))
 			{
 				if (w.isChunkLoaded(pos))
 				{
 					BlockEntity be = w.getBlockEntity(pos);
 					if (be != null)
 					{
-						PlayerEntity player = (PlayerEntity) (Object) client.player;
-						if (slot != -1 && be instanceof Inventory)
-						{
-							task.accept(((Inventory) be).getStack(slot), player, be);
-						}
-						else
-						{
-							task.accept(stack, player, be);
-						}
+						task.accept(stack, p, be);
 					}
 				}
 			}

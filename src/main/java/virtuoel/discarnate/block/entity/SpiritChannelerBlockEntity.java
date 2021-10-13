@@ -7,7 +7,6 @@ import java.util.Random;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
@@ -23,11 +22,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
+import net.minecraft.screen.ScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -50,7 +51,7 @@ import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
-public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ExtendedScreenHandlerFactory
+public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ScreenHandlerFactory
 {
 	@Override
 	public void markRemoved()
@@ -81,6 +82,9 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					{
 						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
+					
+					propertyDelegate.set(0, 0);
+					
 					return false;
 				}
 				onPlayerStart(player);
@@ -152,8 +156,14 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				}
 				
 				taskThread.start();
+				
+				propertyDelegate.set(0, 1);
+				
 				return true;
 			}
+			
+			propertyDelegate.set(0, 0);
+			
 			return false;
 		}
 	}
@@ -175,6 +185,8 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					}
 				}
 			}
+			
+			propertyDelegate.set(0, 0);
 			
 			if (taskThread != null)
 			{
@@ -226,7 +238,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)
 	{
-		return player.getEquippedStack(EquipmentSlot.HEAD).getItem() == Item.fromBlock(Blocks.CARVED_PUMPKIN);
+		return player.getEquippedStack(EquipmentSlot.HEAD).getItem() == Blocks.CARVED_PUMPKIN.asItem();
 	}
 	
 	protected VexEntity setupMarkerVex(VexEntity marker, @NotNull World w, BlockPos pos, PlayerEntity player)
@@ -311,33 +323,40 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	{
 		synchronized (this)
 		{
-			return isActive(getWorld(), getPos());
+			return isActive(getCachedState());
 		}
 	}
 	
 	public static boolean isActive(@Nullable World w, BlockPos pos)
 	{
-		if (w != null)
+		if (w != null && w.isChunkLoaded(pos))
 		{
-			if (w.isChunkLoaded(pos))
-			{
-				BlockState state = w.getBlockState(pos);
-				if (state.contains(SpiritChannelerBlock.ACTIVE))
-				{
-					return state.get(SpiritChannelerBlock.ACTIVE);
-				}
-			}
+			return isActive(w.getBlockState(pos));
 		}
+		
+		return false;
+	}
+	
+	public static boolean isActive(BlockState state)
+	{
+		if (state.contains(SpiritChannelerBlock.ACTIVE))
+		{
+			return state.get(SpiritChannelerBlock.ACTIVE);
+		}
+		
 		return false;
 	}
 	
 	private static final int[] NO_SLOTS = new int[0];
 	private DefaultedList<ItemStack> inventory;
+	protected final PropertyDelegate propertyDelegate;
 	
 	public SpiritChannelerBlockEntity(BlockPos blockPos, BlockState blockState)
 	{
 		super(BlockEntityRegistrar.SPIRIT_CHANNELER, blockPos, blockState);
 		this.inventory = DefaultedList.ofSize(25, ItemStack.EMPTY);
+		this.propertyDelegate = new ArrayPropertyDelegate(1);
+		this.propertyDelegate.set(0, isActive(blockState) ? 1 : 0);
 	}
 	
 	@Override
@@ -460,14 +479,8 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	}
 	
 	@Override
-	public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf)
-	{
-		buf.writeBlockPos(getPos());
-	}
-	
-	@Override
 	protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory)
 	{
-		return new SpiritChannelerScreenHandler(syncId, playerInventory, this);
+		return new SpiritChannelerScreenHandler(syncId, playerInventory, this, propertyDelegate, ScreenHandlerContext.create(getWorld(), getPos()));
 	}
 }

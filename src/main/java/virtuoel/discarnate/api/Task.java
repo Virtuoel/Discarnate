@@ -7,9 +7,18 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
-@FunctionalInterface
-public interface Task extends TriConsumer<ItemStack, PlayerEntity, BlockEntity>
+public class Task implements TaskAction
 {
+	protected final TaskAction action;
+	
+	public Task(TaskAction action)
+	{
+		this.action = action;
+	}
+	
 	@Override
-	void accept(@NotNull ItemStack s, @Nullable PlayerEntity p, @Nullable BlockEntity b);
+	public void accept(@NotNull ItemStack s, @NotNull PlayerEntity p, @Nullable BlockEntity b)
+	{
+		action.accept(s, p, b);
+	}
 }

@@ -7,7 +7,6 @@ import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,15 +15,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
+import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.init.TaskRegistrar;
 
-public class ClientTask implements Task
+public class ClientTask extends Task
 {
-	Task task;
-	
-	public ClientTask(Task task)
+	public ClientTask(TaskAction action)
 	{
-		this.task = task;
+		super(action);
 	}
 	
 	@Override
@@ -35,22 +33,15 @@ public class ClientTask implements Task
 			final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 			final BlockPos pos = getPosFromBlockEntity(b);
 			buf.writeIdentifier(TaskRegistrar.REGISTRY.getId(this));
-			buf.writeInt(pos.getX());
-			buf.writeInt(pos.getY());
-			buf.writeInt(pos.getZ());
-			int slot = getSlotForStack(s, b);
-			buf.writeInt(slot);
-			if (slot == -1)
-			{
-				buf.writeItemStack(s);
-			}
+			buf.writeBlockPos(pos);
+			buf.writeItemStack(s);
 			buf.writeIdentifier(getWorldIdFromBlockEntity(b));
 			
 			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.TASK_PACKET, buf);
 		}
 		else
 		{
-			task.accept(s, p, b);
+			super.accept(s, p, b);
 		}
 	}
 	
@@ -67,22 +58,5 @@ public class ClientTask implements Task
 		}
 		
 		return World.OVERWORLD.getValue();
-	}
-	
-	private static int getSlotForStack(ItemStack stack, BlockEntity te)
-	{
-		if (te instanceof Inventory)
-		{
-			Inventory handler = (Inventory) te;
-			for (int i = 0; i < handler.size(); i++)
-			{
-				if (stack == handler.getStack(i))
-				{
-					return i;
-				}
-			}
-		}
-		
-		return -1;
 	}
 }

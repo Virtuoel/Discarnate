@@ -8,7 +8,7 @@ import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 public class ScreenHandlerRegistrar
 {
 	public static final ScreenHandlerType<SpiritChannelerScreenHandler> SPIRIT_CHANNELER =
-		ScreenHandlerRegistry.registerExtended(
+		ScreenHandlerRegistry.registerSimple(
 			Discarnate.id("spirit_channeler"),
 			SpiritChannelerScreenHandler::new
 		);

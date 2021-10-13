@@ -6,51 +6,46 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 
 public class SpiritChannelerScreenHandler extends ScreenHandler
 {
-	public final SpiritChannelerBlockEntity blockEntity;
+	public final ScreenHandlerContext context;
+	public final Inventory inventory;
+	public final PropertyDelegate propertyDelegate;
 	
-	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory, final PacketByteBuf buffer)
+	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory)
 	{
-		this(syncId, playerInventory, getAtPos(playerInventory.player.world, buffer.readBlockPos()));
+		this(syncId, playerInventory, new SimpleInventory(25), new ArrayPropertyDelegate(1), ScreenHandlerContext.EMPTY);
 	}
 	
-	private static SpiritChannelerBlockEntity getAtPos(World world, BlockPos pos)
-	{
-		if (world.isChunkLoaded(pos))
-		{
-			BlockEntity be = world.getBlockEntity(pos);
-			if (be instanceof SpiritChannelerBlockEntity)
-			{
-				return (SpiritChannelerBlockEntity) be;
-			}
-		}
-		return null;
-	}
-	
-	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory, final SpiritChannelerBlockEntity blockEntity)
+	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory, final Inventory inventory, PropertyDelegate propertyDelegate, ScreenHandlerContext screenHandlerContext)
 	{
 		super(ScreenHandlerRegistrar.SPIRIT_CHANNELER, syncId);
-		this.blockEntity = blockEntity;
-		if (this.blockEntity != null)
-		{
-			addBlockEntitySlots(this.blockEntity);
-		}
+		this.context = screenHandlerContext;
+		this.inventory = inventory;
+		this.propertyDelegate = propertyDelegate;
+		addProperties(this.propertyDelegate);
+		addInventorySlots();
 		addPlayerSlots(playerInventory);
 	}
 	
-	public void addPlayerSlots(Inventory playerInventory)
+	public boolean isActive()
+	{
+		return this.propertyDelegate.get(0) == 1;
+	}
+	
+	public void addPlayerSlots(PlayerInventory playerInventory)
 	{
 		final int xOffset = 8;
 		final int yOffset = 122;
@@ -80,7 +75,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		}
 	}
 	
-	public void addBlockEntitySlots(Inventory inventory)
+	public void addInventorySlots()
 	{
 		final int xOffset = 17;
 		final int yOffset = 18;
@@ -101,13 +96,13 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canTakeItems(PlayerEntity player)
 					{
-						return blockEntity != null && !blockEntity.isActive() && super.canTakeItems(player);
+						return !isActive() && super.canTakeItems(player);
 					}
 					
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).isPresent();
+						return !isActive() && TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).isPresent();
 					}
 				});
 			}
@@ -115,9 +110,37 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	}
 	
 	@Override
+	public boolean onButtonClick(PlayerEntity player, int id)
+	{
+		return context.get((world, pos) ->
+		{
+			if (world.isChunkLoaded(pos))
+			{
+				BlockEntity be = world.getBlockEntity(pos);
+				if (be instanceof SpiritChannelerBlockEntity)
+				{
+					SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
+					if (!channeler.isActive())
+					{
+						return channeler.activate(player);
+					}
+					else
+					{
+						channeler.deactivate();
+						return true;
+					}
+				}
+			}
+			
+			return false;
+		})
+		.orElse(false);
+	}
+	
+	@Override
 	public boolean canUse(PlayerEntity player)
 	{
-		return blockEntity != null && blockEntity.canPlayerUse(player);
+		return inventory.canPlayerUse(player);
 	}
 	
 	@Override
@@ -141,7 +164,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					return ItemStack.EMPTY;
 				}
 			}
-			else if ((blockEntity != null && blockEntity.isActive()) || !this.insertItem(itemstack1, 0, containerSlots, false))
+			else if (isActive() || !this.insertItem(itemstack1, 0, containerSlots, false))
 			{
 				if (index < containerSlots + 27)
 				{

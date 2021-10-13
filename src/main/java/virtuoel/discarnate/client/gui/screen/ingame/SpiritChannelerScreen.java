@@ -2,22 +2,18 @@ package virtuoel.discarnate.client.gui.screen.ingame;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import io.netty.buffer.Unpooled;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
 import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.GameRuleRegistrar;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
@@ -26,12 +22,9 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 {
 	private static final Identifier TEXTURE = Discarnate.id("textures/gui/container/spirit_channeler.png");
 	
-	private SpiritChannelerBlockEntity blockEntity;
-	
 	public SpiritChannelerScreen(SpiritChannelerScreenHandler screenHandler, PlayerInventory playerInventory, Text text)
 	{
 		super(screenHandler, playerInventory, text);
-		this.blockEntity = handler.blockEntity;
 		this.width = 176;
 		this.height = 204;
 		this.backgroundHeight = 204;
@@ -39,7 +32,6 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	}
 	
 	ButtonWidget confirmButton;
-	boolean active = false;
 	
 	private static final Text START_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.start");
 	private static final Text STOP_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.stop");
@@ -48,11 +40,13 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	public void init()
 	{
 		super.init();
-		final GameRules r = blockEntity.getWorld().getGameRules();
+		
+		final GameRules r = client.world.getGameRules();
+		final boolean active = handler.isActive();
+		
 		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
-		this.active = blockEntity.isActive();
 		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
-		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
+		this.confirmButton.active = active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
 		this.addDrawableChild(confirmButton);
 	}
 	
@@ -61,23 +55,16 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	{
 		super.handledScreenTick();
 		
-		final GameRules r = blockEntity.getWorld().getGameRules();
-		
-		this.active = blockEntity.isActive();
+		final GameRules r = client.world.getGameRules();
+		final boolean active = handler.isActive();
 		
 		this.confirmButton.setMessage(active ? STOP_TEXT : START_TEXT);
-		this.confirmButton.active = this.active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
+		this.confirmButton.active = active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
 	}
 	
 	private void confirmAction(ButtonWidget button)
 	{
-		if (button.active)
-		{
-			final PacketByteBuf buffer = new PacketByteBuf(Unpooled.buffer());
-			buffer.writeBlockPos(blockEntity.getPos());
-			buffer.writeBoolean(!active);
-			ClientPlayNetworking.send(Discarnate.ACTIVATE_PACKET, buffer);
-		}
+		client.interactionManager.clickButton(handler.syncId, 0);
 	}
 	
 	@Override

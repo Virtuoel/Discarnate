@@ -5,13 +5,9 @@ import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.BlockRegistrar;
 import virtuoel.discarnate.init.GameRuleRegistrar;
@@ -33,43 +29,12 @@ public class Discarnate implements ModInitializer
 	@Override
 	public void onInitialize()
 	{
-		ItemRegistrar.INSTANCE.getClass();
-		TaskRegistrar.INSTANCE.getClass();
 		BlockRegistrar.INSTANCE.getClass();
-		ScreenHandlerRegistrar.INSTANCE.getClass();
+		ItemRegistrar.INSTANCE.getClass();
 		BlockEntityRegistrar.INSTANCE.getClass();
+		ScreenHandlerRegistrar.INSTANCE.getClass();
 		GameRuleRegistrar.INSTANCE.getClass();
-		
-		ServerPlayNetworking.registerGlobalReceiver(
-			ACTIVATE_PACKET,
-			(server, player, handler, buf, responseSender) ->
-			{
-				BlockPos pos = buf.readBlockPos();
-				boolean activating = buf.readBoolean();
-				server.execute(() ->
-				{
-					if (player.world.isChunkLoaded(pos))
-					{
-						BlockEntity be = player.world.getBlockEntity(pos);
-						if (be instanceof SpiritChannelerBlockEntity)
-						{
-							SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
-							if (activating)
-							{
-								if (!channeler.isActive())
-								{
-									channeler.activate(player);
-								}
-							}
-							else if (channeler.isActive())
-							{
-								channeler.deactivate();
-							}
-						}
-					}
-				});
-			}
-		);
+		TaskRegistrar.INSTANCE.getClass();
 	}
 	
 	public static Identifier id(String path)
@@ -82,6 +47,5 @@ public class Discarnate implements ModInitializer
 		return id(paths.length == 0 ? path : path + "/" + String.join("/", paths));
 	}
 	
-	public static final Identifier ACTIVATE_PACKET = id("activate");
 	public static final Identifier TASK_PACKET = id("task");
 }
