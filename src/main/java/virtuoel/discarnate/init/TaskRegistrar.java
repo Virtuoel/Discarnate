@@ -163,7 +163,7 @@ public class TaskRegistrar
 		{
 			p.prevYaw = p.getYaw();
 			p.prevHeadYaw = p.getHeadYaw();
-			final float value = MathHelper.clamp(Math.round(p.getHeadYaw() / 90.0F) * 90, -180, 180);
+			final float value = MathHelper.wrapDegrees(Math.round(p.getHeadYaw() / 90.0F) * 90);
 			p.setYaw(value);
 			p.setHeadYaw(value);
 		}, ItemRegistrar.FACE_CARDINAL_TASK);
