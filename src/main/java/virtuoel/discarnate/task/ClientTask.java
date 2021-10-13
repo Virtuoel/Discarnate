@@ -13,9 +13,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -46,7 +44,7 @@ public class ClientTask implements Task
 			{
 				buf.writeItemStack(s);
 			}
-			buf.writeIdentifier(getDimensionFromBlockEntity(b));
+			buf.writeIdentifier(getWorldIdFromBlockEntity(b));
 			
 			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.TASK_PACKET, buf);
 		}
@@ -61,14 +59,14 @@ public class ClientTask implements Task
 		return be != null ? be.getPos() : BlockPos.ORIGIN;
 	}
 	
-	private static Identifier getDimensionFromBlockEntity(BlockEntity be)
+	private static Identifier getWorldIdFromBlockEntity(BlockEntity be)
 	{
 		if (be != null)
 		{
-			World w = be.getWorld();
-			return w.getRegistryManager().get(Registry.DIMENSION_TYPE_KEY).getId(w.getDimension());
+			return be.getWorld().getRegistryKey().getValue();
 		}
-		return DimensionType.OVERWORLD_ID;
+		
+		return World.OVERWORLD.getValue();
 	}
 	
 	private static int getSlotForStack(ItemStack stack, BlockEntity te)

@@ -12,9 +12,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.dimension.DimensionType;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.client.gui.screen.ingame.SpiritChannelerScreen;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
@@ -36,12 +35,12 @@ public class DiscarnateClient implements ClientModInitializer
 		BlockPos pos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
 		int slot = buf.readInt();
 		ItemStack stack = slot == -1 ? buf.readItemStack() : ItemStack.EMPTY;
-		DimensionType dimension = handler.getRegistryManager().get(Registry.DIMENSION_TYPE_KEY).get(buf.readIdentifier());
+		Identifier id = buf.readIdentifier();
 		
 		client.execute(() ->
 		{
 			ClientWorld w = client.world;
-			if ((slot != -1 || !stack.isEmpty()) && w != null && w.getDimension() == dimension)
+			if ((slot != -1 || !stack.isEmpty()) && w != null && id.equals(w.getRegistryKey().getValue()))
 			{
 				if (w.isChunkLoaded(pos))
 				{
