@@ -20,6 +20,7 @@ import virtuoel.discarnate.init.BlockRegistrar;
 import virtuoel.discarnate.init.ItemRegistrar;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.network.DiscarnatePacketHandler;
 
 @Mod(Discarnate.MOD_ID)
 public class Discarnate
@@ -58,6 +59,8 @@ public class Discarnate
 		{
 			modBus.addListener(DiscarnateClient::setupClient);
 		});
+		
+		DiscarnatePacketHandler.init();
 	}
 	
 	public static Identifier id(String path)

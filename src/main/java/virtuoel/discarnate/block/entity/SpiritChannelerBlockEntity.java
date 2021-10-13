@@ -35,15 +35,14 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fmllegacy.RegistryObject;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
-import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -223,11 +222,11 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		player.addExperienceLevels(-DiscarnateConfig.COMMON.levelCost.get());
 	}
 	
-	private static final RegistryObject<Task> RESET_CHANNELER_TASK = RegistryObject.of(Discarnate.id("reset_channeler_task"), Task.class, Discarnate.MOD_ID);
+	private static final Identifier RESET_CHANNELER_TASK_ID = Discarnate.id("reset_channeler_task");
 	
 	protected void onPlayerStop(@NotNull PlayerEntity player)
 	{
-		RESET_CHANNELER_TASK.get().accept(ItemStack.EMPTY, player, this);
+		TaskRegistrar.REGISTRY.get().getValue(RESET_CHANNELER_TASK_ID).accept(ItemStack.EMPTY, player, this);
 	}
 	
 	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)
