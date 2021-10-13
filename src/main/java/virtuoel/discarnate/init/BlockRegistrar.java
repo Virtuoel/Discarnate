@@ -23,6 +23,7 @@ public class BlockRegistrar
 			Block.Settings.of(Material.METAL, MapColor.BROWN)
 			.strength(5.0F, 10.0F)
 			.sounds(BlockSoundGroup.METAL)
+			.requiresTool()
 		)
 	);
 	
