@@ -39,7 +39,7 @@ public class DiscarnateClient implements ClientModInitializer
 		{
 			PlayerEntity p = (PlayerEntity) (Object) client.player;
 			ClientWorld w = client.world;
-			if (p != null && w != null && !stack.isEmpty() && id.equals(w.getRegistryKey().getValue()))
+			if (p != null && w != null && id.equals(w.getRegistryKey().getValue()))
 			{
 				if (w.isChunkLoaded(pos))
 				{
