@@ -40,7 +40,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.api.Task;
@@ -223,15 +223,11 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		player.addExperienceLevels(-DiscarnateConfig.COMMON.levelCost.get());
 	}
 	
-	@ObjectHolder(Discarnate.MOD_ID + ":reset_channeler_task")
-	private static final Task RESET_CHANNELER_TASK = null;
+	private static final RegistryObject<Task> RESET_CHANNELER_TASK = RegistryObject.of(Discarnate.id("reset_channeler_task"), Task.class, Discarnate.MOD_ID);
 	
 	protected void onPlayerStop(@NotNull PlayerEntity player)
 	{
-		if (RESET_CHANNELER_TASK != null)
-		{
-			RESET_CHANNELER_TASK.accept(ItemStack.EMPTY, player, this);
-		}
+		RESET_CHANNELER_TASK.get().accept(ItemStack.EMPTY, player, this);
 	}
 	
 	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)

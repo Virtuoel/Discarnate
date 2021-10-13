@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
 	"id": "discarnate",
-	"name": "Discarnate",
-	"version": "${version}",
-	"description": "A mod where you let spirits control your body to do tasks",
+	"name": "Discarnate (Forge Version)",
+	"version": "0.0.0+forge",
+	"description": "Forge version of Discarnate, but you are playing on a Fabric instance! Did you download the wrong mod .jar?",
 	"authors":
 	[
 		"Virtuoel"
@@ -15,26 +15,13 @@
 		"sources": "https://github.com/Virtuoel/Discarnate"
 	},
 	"license": "MIT",
-	"icon": "assets/discarnate/icon.png",
+	"icon": "discarnate_icon.png",
 	"environment": "*",
-	"depends":
-	{
-		"fabricloader": ">=0.11.7",
-		"fabric-api-base": "*"
-	},
 	"entrypoints":
 	{
 		"main":
 		[
-			"virtuoel.discarnate.Discarnate"
-		],
-		"client":
-		[
-			"virtuoel.discarnate.DiscarnateClient"
+			"virtuoel.discarnate.util.FabricEntrypoint::onInitialize"
 		]
-	},
-	"mixins":
-	[
-		"discarnate.mixins.json"
-	]
+	}
 }

@@ -1,0 +1,14 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+license="MIT"
+issueTrackerURL="https://github.com/Virtuoel/Discarnate/issues"
+[[mods]]
+modId="discarnate"
+version="${file.jarVersion}"
+displayName="Discarnate"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/discarnate/"
+logoFile="discarnate_icon.png"
+authors="Virtuoel"
+description='''
+Let spirits control your body to do tasks.
+'''

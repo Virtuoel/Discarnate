@@ -135,7 +135,7 @@ processResources {
 	}
 	
 	filesMatching("META-INF/mods.toml") {
-		expand "version": project.version
+		expand "file.jarVersion": project.version
 	}
 }
 

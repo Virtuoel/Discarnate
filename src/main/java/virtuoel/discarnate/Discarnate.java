@@ -11,6 +11,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import virtuoel.discarnate.api.DiscarnateConfig;
@@ -20,6 +21,7 @@ import virtuoel.discarnate.init.ItemRegistrar;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 
+@Mod(Discarnate.MOD_ID)
 public class Discarnate
 {
 	public static final String MOD_ID = "discarnate";
@@ -52,7 +54,7 @@ public class Discarnate
 		ctx.registerConfig(ModConfig.Type.SERVER, DiscarnateConfig.serverSpec);
 		ctx.registerConfig(ModConfig.Type.COMMON, DiscarnateConfig.commonSpec);
 		
-		DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () ->
+		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
 		{
 			modBus.addListener(DiscarnateClient::setupClient);
 		});
