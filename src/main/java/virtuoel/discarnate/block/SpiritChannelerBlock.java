@@ -104,7 +104,7 @@ public class SpiritChannelerBlock extends Block implements BlockEntityProvider
 	@Nullable
 	public BlockEntity createBlockEntity(BlockPos pos, BlockState state)
 	{
-		return BlockEntityRegistrar.SPIRIT_CHANNELER.instantiate(pos, state);
+		return BlockEntityRegistrar.SPIRIT_CHANNELER.get().instantiate(pos, state);
 	}
 	
 	@Override

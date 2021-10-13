@@ -1,57 +1,39 @@
 package virtuoel.discarnate.init;
 
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
-
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
+import net.minecraftforge.fmllegacy.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
 
 public class BlockRegistrar
 {
-	public static final Block SPIRIT_CHANNELER = registerBlock(
-		Discarnate.id("spirit_channeler"),
-		SpiritChannelerBlock::new,
-		FabricBlockSettings.of(Material.METAL, MapColor.BROWN)
-		.strength(5.0F, 10.0F)
-		.sounds(BlockSoundGroup.METAL)
-		.breakByTool(FabricToolTags.PICKAXES, 1),
-		s -> s.group(Discarnate.ITEM_GROUP)
+	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Discarnate.MOD_ID);
+	private static final DeferredRegister<Item> ITEMS = ItemRegistrar.ITEMS;
+	
+	public static final RegistryObject<Block> SPIRIT_CHANNELER = BLOCKS.register(
+		"spirit_channeler",
+		() -> new SpiritChannelerBlock(
+			Block.Settings.of(Material.METAL, MapColor.BROWN)
+			.strength(5.0F, 10.0F)
+			.sounds(BlockSoundGroup.METAL)
+		)
 	);
 	
-	private static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, UnaryOperator<Item.Settings> itemSettings)
+	static
 	{
-		return registerBlock(name, blockFunc, blockSettings, BlockItem::new, itemSettings);
-	}
-	
-	private static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, BiFunction<Block, Item.Settings, BlockItem> itemFunc, UnaryOperator<Item.Settings> itemSettings)
-	{
-		final Block block = registerBlock(name, blockFunc, blockSettings);
-		
-		Registry.register(Registry.ITEM, name, itemFunc.apply(block, itemSettings.apply(new Item.Settings())));
-		
-		return block;
-	}
-	
-	private static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings)
-	{
-		return registerBlock(name, () -> blockFunc.apply(blockSettings));
-	}
-	
-	private static Block registerBlock(Identifier name, Supplier<Block> blockSupplier)
-	{
-		return Registry.register(Registry.BLOCK, name, blockSupplier.get());
+		ITEMS.register(
+			SPIRIT_CHANNELER.getId().getPath(),
+			() -> new BlockItem(
+				SPIRIT_CHANNELER.get(), new Item.Settings().group(Discarnate.ITEM_GROUP)
+			)
+		);
 	}
 	
 	public static final BlockRegistrar INSTANCE = new BlockRegistrar();

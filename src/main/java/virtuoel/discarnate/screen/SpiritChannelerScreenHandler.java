@@ -13,7 +13,6 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -31,7 +30,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	
 	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory, final Inventory inventory, PropertyDelegate propertyDelegate, ScreenHandlerContext screenHandlerContext)
 	{
-		super(ScreenHandlerRegistrar.SPIRIT_CHANNELER, syncId);
+		super(ScreenHandlerRegistrar.SPIRIT_CHANNELER.get(), syncId);
 		this.context = screenHandlerContext;
 		this.inventory = inventory;
 		this.propertyDelegate = propertyDelegate;
@@ -102,7 +101,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return !isActive() && TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).isPresent();
+						return !isActive() && TaskRegistrar.REGISTRY.get().containsKey(stack.getItem().getRegistryName());
 					}
 				});
 			}

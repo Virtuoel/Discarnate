@@ -39,14 +39,13 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
+import net.minecraftforge.registries.ObjectHolder;
 import virtuoel.discarnate.Discarnate;
+import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
-import virtuoel.discarnate.init.GameRuleRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
@@ -122,7 +121,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 							ItemStack stack = inventory.get(i);
 							if (!stack.isEmpty())
 							{
-								TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).ifPresent(task -> task.accept(stack, player, this));
+								Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, player, this));
 							}
 						}
 						else
@@ -206,14 +205,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public static boolean canPlayerStart(@NotNull PlayerEntity player)
 	{
-		final GameRules r = player.getEntityWorld().getGameRules();
-		return canPlayerContinue(player) && !player.isDead() && (player.isCreative() || (player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST) && (!r.getBoolean(GameRuleRegistrar.PUMPKIN_TO_START) || isWearingPumpkin(player))));
+		return canPlayerContinue(player) && !player.isDead() && (player.isCreative() || (player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get() && (!DiscarnateConfig.COMMON.pumpkinToStart.get() || isWearingPumpkin(player))));
 	}
 	
 	public static boolean canPlayerContinue(@NotNull PlayerEntity player)
 	{
-		final GameRules r = player.getEntityWorld().getGameRules();
-		return !player.isDead() && (player.isCreative() || !r.getBoolean(GameRuleRegistrar.PUMPKIN_TO_CONTINUE) || isWearingPumpkin(player));
+		return !player.isDead() && (player.isCreative() || !DiscarnateConfig.COMMON.pumpkinToContinue.get() || isWearingPumpkin(player));
 	}
 	
 	public static void onPlayerStart(@NotNull PlayerEntity player)
@@ -222,11 +219,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		{
 			((ServerPlayerEntity) player).closeHandledScreen();
 		}
-		final GameRules r = player.getEntityWorld().getGameRules();
-		player.addExperienceLevels(-r.getInt(GameRuleRegistrar.LEVEL_COST));
+		
+		player.addExperienceLevels(-DiscarnateConfig.COMMON.levelCost.get());
 	}
 	
-	private static final Task RESET_CHANNELER_TASK = TaskRegistrar.REGISTRY.get(Discarnate.id("reset_channeler_task"));
+	@ObjectHolder(Discarnate.MOD_ID + ":reset_channeler_task")
+	private static final Task RESET_CHANNELER_TASK = null;
 	
 	protected void onPlayerStop(@NotNull PlayerEntity player)
 	{
@@ -353,7 +351,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public SpiritChannelerBlockEntity(BlockPos blockPos, BlockState blockState)
 	{
-		super(BlockEntityRegistrar.SPIRIT_CHANNELER, blockPos, blockState);
+		super(BlockEntityRegistrar.SPIRIT_CHANNELER.get(), blockPos, blockState);
 		this.inventory = DefaultedList.ofSize(25, ItemStack.EMPTY);
 		this.propertyDelegate = new ArrayPropertyDelegate(1);
 		this.propertyDelegate.set(0, isActive(blockState) ? 1 : 0);

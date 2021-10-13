@@ -3,20 +3,18 @@ package virtuoel.discarnate.task;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import io.netty.buffer.Unpooled;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import virtuoel.discarnate.Discarnate;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
-import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.network.DiscarnatePacketHandler;
+import virtuoel.discarnate.network.TaskPacket;
 
 public class ClientTask extends Task
 {
@@ -30,14 +28,14 @@ public class ClientTask extends Task
 	{
 		if (p instanceof ServerPlayerEntity && !p.getEntityWorld().isClient)
 		{
-			final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			final BlockPos pos = getPosFromBlockEntity(b);
-			buf.writeIdentifier(TaskRegistrar.REGISTRY.getId(this));
-			buf.writeBlockPos(pos);
-			buf.writeItemStack(s);
-			buf.writeIdentifier(getWorldIdFromBlockEntity(b));
+			TaskPacket packet = new TaskPacket(
+				this,
+				getPosFromBlockEntity(b),
+				s,
+				getWorldIdFromBlockEntity(b)
+			);
 			
-			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.TASK_PACKET, buf);
+			((ServerPlayerEntity) p).networkHandler.sendPacket(DiscarnatePacketHandler.INSTANCE.toVanillaPacket(packet, NetworkDirection.PLAY_TO_CLIENT));
 		}
 		else
 		{

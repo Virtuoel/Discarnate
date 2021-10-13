@@ -6,8 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class Task implements TaskAction
+public class Task extends ForgeRegistryEntry<Task> implements TaskAction
 {
 	protected final TaskAction action;
 	

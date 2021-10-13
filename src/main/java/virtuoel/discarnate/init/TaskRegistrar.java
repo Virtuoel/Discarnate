@@ -1,7 +1,8 @@
 package virtuoel.discarnate.init;
 
-import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventories;
@@ -15,7 +16,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
+import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.fmllegacy.RegistryObject;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegistryBuilder;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
@@ -25,11 +30,11 @@ import virtuoel.discarnate.task.ClientTask;
 
 public class TaskRegistrar
 {
-	public static final Registry<Task> REGISTRY = FabricRegistryBuilder.createDefaulted(
-		Task.class,
-		Discarnate.id("tasks"),
-		Registry.ITEM.getId(ItemRegistrar.BLANK_TASK)
-	).attribute(RegistryAttribute.SYNCED).buildAndRegister();
+	public static final DeferredRegister<Task> TASKS = DeferredRegister.create(Task.class, Discarnate.MOD_ID);
+	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry("task", () ->
+	{
+		return new RegistryBuilder<Task>().setDefaultKey(ItemRegistrar.BLANK_TASK.getId());
+	}));
 	
 	private TaskRegistrar()
 	{
@@ -219,7 +224,7 @@ public class TaskRegistrar
 					DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
 					Inventories.readNbt(beNbt, stacks);
 					
-					if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.asItem()))
+					if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.get().asItem()))
 					{
 						for (ItemStack stack : stacks)
 						{
@@ -227,7 +232,7 @@ public class TaskRegistrar
 							{
 								if (!stack.isEmpty())
 								{
-									REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).ifPresent(task -> task.accept(stack, p, b));
+									Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, p, b));
 								}
 							}
 							else
@@ -247,29 +252,39 @@ public class TaskRegistrar
 		}
 	}
 	
-	private static Task registerTask(Task task, Identifier id)
+	private static RegistryObject<Task> registerTask(Supplier<Task> task, Identifier id)
 	{
-		return Registry.register(REGISTRY, id, task);
+		return TASKS.register(id.getPath(), task);
 	}
 	
-	private static Task registerTask(TaskAction task, Identifier id)
+	private static RegistryObject<Task> registerTask(TaskAction task, Identifier id)
 	{
-		return registerTask(new Task(task), id);
+		return registerTask(() -> new Task(task), id);
 	}
 	
-	private static Task registerTask(TaskAction task, ItemConvertible item)
+	private static RegistryObject<Task> registerTask(TaskAction task, RegistryObject<?> entry)
 	{
-		return registerTask(task, Registry.ITEM.getId(item.asItem()));
+		return registerTask(task, entry.getId());
 	}
 	
-	private static Task registerClientTask(TaskAction task, Identifier id)
+	private static RegistryObject<Task> registerTask(TaskAction task, ItemConvertible item)
 	{
-		return registerTask(new ClientTask(task), id);
+		return registerTask(task, item.asItem().getRegistryName());
 	}
 	
-	private static Task registerClientTask(TaskAction task, ItemConvertible item)
+	private static RegistryObject<Task> registerClientTask(TaskAction task, Identifier id)
 	{
-		return registerClientTask(task, Registry.ITEM.getId(item.asItem()));
+		return registerTask(() -> new ClientTask(task), id);
+	}
+	
+	private static RegistryObject<Task> registerClientTask(TaskAction task, RegistryObject<?> entry)
+	{
+		return registerClientTask(task, entry.getId());
+	}
+	
+	private static RegistryObject<Task> registerClientTask(TaskAction task, ItemConvertible item)
+	{
+		return registerClientTask(task, item.asItem().getRegistryName());
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();

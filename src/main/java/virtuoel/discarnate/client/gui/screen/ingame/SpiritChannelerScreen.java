@@ -2,8 +2,6 @@ package virtuoel.discarnate.client.gui.screen.ingame;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.render.GameRenderer;
@@ -12,12 +10,13 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import virtuoel.discarnate.Discarnate;
-import virtuoel.discarnate.init.GameRuleRegistrar;
+import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
-@Environment(EnvType.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHandler>
 {
 	private static final Identifier TEXTURE = Discarnate.id("textures/gui/container/spirit_channeler.png");
@@ -41,12 +40,11 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	{
 		super.init();
 		
-		final GameRules r = client.world.getGameRules();
 		final boolean active = handler.isActive();
 		
 		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
 		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
-		this.confirmButton.active = active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
+		this.confirmButton.active = active || (this.client.player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && this.client.player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get()) || this.client.player.isCreative();
 		this.addDrawableChild(confirmButton);
 	}
 	
@@ -55,11 +53,10 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	{
 		super.handledScreenTick();
 		
-		final GameRules r = client.world.getGameRules();
 		final boolean active = handler.isActive();
 		
 		this.confirmButton.setMessage(active ? STOP_TEXT : START_TEXT);
-		this.confirmButton.active = active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
+		this.confirmButton.active = active || (this.client.player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && this.client.player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get()) || this.client.player.isCreative();
 	}
 	
 	private void confirmAction(ButtonWidget button)
