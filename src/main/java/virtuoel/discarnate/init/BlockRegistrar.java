@@ -26,7 +26,8 @@ public class BlockRegistrar
 		FabricBlockSettings.of(Material.METAL, MapColor.BROWN)
 		.strength(5.0F, 10.0F)
 		.sounds(BlockSoundGroup.METAL)
-		.breakByTool(FabricToolTags.PICKAXES, 1),
+		.requiresTool()
+		.breakByTool(FabricToolTags.PICKAXES, 2),
 		s -> s.group(Discarnate.ITEM_GROUP)
 	);
 	
