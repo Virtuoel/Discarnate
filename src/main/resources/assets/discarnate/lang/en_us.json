@@ -28,5 +28,10 @@
 	"gui.discarnate.spirit_channeler.start": "Start",
 	"gui.discarnate.spirit_channeler.stop": "Stop",
 	
-	"itemGroup.discarnate.general": "Discarnate"
+	"itemGroup.discarnate.general": "Discarnate",
+	
+	"discarnate.configgui.pumpkinToStart": "Whether the player must be wearing a Carved Pumpkin to activate the Spirit Channeler",
+	"discarnate.configgui.pumpkinToContinue": "Whether the player must be wearing a Carved Pumpkin for an active Spirit Channeler to remain active",
+	"discarnate.configgui.minLevel": "The minimum amount of experience levels required to activate the Spirit Channeler",
+	"discarnate.configgui.levelCost": "The amount of experience levels that will be consumed when activating the Spirit Channeler"
 }
