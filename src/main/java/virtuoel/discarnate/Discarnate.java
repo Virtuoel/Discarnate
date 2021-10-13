@@ -41,12 +41,13 @@ public class Discarnate
 	public Discarnate()
 	{
 		IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+		
 		BlockRegistrar.BLOCKS.register(modBus);
 		ItemRegistrar.ITEMS.register(modBus);
 		BlockEntityRegistrar.BLOCK_ENTITIES.register(modBus);
 		ScreenHandlerRegistrar.SCREEN_HANDLERS.register(modBus);
 		TaskRegistrar.TASKS.register(modBus);
+		modBus.register(TaskRegistrar.class);
 		
 		MinecraftForge.EVENT_BUS.register(DiscarnateConfig.class);
 		

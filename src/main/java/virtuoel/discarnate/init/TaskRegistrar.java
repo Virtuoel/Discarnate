@@ -6,7 +6,6 @@ import java.util.function.Supplier;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -17,6 +16,11 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -210,7 +214,11 @@ public class TaskRegistrar
 				((SpiritChannelerBlockEntity) b).deactivate();
 			}
 		}, ItemRegistrar.END_TASK);
-		
+	}
+	
+	@SubscribeEvent
+	public static void registerVanillaTasks(RegistryEvent.Register<Task> event)
+	{
 		final TaskAction shulkerTask = (s, p, b) ->
 		{
 			NbtCompound stackNbt = s.getNbt();
@@ -245,11 +253,16 @@ public class TaskRegistrar
 			}
 		};
 		
-		registerTask(shulkerTask, ShulkerBoxBlock.get(null));
+		ModContainer container = ModLoadingContext.get().getActiveContainer();
+		ModLoadingContext.get().setActiveContainer(ModList.get().getModContainerById("minecraft").orElseThrow());
+		
+		event.getRegistry().register(new Task(shulkerTask).setRegistryName(ShulkerBoxBlock.get(null).getRegistryName()));
 		for (DyeColor color : DyeColor.values())
 		{
-			registerTask(shulkerTask, ShulkerBoxBlock.get(color));
+			event.getRegistry().register(new Task(shulkerTask).setRegistryName(ShulkerBoxBlock.get(color).getRegistryName()));
 		}
+		
+		ModLoadingContext.get().setActiveContainer(container);
 	}
 	
 	private static RegistryObject<Task> registerTask(Supplier<Task> task, Identifier id)
@@ -267,11 +280,6 @@ public class TaskRegistrar
 		return registerTask(task, entry.getId());
 	}
 	
-	private static RegistryObject<Task> registerTask(TaskAction task, ItemConvertible item)
-	{
-		return registerTask(task, item.asItem().getRegistryName());
-	}
-	
 	private static RegistryObject<Task> registerClientTask(TaskAction task, Identifier id)
 	{
 		return registerTask(() -> new ClientTask(task), id);
@@ -280,11 +288,6 @@ public class TaskRegistrar
 	private static RegistryObject<Task> registerClientTask(TaskAction task, RegistryObject<?> entry)
 	{
 		return registerClientTask(task, entry.getId());
-	}
-	
-	private static RegistryObject<Task> registerClientTask(TaskAction task, ItemConvertible item)
-	{
-		return registerClientTask(task, item.asItem().getRegistryName());
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();
