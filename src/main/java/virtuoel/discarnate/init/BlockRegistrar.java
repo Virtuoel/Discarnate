@@ -5,8 +5,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
@@ -23,11 +21,10 @@ public class BlockRegistrar
 	public static final Block SPIRIT_CHANNELER = registerBlock(
 		Discarnate.id("spirit_channeler"),
 		SpiritChannelerBlock::new,
-		FabricBlockSettings.of(Material.METAL, MapColor.BROWN)
+		Block.Settings.of(Material.METAL, MapColor.BROWN)
 		.strength(5.0F, 10.0F)
 		.sounds(BlockSoundGroup.METAL)
-		.requiresTool()
-		.breakByTool(FabricToolTags.PICKAXES, 2),
+		.requiresTool(),
 		s -> s.group(Discarnate.ITEM_GROUP)
 	);
 	
