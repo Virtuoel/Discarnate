@@ -1,6 +1,5 @@
 package virtuoel.discarnate.block.entity;
 
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
 
@@ -258,7 +257,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				{
 					if (marker.hasPassengers())
 					{
-						marker.removeAllPassengers();;
+						marker.removeAllPassengers();
 					}
 					
 					if (marker.hasVehicle())
@@ -374,21 +373,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	@Override
 	public boolean isEmpty()
 	{
-		Iterator<ItemStack> var1 = this.inventory.iterator();
-		
-		ItemStack itemStack;
-		do
-		{
-			if (!var1.hasNext())
-			{
-				return true;
-			}
-			
-			itemStack = (ItemStack) var1.next();
-		}
-		while (itemStack.isEmpty());
-		
-		return false;
+		return this.inventory.stream().allMatch(ItemStack::isEmpty);
 	}
 	
 	@Override
