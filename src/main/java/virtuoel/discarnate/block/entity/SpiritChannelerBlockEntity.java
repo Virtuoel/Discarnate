@@ -75,7 +75,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			{
 				World w = getWorld();
 				boolean hasWorld = w != null;
-				if (player == null || !canPlayerStart(player))
+				if (player == null || !canPlayerStart(player) || isEmpty())
 				{
 					if (hasWorld)
 					{
