@@ -265,6 +265,8 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 						marker.dismountVehicle();
 					}
 					
+					marker.setAttacker(null);
+					marker.setAttacking(null);
 					marker.setLifeTicks(2);
 					marker.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1, 10, false, false));
 					marker.setCharging(marker.getMoveControl().isMoving());
