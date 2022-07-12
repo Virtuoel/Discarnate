@@ -79,7 +79,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				{
 					if (hasWorld)
 					{
-						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_VEX_HURT, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
 					
 					propertyDelegate.set(0, 0);
