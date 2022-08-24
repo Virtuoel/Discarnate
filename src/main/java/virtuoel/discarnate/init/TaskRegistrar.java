@@ -9,7 +9,6 @@ import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -22,6 +21,7 @@ import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.client.option.KeyBindingUtils;
 import virtuoel.discarnate.task.ClientTask;
+import virtuoel.discarnate.util.I18nUtils;
 
 public class TaskRegistrar
 {
@@ -40,7 +40,7 @@ public class TaskRegistrar
 		
 		registerTask((s, p, b) ->
 		{
-			p.sendMessage(new LiteralText("" + s.getCount()), false);
+			p.sendMessage(I18nUtils.literal("" + s.getCount()), false);
 		}, ItemRegistrar.INFO_TASK);
 		
 		registerTask((s, p, b) ->
@@ -79,48 +79,48 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keyForward, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.forwardKey, s.getCount() * 50);
 		}, ItemRegistrar.MOVE_FORWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keyBack, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.backKey, s.getCount() * 50);
 		}, ItemRegistrar.MOVE_BACKWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keyLeft, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.leftKey, s.getCount() * 50);
 		}, ItemRegistrar.STRAFE_LEFT_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keyRight, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.rightKey, s.getCount() * 50);
 		}, ItemRegistrar.STRAFE_RIGHT_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keySneak, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.sneakKey, s.getCount() * 50);
 		}, ItemRegistrar.SNEAK_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keyJump, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.jumpKey, s.getCount() * 50);
 		}, ItemRegistrar.JUMP_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryReleaseKey(mc.options.keyForward);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyBack);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyLeft);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyRight);
-			KeyBindingUtils.tryReleaseKey(mc.options.keySneak);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyJump);
+			KeyBindingUtils.tryReleaseKey(mc.options.forwardKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.backKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.leftKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.rightKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.sneakKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.jumpKey);
 		}, ItemRegistrar.CANCEL_MOVEMENT_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -171,13 +171,13 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keyAttack, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.attackKey, s.getCount() * 50);
 		}, ItemRegistrar.SWING_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.keyUse, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.useKey, s.getCount() * 50);
 		}, ItemRegistrar.USE_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -188,14 +188,14 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryReleaseKey(mc.options.keyForward);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyBack);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyLeft);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyRight);
-			KeyBindingUtils.tryReleaseKey(mc.options.keySneak);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyJump);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyAttack);
-			KeyBindingUtils.tryReleaseKey(mc.options.keyUse);
+			KeyBindingUtils.tryReleaseKey(mc.options.forwardKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.backKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.leftKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.rightKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.sneakKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.jumpKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.attackKey);
+			KeyBindingUtils.tryReleaseKey(mc.options.useKey);
 		}, Discarnate.id("reset_channeler_task"));
 		
 		registerTask((s, p, b) ->

@@ -33,7 +33,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -49,6 +48,7 @@ import virtuoel.discarnate.init.GameRuleRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
+import virtuoel.discarnate.util.I18nUtils;
 
 public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ScreenHandlerFactory
 {
@@ -363,7 +363,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	@Override
 	protected Text getContainerName()
 	{
-		return new TranslatableText("container." + Discarnate.MOD_ID + ".spirit_channeler");
+		return I18nUtils.translate("container." + Discarnate.MOD_ID + ".spirit_channeler", "Spirit Channeler");
 	}
 	
 	@Override
@@ -387,11 +387,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	}
 	
 	@Override
-	public NbtCompound writeNbt(NbtCompound nbt)
+	public void writeNbt(NbtCompound nbt)
 	{
 		super.writeNbt(nbt);
 		Inventories.writeNbt(nbt, this.inventory);
-		return nbt;
 	}
 	
 	@Override
