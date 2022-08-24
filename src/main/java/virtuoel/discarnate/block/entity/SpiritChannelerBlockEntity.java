@@ -251,6 +251,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			}
 			
 			@Override
+			public boolean shouldRunEveryTick()
+			{
+				return true;
+			}
+			
+			@Override
 			public void tick()
 			{
 				if (marker != null)
@@ -280,6 +286,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			public boolean canStart()
 			{
 				return player != null;
+			}
+			
+			@Override
+			public boolean shouldRunEveryTick()
+			{
+				return true;
 			}
 			
 			@Override
