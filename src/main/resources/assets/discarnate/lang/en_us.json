@@ -30,6 +30,15 @@
 	
 	"itemGroup.discarnate.general": "Discarnate",
 	
+	"gamerule.discarnate.pumpkinToStart": "[Discarnate]\nPumpkin to start",
+	"gamerule.discarnate.pumpkinToContinue": "[Discarnate]\nPumpkin to continue",
+	"gamerule.discarnate.minLevel": "[Discarnate]\nMinimum level",
+	"gamerule.discarnate.levelCost": "[Discarnate]\nLevel cost",
+	"gamerule.discarnate.pumpkinToStart.description": "Whether the player must be wearing a Carved Pumpkin to activate the Spirit Channeler",
+	"gamerule.discarnate.pumpkinToContinue.description": "Whether the player must be wearing a Carved Pumpkin for an active Spirit Channeler to remain active",
+	"gamerule.discarnate.minLevel.description": "The minimum amount of experience levels required to activate the Spirit Channeler",
+	"gamerule.discarnate.levelCost.description": "The amount of experience levels that will be consumed when activating the Spirit Channeler",
+	
 	"discarnate.configgui.pumpkinToStart": "Whether the player must be wearing a Carved Pumpkin to activate the Spirit Channeler",
 	"discarnate.configgui.pumpkinToContinue": "Whether the player must be wearing a Carved Pumpkin for an active Spirit Channeler to remain active",
 	"discarnate.configgui.minLevel": "The minimum amount of experience levels required to activate the Spirit Channeler",
