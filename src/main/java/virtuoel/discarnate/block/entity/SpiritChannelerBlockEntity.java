@@ -244,6 +244,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			}
 			
 			@Override
+			public boolean shouldRunEveryTick()
+			{
+				return true;
+			}
+			
+			@Override
 			public void tick()
 			{
 				if (marker != null)
@@ -273,6 +279,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			public boolean canStart()
 			{
 				return player != null;
+			}
+			
+			@Override
+			public boolean shouldRunEveryTick()
+			{
+				return true;
 			}
 			
 			@Override
@@ -380,11 +392,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	}
 	
 	@Override
-	public NbtCompound writeNbt(NbtCompound nbt)
+	public void writeNbt(NbtCompound nbt)
 	{
 		super.writeNbt(nbt);
 		Inventories.writeNbt(nbt, this.inventory);
-		return nbt;
 	}
 	
 	@Override

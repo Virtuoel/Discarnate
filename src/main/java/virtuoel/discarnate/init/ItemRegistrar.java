@@ -4,9 +4,9 @@ import java.util.function.Supplier;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import virtuoel.discarnate.Discarnate;
 
 public class ItemRegistrar

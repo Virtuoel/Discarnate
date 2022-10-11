@@ -10,7 +10,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.network.NetworkDirection;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.network.DiscarnatePacketHandler;

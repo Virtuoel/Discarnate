@@ -1,9 +1,9 @@
 package virtuoel.discarnate.init;
 
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
