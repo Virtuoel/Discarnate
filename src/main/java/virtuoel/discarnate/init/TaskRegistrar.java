@@ -9,7 +9,6 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.LiteralText;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
@@ -31,6 +30,7 @@ import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.client.option.KeyBindingUtils;
 import virtuoel.discarnate.task.ClientTask;
+import virtuoel.discarnate.util.I18nUtils;
 
 public class TaskRegistrar
 {
@@ -49,7 +49,7 @@ public class TaskRegistrar
 		
 		registerTask((s, p, b) ->
 		{
-			p.sendMessage(new LiteralText("" + s.getCount()), false);
+			p.sendMessage(I18nUtils.literal("" + s.getCount()), false);
 		}, ItemRegistrar.INFO_TASK);
 		
 		registerTask((s, p, b) ->

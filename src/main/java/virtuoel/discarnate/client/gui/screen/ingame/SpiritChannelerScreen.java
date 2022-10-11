@@ -8,13 +8,13 @@ import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
+import virtuoel.discarnate.util.I18nUtils;
 
 @OnlyIn(Dist.CLIENT)
 public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHandler>
@@ -32,8 +32,8 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	
 	ButtonWidget confirmButton;
 	
-	private static final Text START_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.start");
-	private static final Text STOP_TEXT = new TranslatableText("gui.discarnate.spirit_channeler.stop");
+	private static final Text START_TEXT = I18nUtils.translate("gui.discarnate.spirit_channeler.start", "Start");
+	private static final Text STOP_TEXT = I18nUtils.translate("gui.discarnate.spirit_channeler.stop", "Stop");
 	
 	@Override
 	public void init()

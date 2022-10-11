@@ -1,6 +1,5 @@
 package virtuoel.discarnate.block.entity;
 
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
 
@@ -34,7 +33,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
@@ -48,6 +46,7 @@ import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
+import virtuoel.discarnate.util.I18nUtils;
 
 public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ScreenHandlerFactory
 {
@@ -74,11 +73,11 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			{
 				World w = getWorld();
 				boolean hasWorld = w != null;
-				if (player == null || !canPlayerStart(player))
+				if (player == null || !canPlayerStart(player) || isEmpty())
 				{
 					if (hasWorld)
 					{
-						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.BLOCKS, 0.5F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
+						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_VEX_HURT, SoundCategory.BLOCKS, 1.0F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
 					
 					propertyDelegate.set(0, 0);
@@ -251,7 +250,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				{
 					if (marker.hasPassengers())
 					{
-						marker.removeAllPassengers();;
+						marker.removeAllPassengers();
 					}
 					
 					if (marker.hasVehicle())
@@ -259,6 +258,8 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 						marker.dismountVehicle();
 					}
 					
+					marker.setAttacker(null);
+					marker.setAttacking(null);
 					marker.setLifeTicks(2);
 					marker.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 1, 10, false, false));
 					marker.setCharging(marker.getMoveControl().isMoving());
@@ -355,7 +356,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	@Override
 	protected Text getContainerName()
 	{
-		return new TranslatableText("container." + Discarnate.MOD_ID + ".spirit_channeler");
+		return I18nUtils.translate("container." + Discarnate.MOD_ID + ".spirit_channeler", "Spirit Channeler");
 	}
 	
 	@Override
@@ -367,21 +368,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	@Override
 	public boolean isEmpty()
 	{
-		Iterator<ItemStack> var1 = this.inventory.iterator();
-		
-		ItemStack itemStack;
-		do
-		{
-			if (!var1.hasNext())
-			{
-				return true;
-			}
-			
-			itemStack = (ItemStack) var1.next();
-		}
-		while (itemStack.isEmpty());
-		
-		return false;
+		return this.inventory.stream().allMatch(ItemStack::isEmpty);
 	}
 	
 	@Override
