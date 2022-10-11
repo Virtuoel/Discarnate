@@ -72,7 +72,7 @@ public class TaskPacket
 	
 	public void encode(PacketByteBuf buf)
 	{
-		buf.writeIdentifier(task.getRegistryName());
+		buf.writeIdentifier(TaskRegistrar.REGISTRY.get().getKey(task));
 		buf.writeBlockPos(pos);
 		buf.writeItemStack(stack);
 		buf.writeIdentifier(id);

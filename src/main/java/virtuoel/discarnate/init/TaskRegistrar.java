@@ -15,13 +15,14 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryBuilder;
 import net.minecraftforge.registries.RegistryObject;
 import virtuoel.discarnate.Discarnate;
@@ -35,7 +36,7 @@ import virtuoel.discarnate.util.I18nUtils;
 public class TaskRegistrar
 {
 	public static final DeferredRegister<Task> TASKS = DeferredRegister.create(Discarnate.id("task"), Discarnate.MOD_ID);
-	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry(Task.class, () ->
+	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry(() ->
 	{
 		return new RegistryBuilder<Task>().setDefaultKey(ItemRegistrar.BLANK_TASK.getId());
 	}));
@@ -217,8 +218,13 @@ public class TaskRegistrar
 	}
 	
 	@SubscribeEvent
-	public static void registerVanillaTasks(RegistryEvent.Register<Task> event)
+	public static void registerVanillaTasks(RegisterEvent event)
 	{
+		if (!event.getRegistryKey().equals(TASKS.getRegistryKey()))
+		{
+			return;
+		}
+		
 		final TaskAction shulkerTask = (s, p, b) ->
 		{
 			NbtCompound stackNbt = s.getNbt();
@@ -240,7 +246,7 @@ public class TaskRegistrar
 							{
 								if (!stack.isEmpty())
 								{
-									Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, p, b));
+									Optional.ofNullable(REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem()))).ifPresent(task -> task.accept(stack, p, b));
 								}
 							}
 							else
@@ -256,10 +262,10 @@ public class TaskRegistrar
 		ModContainer container = ModLoadingContext.get().getActiveContainer();
 		ModLoadingContext.get().setActiveContainer(ModList.get().getModContainerById("minecraft").orElseThrow());
 		
-		event.getRegistry().register(new Task(shulkerTask).setRegistryName(ShulkerBoxBlock.get(null).getRegistryName()));
+		event.getForgeRegistry().register(ForgeRegistries.BLOCKS.getKey(ShulkerBoxBlock.get(null)), new Task(shulkerTask));
 		for (DyeColor color : DyeColor.values())
 		{
-			event.getRegistry().register(new Task(shulkerTask).setRegistryName(ShulkerBoxBlock.get(color).getRegistryName()));
+			event.getForgeRegistry().register(ForgeRegistries.BLOCKS.getKey(ShulkerBoxBlock.get(color)), new Task(shulkerTask));
 		}
 		
 		ModLoadingContext.get().setActiveContainer(container);

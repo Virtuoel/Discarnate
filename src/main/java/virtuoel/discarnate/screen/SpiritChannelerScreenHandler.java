@@ -13,6 +13,7 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+import net.minecraftforge.registries.ForgeRegistries;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -101,7 +102,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return !isActive() && TaskRegistrar.REGISTRY.get().containsKey(stack.getItem().getRegistryName());
+						return !isActive() && TaskRegistrar.REGISTRY.get().containsKey(ForgeRegistries.ITEMS.getKey(stack.getItem()));
 					}
 				});
 			}

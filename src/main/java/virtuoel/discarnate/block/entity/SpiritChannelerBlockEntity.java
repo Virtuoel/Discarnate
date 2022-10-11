@@ -39,6 +39,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.registries.ForgeRegistries;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
@@ -119,7 +120,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 							ItemStack stack = inventory.get(i);
 							if (!stack.isEmpty())
 							{
-								Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, player, this));
+								Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem()))).ifPresent(task -> task.accept(stack, player, this));
 							}
 						}
 						else

@@ -73,13 +73,13 @@ public class ItemRegistrar
 		() -> new Item(new Item.Settings().group(Discarnate.ITEM_GROUP).maxCount(1))
 		{
 			@Override
-			public ItemStack getContainerItem(ItemStack itemStack)
+			public ItemStack getCraftingRemainingItem(ItemStack itemStack)
 			{
 				return new ItemStack(LOOK_UP_TASK.get());
 			}
 			
 			@Override
-			public boolean hasContainerItem(ItemStack stack)
+			public boolean hasCraftingRemainingItem(ItemStack stack)
 			{
 				return true;
 			}
@@ -90,13 +90,13 @@ public class ItemRegistrar
 		() -> new Item(new Item.Settings().group(Discarnate.ITEM_GROUP).maxCount(1))
 		{
 			@Override
-			public ItemStack getContainerItem(ItemStack itemStack)
+			public ItemStack getCraftingRemainingItem(ItemStack itemStack)
 			{
 				return new ItemStack(LOOK_LEFT_TASK.get());
 			}
 			
 			@Override
-			public boolean hasContainerItem(ItemStack stack)
+			public boolean hasCraftingRemainingItem(ItemStack stack)
 			{
 				return true;
 			}

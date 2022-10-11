@@ -9,9 +9,9 @@ import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 
 public class BlockEntityRegistrar
 {
-	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, Discarnate.MOD_ID);
+	public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Discarnate.MOD_ID);
 	
-	public static final RegistryObject<BlockEntityType<?>> SPIRIT_CHANNELER = BLOCK_ENTITIES.register("spirit_channeler",
+	public static final RegistryObject<BlockEntityType<?>> SPIRIT_CHANNELER = BLOCK_ENTITY_TYPES.register("spirit_channeler",
 		() -> BlockEntityType.Builder.create(SpiritChannelerBlockEntity::new, BlockRegistrar.SPIRIT_CHANNELER.get()).build(null)
 	);
 }

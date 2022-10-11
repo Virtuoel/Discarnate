@@ -9,7 +9,7 @@ import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 
 public class ScreenHandlerRegistrar
 {
-	public static final DeferredRegister<ScreenHandlerType<?>> SCREEN_HANDLERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, Discarnate.MOD_ID);
+	public static final DeferredRegister<ScreenHandlerType<?>> SCREEN_HANDLERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, Discarnate.MOD_ID);
 	
 	public static final RegistryObject<ScreenHandlerType<SpiritChannelerScreenHandler>> SPIRIT_CHANNELER = SCREEN_HANDLERS.register("spirit_channeler",
 		() -> new ScreenHandlerType<>(SpiritChannelerScreenHandler::new)
