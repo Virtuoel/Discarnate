@@ -1,5 +1,9 @@
 package virtuoel.discarnate.init;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -18,6 +22,7 @@ import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
+import virtuoel.discarnate.api.TaskContainer;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.client.option.KeyBindingUtils;
 import virtuoel.discarnate.task.ClientTask;
@@ -206,45 +211,82 @@ public class TaskRegistrar
 			}
 		}, ItemRegistrar.END_TASK);
 		
-		final TaskAction shulkerTask = (s, p, b) ->
+		final TaskContainer containedTasks = (s, p, b) ->
 		{
-			NbtCompound stackNbt = s.getNbt();
+			final NbtCompound stackNbt = s.getNbt();
 			
 			if (stackNbt != null && stackNbt.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
 			{
-				NbtCompound beNbt = stackNbt.getCompound("BlockEntityTag");
+				final NbtCompound beNbt = stackNbt.getCompound("BlockEntityTag");
 				
 				if (beNbt.contains("Items", NbtElement.LIST_TYPE))
 				{
-					DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
+					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
+					Inventories.readNbt(beNbt, stacks);
+					
+					final List<TaskAction> tasks = new ArrayList<>();
+					
+					for (final ItemStack stack : stacks)
+					{
+						if (!stack.isEmpty())
+						{
+							REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem()))
+								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+								.ifPresent(tasks::add);
+						}
+					}
+					
+					return tasks;
+				}
+			}
+			
+			return Collections.emptyList();
+		};
+		
+		final TaskContainer shulkerTasks = (s, p, b) ->
+		{
+			final NbtCompound stackNbt = s.getNbt();
+			
+			if (stackNbt != null && stackNbt.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
+			{
+				final NbtCompound beNbt = stackNbt.getCompound("BlockEntityTag");
+				
+				if (beNbt.contains("Items", NbtElement.LIST_TYPE))
+				{
+					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
 					Inventories.readNbt(beNbt, stacks);
 					
 					if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.asItem()))
 					{
-						for (ItemStack stack : stacks)
+						final List<TaskAction> tasks = new ArrayList<>();
+						
+						for (final ItemStack stack : stacks)
 						{
-							if (SpiritChannelerBlockEntity.canPlayerContinue(p) && SpiritChannelerBlockEntity.isActive(b.getWorld(), b.getPos()))
+							if (!stack.isEmpty())
 							{
-								if (!stack.isEmpty())
-								{
-									REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).ifPresent(task -> task.accept(stack, p, b));
-								}
-							}
-							else
-							{
-								break;
+								REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem()))
+									.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+									.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+									.ifPresent(tasks::add);
 							}
 						}
+						
+						return tasks;
 					}
 				}
 			}
+			
+			return Collections.emptyList();
 		};
 		
-		registerTask(shulkerTask, ShulkerBoxBlock.get(null));
+		registerTasks(shulkerTasks, ShulkerBoxBlock.get(null));
 		for (DyeColor color : DyeColor.values())
 		{
-			registerTask(shulkerTask, ShulkerBoxBlock.get(color));
+			registerTasks(shulkerTasks, ShulkerBoxBlock.get(color));
 		}
+		
+		registerTasks(containedTasks, BlockRegistrar.SPIRIT_CHANNELER.asItem());
 	}
 	
 	private static Task registerTask(Task task, Identifier id)
@@ -262,6 +304,16 @@ public class TaskRegistrar
 		return registerTask(task, Registry.ITEM.getId(item.asItem()));
 	}
 	
+	private static Task registerTasks(TaskContainer container, Identifier id)
+	{
+		return registerTask(new Task(container), id);
+	}
+	
+	private static Task registerTasks(TaskContainer container, ItemConvertible item)
+	{
+		return registerTasks(container, Registry.ITEM.getId(item.asItem()));
+	}
+	
 	private static Task registerClientTask(TaskAction task, Identifier id)
 	{
 		return registerTask(new ClientTask(task), id);
@@ -270,6 +322,16 @@ public class TaskRegistrar
 	private static Task registerClientTask(TaskAction task, ItemConvertible item)
 	{
 		return registerClientTask(task, Registry.ITEM.getId(item.asItem()));
+	}
+	
+	private static Task registerClientTasks(TaskContainer container, Identifier id)
+	{
+		return registerTask(new ClientTask(container), id);
+	}
+	
+	protected static Task registerClientTasks(TaskContainer container, ItemConvertible item)
+	{
+		return registerClientTasks(container, Registry.ITEM.getId(item.asItem()));
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();

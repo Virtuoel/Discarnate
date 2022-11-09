@@ -1,5 +1,9 @@
 package virtuoel.discarnate.task;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +20,7 @@ import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
+import virtuoel.discarnate.api.TaskContainer;
 import virtuoel.discarnate.init.TaskRegistrar;
 
 public class ClientTask extends Task
@@ -25,24 +30,32 @@ public class ClientTask extends Task
 		super(action);
 	}
 	
+	@ApiStatus.Experimental
+	public ClientTask(TaskContainer container)
+	{
+		super(container);
+	}
+	
 	@Override
-	public void accept(@NotNull ItemStack s, @Nullable PlayerEntity p, @Nullable BlockEntity b)
+	@ApiStatus.Experimental
+	public List<TaskAction> getContainedTasks(@NotNull ItemStack s, @NotNull PlayerEntity p, @Nullable BlockEntity b)
 	{
 		if (p instanceof ServerPlayerEntity && !p.getEntityWorld().isClient)
 		{
-			final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-			final BlockPos pos = getPosFromBlockEntity(b);
-			buf.writeIdentifier(TaskRegistrar.REGISTRY.getId(this));
-			buf.writeBlockPos(pos);
-			buf.writeItemStack(s);
-			buf.writeIdentifier(getWorldIdFromBlockEntity(b));
-			
-			ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.TASK_PACKET, buf);
+			return Collections.singletonList((s1, p1, b1) ->
+			{
+				final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+				final BlockPos pos = getPosFromBlockEntity(b1);
+				buf.writeIdentifier(TaskRegistrar.REGISTRY.getId(this));
+				buf.writeBlockPos(pos);
+				buf.writeItemStack(s1);
+				buf.writeIdentifier(getWorldIdFromBlockEntity(b1));
+				
+				ServerPlayNetworking.send((ServerPlayerEntity) p, Discarnate.TASK_PACKET, buf);
+			});
 		}
-		else
-		{
-			super.accept(s, p, b);
-		}
+		
+		return super.getContainedTasks(s, p, b);
 	}
 	
 	private static BlockPos getPosFromBlockEntity(BlockEntity be)

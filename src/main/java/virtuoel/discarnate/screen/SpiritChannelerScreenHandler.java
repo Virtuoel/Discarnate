@@ -36,7 +36,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		this.inventory = inventory;
 		this.propertyDelegate = propertyDelegate;
 		addProperties(this.propertyDelegate);
-		addInventorySlots();
+		addInventorySlots(playerInventory.player);
 		addPlayerSlots(playerInventory);
 	}
 	
@@ -75,7 +75,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		}
 	}
 	
-	public void addInventorySlots()
+	public void addInventorySlots(PlayerEntity player)
 	{
 		final int xOffset = 17;
 		final int yOffset = 18;
@@ -102,7 +102,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return !isActive() && TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).isPresent();
+						return !isActive() && TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).map(t -> !t.getContainedTasks(stack, player, inventory instanceof BlockEntity ? (BlockEntity) inventory : null).isEmpty()).orElse(false);
 					}
 				});
 			}
