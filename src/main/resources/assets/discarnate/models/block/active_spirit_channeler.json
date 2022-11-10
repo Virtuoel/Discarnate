@@ -1,9 +1,7 @@
 {
-	"parent": "block/cube_column",
+	"parent": "discarnate:block/spirit_channeler",
 	"textures":
 	{
-		"particle": "discarnate:blocks/spirit_channeler_end",
-		"side": "discarnate:blocks/spirit_channeler_side_active",
-		"end": "discarnate:blocks/spirit_channeler_end"
+		"vex": "discarnate:blocks/vex_charging"
 	}
 }
