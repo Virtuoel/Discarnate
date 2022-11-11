@@ -344,10 +344,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			}
 		};
 		
-		MobEntityAccessor m = (MobEntityAccessor) marker;
-		GoalSelector selector = m.getGoalSelector();
+		final MobEntityAccessor m = (MobEntityAccessor) marker;
+		final GoalSelector selector = m.getGoalSelector();
 		
-		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, true));
+		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, false));
 		marker.setHealth(0.1F);
 		marker.setLifeTicks(2);
 		m.setExperiencePoints(0);
