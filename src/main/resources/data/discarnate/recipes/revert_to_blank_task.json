@@ -1,6 +1,5 @@
 {
 	"type": "minecraft:crafting_shaped",
-	"group": "discarnate:blank_task",
 	"result":
 	{
 		"item": "discarnate:blank_task",
