@@ -22,6 +22,9 @@ public class BlockRegistrar
 		Discarnate.id("spirit_channeler"),
 		SpiritChannelerBlock::new,
 		Block.Settings.of(Material.METAL, MapColor.BROWN)
+		.suffocates((s, w, p) -> false)
+		.blockVision((s, w, p) -> false)
+		.luminance(s -> 1)
 		.strength(5.0F, 10.0F)
 		.sounds(BlockSoundGroup.METAL)
 		.requiresTool(),
