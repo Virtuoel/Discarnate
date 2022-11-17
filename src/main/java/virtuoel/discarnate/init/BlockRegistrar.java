@@ -28,7 +28,7 @@ public class BlockRegistrar
 		.strength(5.0F, 10.0F)
 		.sounds(BlockSoundGroup.METAL)
 		.requiresTool(),
-		s -> s.group(Discarnate.ITEM_GROUP)
+		UnaryOperator.identity()
 	);
 	
 	private static Block registerBlock(Identifier name, Function<Block.Settings, Block> blockFunc, Block.Settings blockSettings, UnaryOperator<Item.Settings> itemSettings)
@@ -40,7 +40,7 @@ public class BlockRegistrar
 	{
 		final Block block = registerBlock(name, blockFunc, blockSettings);
 		
-		Registry.register(Registry.ITEM, name, itemFunc.apply(block, itemSettings.apply(new Item.Settings())));
+		Registry.register(Registry.ITEM, name, itemFunc.apply(block, itemSettings.apply(Discarnate.commonItemSettings())));
 		
 		return block;
 	}

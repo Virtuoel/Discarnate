@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
@@ -35,6 +36,11 @@ public class Discarnate implements ModInitializer
 		ScreenHandlerRegistrar.INSTANCE.getClass();
 		GameRuleRegistrar.INSTANCE.getClass();
 		TaskRegistrar.INSTANCE.getClass();
+	}
+	
+	public static Item.Settings commonItemSettings()
+	{
+		return new Item.Settings().group(ITEM_GROUP);
 	}
 	
 	public static Identifier id(String path)

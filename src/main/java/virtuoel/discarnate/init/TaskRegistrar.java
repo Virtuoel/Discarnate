@@ -83,43 +83,79 @@ public class TaskRegistrar
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.forwardKey, s.getCount() * 50);
 		}, ItemRegistrar.MOVE_FORWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.forwardKey);
+		}, ItemRegistrar.TOGGLE_MOVE_FORWARD_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.backKey, s.getCount() * 50);
 		}, ItemRegistrar.MOVE_BACKWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.backKey);
+		}, ItemRegistrar.TOGGLE_MOVE_BACKWARD_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.leftKey, s.getCount() * 50);
 		}, ItemRegistrar.STRAFE_LEFT_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.leftKey);
+		}, ItemRegistrar.TOGGLE_STRAFE_LEFT_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.rightKey, s.getCount() * 50);
 		}, ItemRegistrar.STRAFE_RIGHT_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.rightKey);
+		}, ItemRegistrar.TOGGLE_STRAFE_RIGHT_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.sneakKey, s.getCount() * 50);
 		}, ItemRegistrar.SNEAK_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.sneakKey);
+		}, ItemRegistrar.TOGGLE_SNEAK_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.jumpKey, s.getCount() * 50);
 		}, ItemRegistrar.JUMP_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.jumpKey);
+		}, ItemRegistrar.TOGGLE_JUMP_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryReleaseKey(mc.options.forwardKey);
 			KeyBindingUtils.tryReleaseKey(mc.options.backKey);
 			KeyBindingUtils.tryReleaseKey(mc.options.leftKey);
@@ -175,15 +211,27 @@ public class TaskRegistrar
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.attackKey, s.getCount() * 50);
 		}, ItemRegistrar.SWING_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.attackKey);
+		}, ItemRegistrar.TOGGLE_SWING_ITEM_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.useKey, s.getCount() * 50);
 		}, ItemRegistrar.USE_ITEM_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.useKey);
+		}, ItemRegistrar.TOGGLE_USE_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
@@ -192,7 +240,7 @@ public class TaskRegistrar
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryReleaseKey(mc.options.forwardKey);
 			KeyBindingUtils.tryReleaseKey(mc.options.backKey);
 			KeyBindingUtils.tryReleaseKey(mc.options.leftKey);
