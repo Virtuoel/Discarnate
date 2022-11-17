@@ -8,12 +8,12 @@
 	"pattern":
 	[
 		"BBB",
-		"BLB",
+		"BSB",
 		"BBB"
 	],
 	"key":
 	{
 		"B": { "item": "discarnate:blank_task" },
-		"L": { "item": "minecraft:lever" }
+		"S": { "item": "minecraft:stone_button" }
 	}
 }
