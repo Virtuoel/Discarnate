@@ -1,19 +1,10 @@
 {
-	"type": "minecraft:crafting_shaped",
-	"result":
-	{
-		"item": "discarnate:cancel_movement_task",
-		"count": 1
-	},
-	"pattern":
+	"type": "minecraft:stonecutting",
+	"count": 1,
+	"result": "discarnate:cancel_movement_task",
+	"ingredient":
 	[
-		"SSS",
-		"SBS",
-		"SSS"
-	],
-	"key":
-	{
-		"B": { "item": "discarnate:blank_task" },
-		"S": [ { "item": "minecraft:soul_sand" }, { "item": "minecraft:soul_soil" } ]
-	}
+		{ "tag": "discarnate:tasks" },
+		{ "item": "discarnate:blank_task" }
+	]
 }

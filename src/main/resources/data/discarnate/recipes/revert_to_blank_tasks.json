@@ -1,0 +1,18 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"result":
+	{
+		"item": "discarnate:blank_task",
+		"count": 9
+	},
+	"pattern":
+	[
+		"TTT",
+		"TTT",
+		"TTT"
+	],
+	"key":
+	{
+		"T": { "tag": "discarnate:tasks" }
+	}
+}

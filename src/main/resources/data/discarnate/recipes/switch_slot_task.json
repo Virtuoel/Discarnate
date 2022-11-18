@@ -1,15 +1,10 @@
 {
-	"type": "minecraft:crafting_shapeless",
-	"result":
-	{
-		"item": "discarnate:switch_slot_task",
-		"count": 3
-	},
-	"ingredients":
+	"type": "minecraft:stonecutting",
+	"count": 1,
+	"result": "discarnate:switch_slot_task",
+	"ingredient":
 	[
-		{ "item": "discarnate:blank_task" },
-		{ "item": "discarnate:blank_task" },
-		{ "item": "discarnate:blank_task" },
-		{ "item": "minecraft:glass_pane" }
+		{ "tag": "discarnate:tasks" },
+		{ "item": "discarnate:blank_task" }
 	]
 }
