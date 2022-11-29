@@ -6,7 +6,7 @@
 		"inner": "block/note_block",
 		"particle": "block/iron_bars",
 		"bars": "block/iron_bars",
-		"vex": "discarnate:blocks/vex"
+		"vex": "discarnate:block/vex"
 	},
 	"elements": [
 		{

@@ -2,6 +2,6 @@
 	"parent": "discarnate:block/spirit_channeler",
 	"textures":
 	{
-		"vex": "discarnate:blocks/vex_charging"
+		"vex": "discarnate:block/vex_charging"
 	}
 }

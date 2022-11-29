@@ -2,6 +2,6 @@
 	"parent": "item/generated",
 	"textures":
 	{
-		"layer0": "discarnate:items/move_forward_task"
+		"layer0": "discarnate:item/move_forward_task"
 	}
 }

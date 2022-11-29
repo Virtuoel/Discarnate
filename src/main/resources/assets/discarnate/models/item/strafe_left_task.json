@@ -2,6 +2,6 @@
 	"parent": "item/generated",
 	"textures":
 	{
-		"layer0": "discarnate:items/strafe_left_task"
+		"layer0": "discarnate:item/strafe_left_task"
 	}
 }
