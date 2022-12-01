@@ -10,11 +10,12 @@ import net.minecraft.block.MapColor;
 import net.minecraft.block.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class BlockRegistrar
 {
@@ -40,7 +41,7 @@ public class BlockRegistrar
 	{
 		final Block block = registerBlock(name, blockFunc, blockSettings);
 		
-		Registry.register(Registry.ITEM, name, itemFunc.apply(block, itemSettings.apply(Discarnate.commonItemSettings())));
+		Registry.register(ReflectionUtils.ITEM_REGISTRY, name, itemFunc.apply(block, itemSettings.apply(Discarnate.commonItemSettings())));
 		
 		return block;
 	}
@@ -52,7 +53,7 @@ public class BlockRegistrar
 	
 	private static Block registerBlock(Identifier name, Supplier<Block> blockSupplier)
 	{
-		return Registry.register(Registry.BLOCK, name, blockSupplier.get());
+		return Registry.register(ReflectionUtils.BLOCK_REGISTRY, name, blockSupplier.get());
 	}
 	
 	public static final BlockRegistrar INSTANCE = new BlockRegistrar();

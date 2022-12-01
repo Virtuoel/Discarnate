@@ -9,16 +9,17 @@ import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
@@ -27,13 +28,14 @@ import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.client.option.KeyBindingUtils;
 import virtuoel.discarnate.task.ClientTask;
 import virtuoel.discarnate.util.I18nUtils;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class TaskRegistrar
 {
 	public static final Registry<Task> REGISTRY = FabricRegistryBuilder.createDefaulted(
 		Task.class,
 		Discarnate.id("tasks"),
-		Registry.ITEM.getId(ItemRegistrar.BLANK_TASK)
+		getId(ItemRegistrar.BLANK_TASK)
 	).attribute(RegistryAttribute.SYNCED).buildAndRegister();
 	
 	private TaskRegistrar()
@@ -278,7 +280,7 @@ public class TaskRegistrar
 					{
 						if (!stack.isEmpty())
 						{
-							REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem()))
+							REGISTRY.getOrEmpty(getId(stack.getItem()))
 								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
 								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
 								.ifPresent(tasks::add);
@@ -313,7 +315,7 @@ public class TaskRegistrar
 						{
 							if (!stack.isEmpty())
 							{
-								REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem()))
+								REGISTRY.getOrEmpty(getId(stack.getItem()))
 									.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
 									.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
 									.ifPresent(tasks::add);
@@ -349,7 +351,7 @@ public class TaskRegistrar
 	
 	private static Task registerTask(TaskAction task, ItemConvertible item)
 	{
-		return registerTask(task, Registry.ITEM.getId(item.asItem()));
+		return registerTask(task, getId(item.asItem()));
 	}
 	
 	private static Task registerTasks(TaskContainer container, Identifier id)
@@ -359,7 +361,7 @@ public class TaskRegistrar
 	
 	private static Task registerTasks(TaskContainer container, ItemConvertible item)
 	{
-		return registerTasks(container, Registry.ITEM.getId(item.asItem()));
+		return registerTasks(container, getId(item.asItem()));
 	}
 	
 	private static Task registerClientTask(TaskAction task, Identifier id)
@@ -369,7 +371,7 @@ public class TaskRegistrar
 	
 	private static Task registerClientTask(TaskAction task, ItemConvertible item)
 	{
-		return registerClientTask(task, Registry.ITEM.getId(item.asItem()));
+		return registerClientTask(task, getId(item.asItem()));
 	}
 	
 	private static Task registerClientTasks(TaskContainer container, Identifier id)
@@ -379,7 +381,12 @@ public class TaskRegistrar
 	
 	protected static Task registerClientTasks(TaskContainer container, ItemConvertible item)
 	{
-		return registerClientTasks(container, Registry.ITEM.getId(item.asItem()));
+		return registerClientTasks(container, getId(item.asItem()));
+	}
+	
+	private static Identifier getId(Item item)
+	{
+		return ReflectionUtils.ITEM_REGISTRY.getId(item);
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();

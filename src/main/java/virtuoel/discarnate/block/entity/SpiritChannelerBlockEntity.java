@@ -40,7 +40,6 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
@@ -53,6 +52,7 @@ import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 import virtuoel.discarnate.util.I18nUtils;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ScreenHandlerFactory
 {
@@ -86,7 +86,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					
 					if (!stack.isEmpty())
 					{
-						TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem()))
+						TaskRegistrar.REGISTRY.getOrEmpty(ReflectionUtils.ITEM_REGISTRY.getId(stack.getItem()))
 							.map(task -> task.getContainedTasks(stack, player, this))
 							.filter(Predicate.not(List::isEmpty))
 							.ifPresent(t ->
@@ -362,7 +362,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		
 		m.getTargetSelector().getGoals().clear();
 		
-		selector.clear();
+		selector.getGoals().clear();
 		selector.add(0, visuals);
 		selector.add(1, follow);
 		

@@ -13,10 +13,10 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.registry.Registry;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class SpiritChannelerScreenHandler extends ScreenHandler
 {
@@ -102,7 +102,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return !isActive() && TaskRegistrar.REGISTRY.getOrEmpty(Registry.ITEM.getId(stack.getItem())).map(t -> !t.getContainedTasks(stack, player, inventory instanceof BlockEntity ? (BlockEntity) inventory : null).isEmpty()).orElse(false);
+						return !isActive() && TaskRegistrar.REGISTRY.getOrEmpty(ReflectionUtils.ITEM_REGISTRY.getId(stack.getItem())).map(t -> !t.getContainedTasks(stack, player, inventory instanceof BlockEntity ? (BlockEntity) inventory : null).isEmpty()).orElse(false);
 					}
 				});
 			}
@@ -145,7 +145,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	
 	@Override
 	@NotNull
-	public ItemStack transferSlot(PlayerEntity player, int index)
+	public ItemStack quickMove(PlayerEntity player, int index)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = slots.get(index);

@@ -16,6 +16,7 @@ import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.init.GameRuleRegistrar;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 import virtuoel.discarnate.util.I18nUtils;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 @Environment(EnvType.CLIENT)
 public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHandler>
@@ -45,7 +46,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 		final boolean active = handler.isActive();
 		
 		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
-		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
+		this.confirmButton = ReflectionUtils.Client.buildButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
 		this.confirmButton.active = active || (this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.MIN_LEVEL) && this.client.player.experienceLevel >= r.getInt(GameRuleRegistrar.LEVEL_COST)) || this.client.player.isCreative();
 		this.addDrawableChild(confirmButton);
 	}
@@ -71,10 +72,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY)
 	{
 		super.drawForeground(matrices, mouseX, mouseY);
-		if (confirmButton.isHovered() && !confirmButton.isFocused())
-		{
-			confirmButton.renderTooltip(matrices, mouseX - this.x, mouseY - this.y);
-		}
+		ReflectionUtils.Client.renderClickableWidgetTooltip(this.confirmButton, matrices, mouseX - this.x, mouseY - this.y);
 	}
 	
 	@Override
@@ -88,7 +86,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	@Override
 	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		int i = (this.width - this.backgroundWidth) / 2;
