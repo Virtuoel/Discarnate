@@ -6,6 +6,7 @@ import java.lang.invoke.MethodHandles.Lookup;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ import virtuoel.discarnate.Discarnate;
 
 public final class ReflectionUtils
 {
-	public static final MethodHandle FORMATTED, GROUP, BUTTON_WIDGET, RENDER_TOOLTIP, BUILD;
+	public static final MethodHandle FORMATTED, GROUP, BUTTON_WIDGET, RENDER_TOOLTIP, BUILD, REGISTER, GET, GET_ID, GET_OR_EMPTY;
 	public static final Registry<Block> BLOCK_REGISTRY;
 	public static final Registry<Item> ITEM_REGISTRY;
 	public static final Registry<BlockEntityType<?>> BLOCK_ENTITY_TYPE_REGISTRY;
@@ -112,6 +113,22 @@ public final class ReflectionUtils
 				m = clazz.getMethod(mapped, Identifier.class, Supplier.class);
 				h.put(4, lookup.unreflect(m));
 			}
+			
+			mapped = mappingResolver.mapMethodName("intermediary", "net.minecraft.class_2378", "method_10230", "(Lnet/minecraft/class_2378;Lnet/minecraft/class_2960;Ljava/lang/Object;)Ljava/lang/Object;");
+			m = Registry.class.getMethod(mapped, Registry.class, Identifier.class, Object.class);
+			h.put(5, lookup.unreflect(m));
+			
+			mapped = mappingResolver.mapMethodName("intermediary", "net.minecraft.class_2378", "method_10223", "(Lnet/minecraft/class_2960;)Ljava/lang/Object;");
+			m = Registry.class.getMethod(mapped, Identifier.class);
+			h.put(6, lookup.unreflect(m));
+			
+			mapped = mappingResolver.mapMethodName("intermediary", "net.minecraft.class_2378", "method_10221", "(Ljava/lang/Object;)Lnet/minecraft/class_2960;");
+			m = Registry.class.getMethod(mapped, Object.class);
+			h.put(7, lookup.unreflect(m));
+			
+			mapped = mappingResolver.mapMethodName("intermediary", "net.minecraft.class_2378", "method_17966", "(Lnet/minecraft/class_2960;)Ljava/util/Optional;");
+			m = Registry.class.getMethod(mapped, Identifier.class);
+			h.put(8, lookup.unreflect(m));
 		}
 		catch (NoSuchMethodException | SecurityException | IllegalAccessException | ClassNotFoundException | NoSuchFieldException e)
 		{
@@ -124,6 +141,10 @@ public final class ReflectionUtils
 		BUTTON_WIDGET = h.get(2);
 		RENDER_TOOLTIP = h.get(3);
 		BUILD = h.get(4);
+		REGISTER = h.get(5);
+		GET = h.get(6);
+		GET_ID = h.get(7);
+		GET_OR_EMPTY = h.get(8);
 		BLOCK_REGISTRY = castRegistry(rB);
 		ITEM_REGISTRY = castRegistry(rI);
 		BLOCK_ENTITY_TYPE_REGISTRY = castRegistry(rBe);
@@ -152,7 +173,7 @@ public final class ReflectionUtils
 			}
 			catch (Throwable e)
 			{
-				
+				throw new RuntimeException(e);
 			}
 		}
 		
@@ -169,7 +190,7 @@ public final class ReflectionUtils
 			}
 			catch (Throwable e)
 			{
-				
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -184,7 +205,7 @@ public final class ReflectionUtils
 			}
 			catch (Throwable e)
 			{
-				
+				throw new RuntimeException(e);
 			}
 		}
 		
@@ -195,6 +216,50 @@ public final class ReflectionUtils
 				items.get().forEach(entries::add);
 			})
 			.build();
+	}
+	
+	public static <V, T extends V> T register(Registry<V> registry, Identifier id, T entry) {
+		try
+		{
+			return (T) REGISTER.invoke(registry, id, entry);
+		}
+		catch (Throwable e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static <V> V get(Registry<V> registry, Identifier id) {
+		try
+		{
+			return (V) GET.invoke(registry, id);
+		}
+		catch (Throwable e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static <V> Identifier getId(Registry<V> registry, V entry) {
+		try
+		{
+			return (Identifier) GET_ID.invoke(registry, entry);
+		}
+		catch (Throwable e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public static <V> Optional<V> getOrEmpty(Registry<V> registry, Identifier id) {
+		try
+		{
+			return (Optional<V>) GET_OR_EMPTY.invoke(registry, id);
+		}
+		catch (Throwable e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static final class Client
@@ -209,7 +274,7 @@ public final class ReflectionUtils
 				}
 				catch (Throwable e)
 				{
-					
+					throw new RuntimeException(e);
 				}
 			}
 			
@@ -230,7 +295,7 @@ public final class ReflectionUtils
 					}
 					catch (Throwable e)
 					{
-						
+						throw new RuntimeException(e);
 					}
 				}
 			}

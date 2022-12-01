@@ -86,7 +86,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					
 					if (!stack.isEmpty())
 					{
-						TaskRegistrar.REGISTRY.getOrEmpty(ReflectionUtils.ITEM_REGISTRY.getId(stack.getItem()))
+						ReflectionUtils.getOrEmpty(TaskRegistrar.REGISTRY, ReflectionUtils.getId(ReflectionUtils.ITEM_REGISTRY, stack.getItem()))
 							.map(task -> task.getContainedTasks(stack, player, this))
 							.filter(Predicate.not(List::isEmpty))
 							.ifPresent(t ->
@@ -262,7 +262,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		player.addExperienceLevels(-r.getInt(GameRuleRegistrar.LEVEL_COST));
 	}
 	
-	private static final Task RESET_CHANNELER_TASK = TaskRegistrar.REGISTRY.get(Discarnate.id("reset_channeler_task"));
+	private static final Task RESET_CHANNELER_TASK = ReflectionUtils.get(TaskRegistrar.REGISTRY, Discarnate.id("reset_channeler_task"));
 	
 	protected void onPlayerStop(@NotNull PlayerEntity player)
 	{

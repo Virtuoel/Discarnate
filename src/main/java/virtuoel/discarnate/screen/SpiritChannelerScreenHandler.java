@@ -102,7 +102,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return !isActive() && TaskRegistrar.REGISTRY.getOrEmpty(ReflectionUtils.ITEM_REGISTRY.getId(stack.getItem())).map(t -> !t.getContainedTasks(stack, player, inventory instanceof BlockEntity ? (BlockEntity) inventory : null).isEmpty()).orElse(false);
+						return !isActive() && ReflectionUtils.getOrEmpty(TaskRegistrar.REGISTRY, ReflectionUtils.getId(ReflectionUtils.ITEM_REGISTRY, stack.getItem())).map(t -> !t.getContainedTasks(stack, player, inventory instanceof BlockEntity ? (BlockEntity) inventory : null).isEmpty()).orElse(false);
 					}
 				});
 			}

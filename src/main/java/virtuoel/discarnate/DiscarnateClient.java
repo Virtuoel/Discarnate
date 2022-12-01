@@ -20,6 +20,7 @@ import virtuoel.discarnate.client.gui.screen.ingame.SpiritChannelerScreen;
 import virtuoel.discarnate.init.BlockRegistrar;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class DiscarnateClient implements ClientModInitializer
 {
@@ -35,7 +36,7 @@ public class DiscarnateClient implements ClientModInitializer
 	
 	private static void handleTaskPacket(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender)
 	{
-		Task task = TaskRegistrar.REGISTRY.get(buf.readIdentifier());
+		Task task = ReflectionUtils.get(TaskRegistrar.REGISTRY, buf.readIdentifier());
 		BlockPos pos = buf.readBlockPos();
 		ItemStack stack = buf.readItemStack();
 		Identifier id = buf.readIdentifier();

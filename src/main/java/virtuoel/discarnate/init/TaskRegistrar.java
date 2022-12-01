@@ -280,7 +280,7 @@ public class TaskRegistrar
 					{
 						if (!stack.isEmpty())
 						{
-							REGISTRY.getOrEmpty(getId(stack.getItem()))
+							ReflectionUtils.getOrEmpty(REGISTRY, getId(stack.getItem()))
 								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
 								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
 								.ifPresent(tasks::add);
@@ -315,7 +315,7 @@ public class TaskRegistrar
 						{
 							if (!stack.isEmpty())
 							{
-								REGISTRY.getOrEmpty(getId(stack.getItem()))
+								ReflectionUtils.getOrEmpty(REGISTRY, getId(stack.getItem()))
 									.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
 									.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
 									.ifPresent(tasks::add);
@@ -341,7 +341,7 @@ public class TaskRegistrar
 	
 	private static Task registerTask(Task task, Identifier id)
 	{
-		return Registry.register(REGISTRY, id, task);
+		return ReflectionUtils.register(REGISTRY, id, task);
 	}
 	
 	private static Task registerTask(TaskAction task, Identifier id)
@@ -386,7 +386,7 @@ public class TaskRegistrar
 	
 	private static Identifier getId(Item item)
 	{
-		return ReflectionUtils.ITEM_REGISTRY.getId(item);
+		return ReflectionUtils.getId(ReflectionUtils.ITEM_REGISTRY, item);
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();

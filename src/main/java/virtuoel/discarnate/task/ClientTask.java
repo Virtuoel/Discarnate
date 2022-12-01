@@ -22,6 +22,7 @@ import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.api.TaskContainer;
 import virtuoel.discarnate.init.TaskRegistrar;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class ClientTask extends Task
 {
@@ -46,7 +47,7 @@ public class ClientTask extends Task
 			{
 				final PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 				final BlockPos pos = getPosFromBlockEntity(b1);
-				buf.writeIdentifier(TaskRegistrar.REGISTRY.getId(this));
+				buf.writeIdentifier(ReflectionUtils.getId(TaskRegistrar.REGISTRY, this));
 				buf.writeBlockPos(pos);
 				buf.writeItemStack(s1);
 				buf.writeIdentifier(getWorldIdFromBlockEntity(b1));

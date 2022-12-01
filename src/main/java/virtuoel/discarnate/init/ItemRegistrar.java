@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
@@ -205,7 +204,7 @@ public class ItemRegistrar
 	
 	private static Item register(String name, Item entry)
 	{
-		return Registry.register(ReflectionUtils.ITEM_REGISTRY, Discarnate.id(name), entry);
+		return ReflectionUtils.register(ReflectionUtils.ITEM_REGISTRY, Discarnate.id(name), entry);
 	}
 	
 	public static final ItemRegistrar INSTANCE = new ItemRegistrar();
