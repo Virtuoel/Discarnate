@@ -218,7 +218,8 @@ public final class ReflectionUtils
 			.build();
 	}
 	
-	public static <V, T extends V> T register(Registry<V> registry, Identifier id, T entry) {
+	public static <V, T extends V> T register(Registry<V> registry, Identifier id, T entry)
+	{
 		try
 		{
 			return (T) REGISTER.invoke(registry, id, entry);
@@ -229,7 +230,8 @@ public final class ReflectionUtils
 		}
 	}
 	
-	public static <V> V get(Registry<V> registry, Identifier id) {
+	public static <V> V get(Registry<V> registry, Identifier id)
+	{
 		try
 		{
 			return (V) GET.invoke(registry, id);
@@ -240,7 +242,8 @@ public final class ReflectionUtils
 		}
 	}
 	
-	public static <V> Identifier getId(Registry<V> registry, V entry) {
+	public static <V> Identifier getId(Registry<V> registry, V entry)
+	{
 		try
 		{
 			return (Identifier) GET_ID.invoke(registry, entry);
@@ -251,7 +254,8 @@ public final class ReflectionUtils
 		}
 	}
 	
-	public static <V> Optional<V> getOrEmpty(Registry<V> registry, Identifier id) {
+	public static <V> Optional<V> getOrEmpty(Registry<V> registry, Identifier id)
+	{
 		try
 		{
 			return (Optional<V>) GET_OR_EMPTY.invoke(registry, id);
