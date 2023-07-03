@@ -20,6 +20,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
@@ -65,8 +66,9 @@ public class TaskRegistrar
 		registerTask((s, p, b) ->
 		{
 			final ItemStack itemStack = p.getInventory().dropSelectedItem(false);
+			final World world = p.getEntityWorld();
 			
-			if (!p.world.isClient)
+			if (!world.isClient)
 			{
 				p.dropItem(itemStack, false, true);
 			}

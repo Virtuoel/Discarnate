@@ -41,13 +41,13 @@ public class KeyBindingUtils
 	public static void tryHoldKey(KeyBinding key)
 	{
 		final MinecraftClient mc = MinecraftClient.getInstance();
-		tryPressKey(key, mc.currentScreen == null || mc.currentScreen.passEvents);
+		tryPressKey(key, mc.currentScreen == null);
 	}
 	
 	public static void tryToggleKey(KeyBinding key)
 	{
 		final MinecraftClient mc = MinecraftClient.getInstance();
-		tryPressKey(key, !key.isPressed() && (mc.currentScreen == null || mc.currentScreen.passEvents));
+		tryPressKey(key, !key.isPressed() && (mc.currentScreen == null));
 	}
 	
 	public static void tryReleaseKey(KeyBinding key)

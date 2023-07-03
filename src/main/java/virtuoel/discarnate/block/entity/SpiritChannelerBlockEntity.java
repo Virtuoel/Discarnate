@@ -467,7 +467,6 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		{
 			this.inventory.set(slot, stack);
 		}
-		
 	}
 	
 	@Override

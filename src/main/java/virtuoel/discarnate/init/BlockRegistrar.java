@@ -7,7 +7,6 @@ import java.util.function.UnaryOperator;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.sound.BlockSoundGroup;
@@ -21,7 +20,8 @@ public class BlockRegistrar
 	public static final Block SPIRIT_CHANNELER = registerBlock(
 		Discarnate.id("spirit_channeler"),
 		SpiritChannelerBlock::new,
-		Block.Settings.of(Material.METAL, MapColor.BROWN)
+		ReflectionUtils.createBlockSettings(ReflectionUtils.METAL)
+		.mapColor(MapColor.BROWN)
 		.suffocates((s, w, p) -> false)
 		.blockVision((s, w, p) -> false)
 		.luminance(s -> 1)

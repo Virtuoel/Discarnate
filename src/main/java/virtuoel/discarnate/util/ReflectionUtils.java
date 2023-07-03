@@ -3,12 +3,16 @@ package virtuoel.discarnate.util;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
+import org.jetbrains.annotations.Nullable;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -24,8 +28,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroup.DisplayContext;
+import net.minecraft.item.ItemGroup.Entries;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -34,16 +42,18 @@ import virtuoel.discarnate.Discarnate;
 
 public final class ReflectionUtils
 {
-	public static final MethodHandle FORMATTED, GROUP, BUTTON_WIDGET, RENDER_TOOLTIP, BUILD, REGISTER, GET, GET_ID, GET_OR_EMPTY;
+	public static final MethodHandle FORMATTED, GROUP, BUTTON_WIDGET, RENDER_TOOLTIP, BUILD, REGISTER, GET, GET_ID, GET_OR_EMPTY, OF;
 	public static final Registry<Block> BLOCK_REGISTRY;
 	public static final Registry<Item> ITEM_REGISTRY;
 	public static final Registry<BlockEntityType<?>> BLOCK_ENTITY_TYPE_REGISTRY;
+	public static final Object METAL;
 	
 	static
 	{
 		final MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
 		final Int2ObjectMap<MethodHandle> h = new Int2ObjectArrayMap<MethodHandle>();
 		Object rB, rI, rBe = rI = rB = null;
+		Object metal = null;
 		
 		final Lookup lookup = MethodHandles.lookup();
 		String mapped = "unset";
@@ -129,6 +139,22 @@ public final class ReflectionUtils
 			mapped = mappingResolver.mapMethodName("intermediary", "net.minecraft.class_2378", "method_17966", "(Lnet/minecraft/class_2960;)Ljava/util/Optional;");
 			m = Registry.class.getMethod(mapped, Identifier.class);
 			h.put(8, lookup.unreflect(m));
+			
+			if (VersionUtils.MINOR <= 19)
+			{
+				final String material = "net.minecraft.class_3614";
+				
+				mapped = mappingResolver.mapClassName("intermediary", material);
+				clazz = Class.forName(mapped);
+				
+				mapped = mappingResolver.mapFieldName("intermediary", material, "field_15953", "Lnet/minecraft/class_3614;");
+				f = clazz.getField(mapped);
+				metal = f.get(null);
+				
+				mapped = mappingResolver.mapMethodName("intermediary", "net.minecraft.class_4970$class_2251", "method_9637", "(Lnet/minecraft/class_3614;)Lnet/minecraft/class_4970$class_2251;");
+				m = Block.Settings.class.getMethod(mapped, clazz);
+				h.put(9, lookup.unreflect(m).asType(MethodType.methodType(Block.Settings.class, clazz)));
+			}
 		}
 		catch (NoSuchMethodException | SecurityException | IllegalAccessException | ClassNotFoundException | NoSuchFieldException e)
 		{
@@ -145,9 +171,11 @@ public final class ReflectionUtils
 		GET = h.get(6);
 		GET_ID = h.get(7);
 		GET_OR_EMPTY = h.get(8);
+		OF = h.get(9);
 		BLOCK_REGISTRY = castRegistry(rB);
 		ITEM_REGISTRY = castRegistry(rI);
 		BLOCK_ENTITY_TYPE_REGISTRY = castRegistry(rBe);
+		METAL = metal;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -209,13 +237,81 @@ public final class ReflectionUtils
 			}
 		}
 		
-		return FabricItemGroup.builder(id)
-			.icon(icon)
-			.entries((enabledFeatures, entries, operatorEnabled) ->
+		final Supplier<ItemGroup.Builder> builder;
+		
+		if (VersionUtils.MINOR == 19 && VersionUtils.PATCH == 3)
+		{
+			try
 			{
-				items.get().forEach(entries::add);
-			})
-			.build();
+				final Method m = FabricItemGroup.class.getMethod("builder", Identifier.class);
+				builder = () -> {
+					try
+					{
+						return (ItemGroup.Builder) m.invoke(null, id);
+					}
+					catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+					{
+						throw new RuntimeException(e);
+					}
+				};
+			}
+			catch (NoSuchMethodException | SecurityException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		else
+		{
+			builder = () -> FabricItemGroup.builder()
+				.displayName(Text.translatable("itemGroup." + Discarnate.MOD_ID + ".general"));
+		}
+		
+		final ItemGroup group = Classloading1193Plus.addEntries(builder.get().icon(icon), items).build();
+		
+		if (VersionUtils.MINOR > 19 || (VersionUtils.MINOR == 19 && VersionUtils.PATCH == 4))
+		{
+			return Registry.register(Registries.ITEM_GROUP, id, group);
+		}
+		
+		return group;
+	}
+	
+	public static final class Classloading1193Plus
+	{
+		public static ItemGroup.Builder addEntries(ItemGroup.Builder builder, Supplier<Stream<ItemConvertible>> items)
+		{
+			return builder.entries(new ItemGroup.EntryCollector()
+			{
+				@Override
+				public void accept(DisplayContext displayContext, Entries entries)
+				{
+					items.get().forEach(entries::add);
+				}
+				
+				@SuppressWarnings("unused")
+				public void accept(FeatureSet enabledFeatures, Entries entries, boolean operatorEnabled)
+				{
+					items.get().forEach(entries::add);
+				}
+			});
+		}
+	}
+	
+	public static Block.Settings createBlockSettings(@Nullable Object material)
+	{
+		if (material != null)
+		{
+			try
+			{
+				return (Block.Settings) OF.invokeWithArguments(material);
+			}
+			catch (Throwable e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return Block.Settings.create();
 	}
 	
 	public static <V, T extends V> T register(Registry<V> registry, Identifier id, T entry)
@@ -291,7 +387,7 @@ public final class ReflectionUtils
 		{
 			if (RENDER_TOOLTIP != null)
 			{
-				if (widget.isHovered() && !widget.isFocused())
+				if (widget.isSelected() && !widget.isFocused())
 				{
 					try
 					{
@@ -309,6 +405,103 @@ public final class ReflectionUtils
 		{
 			
 		}
+	}
+	
+	public static Optional<Field> getField(final Optional<Class<?>> classObj, final String fieldName)
+	{
+		return classObj.map(c ->
+		{
+			try
+			{
+				final Field f = c.getDeclaredField(fieldName);
+				f.setAccessible(true);
+				return f;
+			}
+			catch (SecurityException | NoSuchFieldException e)
+			{
+				
+			}
+			return null;
+		});
+	}
+	
+	public static void setField(final Optional<Class<?>> classObj, final String fieldName, Object object, Object value)
+	{
+		ReflectionUtils.getField(classObj, fieldName).ifPresent(f ->
+		{
+			try
+			{
+				f.set(object, value);
+			}
+			catch (IllegalArgumentException | IllegalAccessException e)
+			{
+				
+			}
+		});
+	}
+	
+	public static Optional<Method> getMethod(final Optional<Class<?>> classObj, final String methodName, Class<?>... args)
+	{
+		return classObj.map(c ->
+		{
+			try
+			{
+				final Method m = c.getMethod(methodName, args);
+				m.setAccessible(true);
+				return m;
+			}
+			catch (SecurityException | NoSuchMethodException e)
+			{
+				
+			}
+			return null;
+		});
+	}
+	
+	public static <T> Optional<Constructor<T>> getConstructor(final Optional<Class<T>> clazz, final Class<?>... params)
+	{
+		return clazz.map(c ->
+		{
+			try
+			{
+				return c.getConstructor(params);
+			}
+			catch (NoSuchMethodException | SecurityException e)
+			{
+				return null;
+			}
+		});
+	}
+	
+	public static Optional<Class<?>> getClass(final String className, final String... classNames)
+	{
+		Optional<Class<?>> ret = getClass(className);
+		
+		for (final String name : classNames)
+		{
+			if (ret.isPresent())
+			{
+				return ret;
+			}
+			
+			ret = getClass(name);
+		}
+		
+		return ret;
+	}
+	
+	public static Optional<Class<?>> getClass(final String className)
+	{
+		try
+		{
+			return Optional.of(Class.forName(className));
+		}
+		catch (ClassNotFoundException e)
+		{
+			
+		}
+		
+		return Optional.empty();
 	}
 	
 	private ReflectionUtils()

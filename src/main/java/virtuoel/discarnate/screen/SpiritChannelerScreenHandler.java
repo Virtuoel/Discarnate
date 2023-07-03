@@ -17,6 +17,7 @@ import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.util.ReflectionUtils;
+import virtuoel.discarnate.util.VersionUtils;
 
 public class SpiritChannelerScreenHandler extends ScreenHandler
 {
@@ -184,7 +185,14 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 			
 			if (itemstack1.isEmpty())
 			{
-				slot.setStack(ItemStack.EMPTY);
+				if (VersionUtils.MINOR > 19 || (VersionUtils.MINOR == 19 && VersionUtils.PATCH == 4))
+				{
+					slot.setStack(ItemStack.EMPTY);
+				}
+				else
+				{
+					slot.setStackNoCallbacks(ItemStack.EMPTY);
+				}
 			}
 			else
 			{

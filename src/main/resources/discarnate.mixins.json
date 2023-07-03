@@ -11,6 +11,13 @@
 		"compat117.LockableContainerBlockEntityMixin",
 		"compat117.SpiritChannelerBlockEntityMixin"
 	],
+	"client":
+	[
+		"client.compat1193minus.DrawableHelperInvoker",
+		"client.compat1193minus.HandledScreenMixin",
+		"client.compat1193minus.ScreenMixin",
+		"client.compat1193minus.SpiritChannelerScreenMixin"
+	],
 	"injectors":
 	{
 		"defaultRequire": 1
