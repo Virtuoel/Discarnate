@@ -239,7 +239,7 @@ public final class ReflectionUtils
 		
 		final Supplier<ItemGroup.Builder> builder;
 		
-		if (VersionUtils.MINOR == 19 && VersionUtils.PATCH == 3)
+		if (VersionUtils.MINOR == 19 && VersionUtils.PATCH >= 3)
 		{
 			try
 			{
@@ -268,7 +268,7 @@ public final class ReflectionUtils
 		
 		final ItemGroup group = Classloading1193Plus.addEntries(builder.get().icon(icon), items).build();
 		
-		if (VersionUtils.MINOR > 19 || (VersionUtils.MINOR == 19 && VersionUtils.PATCH == 4))
+		if (VersionUtils.MINOR > 19)
 		{
 			return Registry.register(Registries.ITEM_GROUP, id, group);
 		}

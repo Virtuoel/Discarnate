@@ -13,10 +13,10 @@
 	],
 	"client":
 	[
-		"client.compat1193minus.DrawableHelperInvoker",
-		"client.compat1193minus.HandledScreenMixin",
-		"client.compat1193minus.ScreenMixin",
-		"client.compat1193minus.SpiritChannelerScreenMixin"
+		"client.compat119minus.DrawableHelperInvoker",
+		"client.compat119minus.HandledScreenMixin",
+		"client.compat119minus.ScreenMixin",
+		"client.compat119minus.SpiritChannelerScreenMixin"
 	],
 	"injectors":
 	{

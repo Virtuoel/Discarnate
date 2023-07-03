@@ -1,4 +1,4 @@
-package virtuoel.discarnate.mixin.client.compat1193minus;
+package virtuoel.discarnate.mixin.client.compat119minus;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
