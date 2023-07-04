@@ -1,19 +1,18 @@
 package virtuoel.discarnate.init;
 
+import java.util.List;
 import java.util.function.Supplier;
 
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import java.util.List;
-
-import net.minecraft.client.item.TooltipContext;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.util.I18nUtils;
 import virtuoel.discarnate.util.ReflectionUtils;
