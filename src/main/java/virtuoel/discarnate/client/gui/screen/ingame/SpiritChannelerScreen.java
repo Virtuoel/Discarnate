@@ -44,7 +44,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 		final boolean active = handler.isActive();
 		
 		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
-		this.confirmButton = new ButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
+		this.confirmButton = ReflectionUtils.Client.buildButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
 		this.confirmButton.active = active || (this.client.player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && this.client.player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get()) || this.client.player.isCreative();
 		this.addDrawableChild(confirmButton);
 	}
@@ -66,13 +66,6 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	}
 	
 	@Override
-	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY)
-	{
-		super.drawForeground(matrices, mouseX, mouseY);
-		ReflectionUtils.Client.renderClickableWidgetTooltip(this.confirmButton, matrices, mouseX - this.x, mouseY - this.y);
-	}
-	
-	@Override
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta)
 	{
 		this.renderBackground(matrices);
@@ -83,11 +76,11 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	@Override
 	protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY)
 	{
-		RenderSystem.setShader(GameRenderer::getPositionTexShader);
+		RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, TEXTURE);
 		final int i = (this.width - this.backgroundWidth) / 2;
 		final int j = (this.height - this.backgroundHeight) / 2;
-		this.drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
+		drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 }

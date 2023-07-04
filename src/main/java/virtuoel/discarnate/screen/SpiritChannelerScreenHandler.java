@@ -147,7 +147,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	
 	@Override
 	@NotNull
-	public ItemStack transferSlot(PlayerEntity player, int index)
+	public ItemStack quickMove(PlayerEntity player, int index)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;
 		Slot slot = slots.get(index);

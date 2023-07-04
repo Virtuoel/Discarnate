@@ -6,17 +6,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegistryObject;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.BlockRegistrar;
@@ -24,7 +27,6 @@ import virtuoel.discarnate.init.ItemRegistrar;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.network.DiscarnatePacketHandler;
-import virtuoel.discarnate.util.ReflectionUtils;
 
 @Mod(Discarnate.MOD_ID)
 public class Discarnate
@@ -33,43 +35,52 @@ public class Discarnate
 	
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	
-	public static final ItemGroup ITEM_GROUP = ReflectionUtils.buildItemGroup(
-		id("general"),
-		() -> new ItemStack(BlockRegistrar.SPIRIT_CHANNELER.get()),
-		() -> Stream.of(
-				BlockRegistrar.SPIRIT_CHANNELER,
-				ItemRegistrar.BLANK_TASK,
-				ItemRegistrar.INFO_TASK,
-				ItemRegistrar.WAIT_TASK,
-				ItemRegistrar.DROP_TASK,
-				ItemRegistrar.SWAP_TASK,
-				ItemRegistrar.MOVE_FORWARD_TASK,
-				ItemRegistrar.TOGGLE_MOVE_FORWARD_TASK,
-				ItemRegistrar.MOVE_BACKWARD_TASK,
-				ItemRegistrar.TOGGLE_MOVE_BACKWARD_TASK,
-				ItemRegistrar.STRAFE_LEFT_TASK,
-				ItemRegistrar.TOGGLE_STRAFE_LEFT_TASK,
-				ItemRegistrar.STRAFE_RIGHT_TASK,
-				ItemRegistrar.TOGGLE_STRAFE_RIGHT_TASK,
-				ItemRegistrar.CANCEL_MOVEMENT_TASK,
-				ItemRegistrar.LOOK_UP_TASK,
-				ItemRegistrar.LOOK_DOWN_TASK,
-				ItemRegistrar.LOOK_LEFT_TASK,
-				ItemRegistrar.LOOK_RIGHT_TASK,
-				ItemRegistrar.FACE_HORIZON_TASK,
-				ItemRegistrar.FACE_CARDINAL_TASK,
-				ItemRegistrar.SNEAK_TASK,
-				ItemRegistrar.TOGGLE_SNEAK_TASK,
-				ItemRegistrar.JUMP_TASK,
-				ItemRegistrar.TOGGLE_JUMP_TASK,
-				ItemRegistrar.SWING_ITEM_TASK,
-				ItemRegistrar.TOGGLE_SWING_ITEM_TASK,
-				ItemRegistrar.USE_ITEM_TASK,
-				ItemRegistrar.TOGGLE_USE_ITEM_TASK,
-				ItemRegistrar.SWITCH_SLOT_TASK,
-				ItemRegistrar.END_TASK
-			)
-	);
+	@SubscribeEvent
+	public void buildContents(CreativeModeTabEvent.Register event)
+	{
+		event.registerCreativeModeTab(id("general"), builder ->
+		{
+			builder.icon(() -> new ItemStack(BlockRegistrar.SPIRIT_CHANNELER.get()))
+				.displayName(Text.translatable("itemGroup." + MOD_ID + ".general"))
+				.entries((ctx, entries) -> {
+					Stream.of(
+						BlockRegistrar.SPIRIT_CHANNELER,
+						ItemRegistrar.BLANK_TASK,
+						ItemRegistrar.INFO_TASK,
+						ItemRegistrar.WAIT_TASK,
+						ItemRegistrar.DROP_TASK,
+						ItemRegistrar.SWAP_TASK,
+						ItemRegistrar.MOVE_FORWARD_TASK,
+						ItemRegistrar.TOGGLE_MOVE_FORWARD_TASK,
+						ItemRegistrar.MOVE_BACKWARD_TASK,
+						ItemRegistrar.TOGGLE_MOVE_BACKWARD_TASK,
+						ItemRegistrar.STRAFE_LEFT_TASK,
+						ItemRegistrar.TOGGLE_STRAFE_LEFT_TASK,
+						ItemRegistrar.STRAFE_RIGHT_TASK,
+						ItemRegistrar.TOGGLE_STRAFE_RIGHT_TASK,
+						ItemRegistrar.CANCEL_MOVEMENT_TASK,
+						ItemRegistrar.LOOK_UP_TASK,
+						ItemRegistrar.LOOK_DOWN_TASK,
+						ItemRegistrar.LOOK_LEFT_TASK,
+						ItemRegistrar.LOOK_RIGHT_TASK,
+						ItemRegistrar.FACE_HORIZON_TASK,
+						ItemRegistrar.FACE_CARDINAL_TASK,
+						ItemRegistrar.SNEAK_TASK,
+						ItemRegistrar.TOGGLE_SNEAK_TASK,
+						ItemRegistrar.JUMP_TASK,
+						ItemRegistrar.TOGGLE_JUMP_TASK,
+						ItemRegistrar.SWING_ITEM_TASK,
+						ItemRegistrar.TOGGLE_SWING_ITEM_TASK,
+						ItemRegistrar.USE_ITEM_TASK,
+						ItemRegistrar.TOGGLE_USE_ITEM_TASK,
+						ItemRegistrar.SWITCH_SLOT_TASK,
+						ItemRegistrar.END_TASK
+					)
+					.map(RegistryObject::get)
+					.forEach(entries::add);
+				});
+		});
+	}
 	
 	public Discarnate()
 	{
@@ -81,6 +92,7 @@ public class Discarnate
 		ScreenHandlerRegistrar.SCREEN_HANDLERS.register(modBus);
 		TaskRegistrar.TASKS.register(modBus);
 		modBus.register(TaskRegistrar.class);
+		modBus.register(this);
 		
 		MinecraftForge.EVENT_BUS.register(DiscarnateConfig.class);
 		
@@ -100,8 +112,6 @@ public class Discarnate
 	public static Item.Settings commonItemSettings()
 	{
 		final Item.Settings settings = new Item.Settings();
-		
-		ReflectionUtils.setItemSettingsGroup(settings, ITEM_GROUP);
 		
 		return settings;
 	}

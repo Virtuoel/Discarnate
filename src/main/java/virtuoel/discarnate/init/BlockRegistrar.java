@@ -33,7 +33,7 @@ public class BlockRegistrar
 		ITEMS.register(
 			SPIRIT_CHANNELER.getId().getPath(),
 			() -> new BlockItem(
-				SPIRIT_CHANNELER.get(), new Item.Settings().group(Discarnate.ITEM_GROUP)
+				SPIRIT_CHANNELER.get(), new Item.Settings()
 			)
 		);
 	}

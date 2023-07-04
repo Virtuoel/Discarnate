@@ -4,45 +4,19 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.ClickableWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registry;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraftforge.registries.RegistryObject;
 
 public final class ReflectionUtils
 {
 	public static MutableText formatted(MutableText input, Formatting... formatting)
 	{
 		return input.formatted(formatting);
-	}
-	
-	public static void setItemSettingsGroup(Item.Settings settings, ItemGroup group)
-	{
-		settings.group(group);
-	}
-	
-	public static ItemGroup buildItemGroup(Identifier id, Supplier<ItemStack> icon, Supplier<Stream<RegistryObject<? extends ItemConvertible>>> items)
-	{
-		return new ItemGroup(id.getNamespace() + "." + id.getPath())
-		{
-			@Override
-			public ItemStack createIcon()
-			{
-				return icon.get();
-			}
-		};
 	}
 	
 	public static <V> V get(Registry<V> registry, Identifier id)
@@ -64,15 +38,7 @@ public final class ReflectionUtils
 	{
 		public static ButtonWidget buildButtonWidget(int x, int y, int width, int height, Text message, ButtonWidget.PressAction onPress)
 		{
-			return new ButtonWidget(x, y, width, height, message, onPress);
-		}
-		
-		public static void renderClickableWidgetTooltip(ClickableWidget widget, MatrixStack matrices, int x, int y)
-		{
-			if (widget.isHovered() && !widget.isFocused())
-			{
-				widget.renderTooltip(matrices, x, y);
-			}
+			return ButtonWidget.builder(message, onPress).dimensions(x, y, width, height).build();
 		}
 		
 		private Client()
