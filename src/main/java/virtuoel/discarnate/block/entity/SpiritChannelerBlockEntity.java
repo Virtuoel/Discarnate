@@ -1,7 +1,10 @@
 package virtuoel.discarnate.block.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Predicate;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,6 +45,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.registries.ForgeRegistries;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
+import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -72,9 +76,34 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		{
 			if (taskThread == null)
 			{
+				final List<TaskAction> tasks = new ArrayList<>();
+				final List<ItemStack> stacks = new ArrayList<>();
+				
+				for (int i = 0; i < inventory.size(); i++)
+				{
+					final ItemStack stack = inventory.get(i);
+					
+					if (!stack.isEmpty())
+					{
+						Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem())))
+							.map(task -> task.getContainedTasks(stack, player, this))
+							.filter(Predicate.not(List::isEmpty))
+							.ifPresent(t ->
+							{
+								final ItemStack s = stack.copy();
+								
+								for (TaskAction action : t)
+								{
+									tasks.add(action);
+									stacks.add(s);
+								}
+							});
+					}
+				}
+				
 				World w = getWorld();
 				boolean hasWorld = w != null;
-				if (player == null || !canPlayerStart(player) || isEmpty())
+				if (player == null || !canPlayerStart(player) || isEmpty() || tasks.isEmpty())
 				{
 					if (hasWorld)
 					{
@@ -113,14 +142,22 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 						});
 					}
 					
-					for (int i = 0; i < inventory.size(); i++)
+					for (int i = 0; i < tasks.size(); i++)
 					{
 						if (player != null && canPlayerContinue(player) && isActive())
 						{
-							ItemStack stack = inventory.get(i);
-							if (!stack.isEmpty())
+							final TaskAction task = tasks.get(i);
+							
+							if (task != null)
 							{
-								Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem()))).ifPresent(task -> task.accept(stack, player, this));
+								if (player != null && canPlayerContinue(player) && isActive())
+								{
+									task.accept(stacks.get(i), player, this);
+								}
+								else
+								{
+									break;
+								}
 							}
 						}
 						else
@@ -301,10 +338,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 			}
 		};
 		
-		MobEntityAccessor m = (MobEntityAccessor) marker;
-		GoalSelector selector = m.getGoalSelector();
+		final MobEntityAccessor m = (MobEntityAccessor) marker;
+		final GoalSelector selector = m.getGoalSelector();
 		
-		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, true));
+		marker.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1000000, 0, true, false));
 		marker.setHealth(0.1F);
 		marker.setLifeTicks(2);
 		m.setExperiencePoints(0);
@@ -319,7 +356,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		
 		m.getTargetSelector().getGoals().clear();
 		
-		selector.clear();
+		selector.getGoals().clear();
 		selector.add(0, visuals);
 		selector.add(1, follow);
 		
@@ -424,7 +461,6 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		{
 			this.inventory.set(slot, stack);
 		}
-		
 	}
 	
 	@Override

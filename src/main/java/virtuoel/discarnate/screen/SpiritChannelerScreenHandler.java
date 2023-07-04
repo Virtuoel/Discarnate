@@ -1,5 +1,7 @@
 package virtuoel.discarnate.screen;
 
+import java.util.Optional;
+
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.block.entity.BlockEntity;
@@ -36,7 +38,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		this.inventory = inventory;
 		this.propertyDelegate = propertyDelegate;
 		addProperties(this.propertyDelegate);
-		addInventorySlots();
+		addInventorySlots(playerInventory.player);
 		addPlayerSlots(playerInventory);
 	}
 	
@@ -75,7 +77,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		}
 	}
 	
-	public void addInventorySlots()
+	public void addInventorySlots(PlayerEntity player)
 	{
 		final int xOffset = 17;
 		final int yOffset = 18;
@@ -102,7 +104,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return !isActive() && TaskRegistrar.REGISTRY.get().containsKey(ForgeRegistries.ITEMS.getKey(stack.getItem()));
+						return !isActive() && Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem()))).map(t -> !t.getContainedTasks(stack, player, inventory instanceof BlockEntity ? (BlockEntity) inventory : null).isEmpty()).orElse(false);
 					}
 				});
 			}
