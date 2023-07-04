@@ -1,13 +1,10 @@
 {
-	"type": "minecraft:crafting_shapeless",
-	"group": "discarnate:convert_task",
-	"result":
-	{
-		"item": "discarnate:strafe_right_task",
-		"count": 1
-	},
-	"ingredients":
+	"type": "minecraft:stonecutting",
+	"count": 1,
+	"result": "discarnate:strafe_right_task",
+	"ingredient":
 	[
-		{ "item": "discarnate:move_forward_task" }
+		{ "tag": "discarnate:tasks" },
+		{ "item": "discarnate:blank_task" }
 	]
 }

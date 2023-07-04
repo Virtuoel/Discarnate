@@ -20,7 +20,8 @@ public class BlockRegistrar
 	public static final RegistryObject<Block> SPIRIT_CHANNELER = BLOCKS.register(
 		"spirit_channeler",
 		() -> new SpiritChannelerBlock(
-			Block.Settings.of(Material.METAL, MapColor.BROWN)
+			Block.Settings.of(Material.METAL)
+			.mapColor(MapColor.BROWN)
 			.strength(5.0F, 10.0F)
 			.sounds(BlockSoundGroup.METAL)
 			.requiresTool()

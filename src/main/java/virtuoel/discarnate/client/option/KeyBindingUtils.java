@@ -31,12 +31,23 @@ public class KeyBindingUtils
 			}
 		});
 		
-		MinecraftClient mc = MinecraftClient.getInstance();
-		tryPressKey(key, mc.currentScreen == null || mc.currentScreen.passEvents);
+		tryHoldKey(key);
 		
 		KEY_THREAD_MAP.put(key, t);
 		
 		t.start();
+	}
+	
+	public static void tryHoldKey(KeyBinding key)
+	{
+		final MinecraftClient mc = MinecraftClient.getInstance();
+		tryPressKey(key, mc.currentScreen == null);
+	}
+	
+	public static void tryToggleKey(KeyBinding key)
+	{
+		final MinecraftClient mc = MinecraftClient.getInstance();
+		tryPressKey(key, !key.isPressed() && (mc.currentScreen == null));
 	}
 	
 	public static void tryReleaseKey(KeyBinding key)

@@ -15,6 +15,7 @@ import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 import virtuoel.discarnate.util.I18nUtils;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 @OnlyIn(Dist.CLIENT)
 public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHandler>
@@ -68,10 +69,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY)
 	{
 		super.drawForeground(matrices, mouseX, mouseY);
-		if (confirmButton.isHovered() && !confirmButton.isFocused())
-		{
-			confirmButton.renderTooltip(matrices, mouseX - this.x, mouseY - this.y);
-		}
+		ReflectionUtils.Client.renderClickableWidgetTooltip(this.confirmButton, matrices, mouseX - this.x, mouseY - this.y);
 	}
 	
 	@Override
@@ -88,8 +86,8 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 		RenderSystem.setShader(GameRenderer::getPositionTexShader);
 		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		RenderSystem.setShaderTexture(0, TEXTURE);
-		int i = (this.width - this.backgroundWidth) / 2;
-		int j = (this.height - this.backgroundHeight) / 2;
+		final int i = (this.width - this.backgroundWidth) / 2;
+		final int j = (this.height - this.backgroundHeight) / 2;
 		this.drawTexture(matrices, i, j, 0, 0, this.backgroundWidth, this.backgroundHeight);
 	}
 }

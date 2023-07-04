@@ -1,19 +1,10 @@
 {
-	"type": "minecraft:crafting_shaped",
-	"result":
-	{
-		"item": "discarnate:wait_task",
-		"count": 8
-	},
-	"pattern":
+	"type": "minecraft:stonecutting",
+	"count": 1,
+	"result": "discarnate:wait_task",
+	"ingredient":
 	[
-		"BBB",
-		"BSB",
-		"BBB"
-	],
-	"key":
-	{
-		"B": { "item": "discarnate:blank_task" },
-		"S": { "tag": "minecraft:sand" }
-	}
+		{ "tag": "discarnate:tasks" },
+		{ "item": "discarnate:blank_task" }
+	]
 }
