@@ -1,0 +1,10 @@
+{
+	"type": "minecraft:stonecutting",
+	"count": 1,
+	"result": "discarnate:toggle_move_forward_task",
+	"ingredient":
+	[
+		{ "tag": "discarnate:tasks" },
+		{ "item": "discarnate:blank_task" }
+	]
+}

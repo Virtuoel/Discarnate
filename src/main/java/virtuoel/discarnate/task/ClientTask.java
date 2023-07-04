@@ -1,5 +1,9 @@
 package virtuoel.discarnate.task;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +17,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fmllegacy.network.NetworkDirection;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
+import virtuoel.discarnate.api.TaskContainer;
 import virtuoel.discarnate.network.DiscarnatePacketHandler;
 import virtuoel.discarnate.network.TaskPacket;
 
@@ -23,24 +28,32 @@ public class ClientTask extends Task
 		super(action);
 	}
 	
+	@ApiStatus.Experimental
+	public ClientTask(TaskContainer container)
+	{
+		super(container);
+	}
+	
 	@Override
-	public void accept(@NotNull ItemStack s, @Nullable PlayerEntity p, @Nullable BlockEntity b)
+	@ApiStatus.Experimental
+	public List<TaskAction> getContainedTasks(@NotNull ItemStack s, @NotNull PlayerEntity p, @Nullable BlockEntity b)
 	{
 		if (p instanceof ServerPlayerEntity && !p.getEntityWorld().isClient)
 		{
-			TaskPacket packet = new TaskPacket(
-				this,
-				getPosFromBlockEntity(b),
-				s,
-				getWorldIdFromBlockEntity(b)
-			);
-			
-			((ServerPlayerEntity) p).networkHandler.sendPacket(DiscarnatePacketHandler.INSTANCE.toVanillaPacket(packet, NetworkDirection.PLAY_TO_CLIENT));
+			return Collections.singletonList((s1, p1, b1) ->
+			{
+				final TaskPacket packet = new TaskPacket(
+					this,
+					getPosFromBlockEntity(b1),
+					s1,
+					getWorldIdFromBlockEntity(b1)
+				);
+				
+				((ServerPlayerEntity) p).networkHandler.sendPacket(DiscarnatePacketHandler.INSTANCE.toVanillaPacket(packet, NetworkDirection.PLAY_TO_CLIENT));
+			});
 		}
-		else
-		{
-			super.accept(s, p, b);
-		}
+		
+		return super.getContainedTasks(s, p, b);
 	}
 	
 	private static BlockPos getPosFromBlockEntity(BlockEntity be)

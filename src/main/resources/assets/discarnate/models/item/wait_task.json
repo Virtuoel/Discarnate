@@ -2,6 +2,6 @@
 	"parent": "item/generated",
 	"textures":
 	{
-		"layer0": "discarnate:items/wait_task"
+		"layer0": "discarnate:item/wait_task"
 	}
 }

@@ -1,19 +1,10 @@
 {
-	"type": "minecraft:crafting_shaped",
-	"result":
-	{
-		"item": "discarnate:swing_item_task",
-		"count": 8
-	},
-	"pattern":
+	"type": "minecraft:stonecutting",
+	"count": 1,
+	"result": "discarnate:swing_item_task",
+	"ingredient":
 	[
-		"BBB",
-		"BAB",
-		"BBB"
-	],
-	"key":
-	{
-		"B": { "item": "discarnate:blank_task" },
-		"A": { "item": "minecraft:arrow" }
-	}
+		{ "tag": "discarnate:tasks" },
+		{ "item": "discarnate:blank_task" }
+	]
 }

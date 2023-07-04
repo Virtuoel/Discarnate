@@ -2,7 +2,6 @@
 	"replace": false,
 	"values":
 	[
-		"discarnate:blank_task",
 		"discarnate:info_task",
 		"discarnate:wait_task",
 		"discarnate:drop_task",

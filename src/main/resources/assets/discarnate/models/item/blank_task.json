@@ -2,6 +2,6 @@
 	"parent": "item/generated",
 	"textures":
 	{
-		"layer0": "discarnate:items/blank_task"
+		"layer0": "discarnate:item/blank_task"
 	}
 }

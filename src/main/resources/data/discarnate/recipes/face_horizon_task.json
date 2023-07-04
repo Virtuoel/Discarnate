@@ -1,18 +1,10 @@
 {
-	"type": "minecraft:crafting_shaped",
-	"result":
-	{
-		"item": "discarnate:face_horizon_task",
-		"count": 1
-	},
-	"pattern":
+	"type": "minecraft:stonecutting",
+	"count": 1,
+	"result": "discarnate:face_horizon_task",
+	"ingredient":
 	[
-		"U",
-		"D"
-	],
-	"key":
-	{
-		"U": { "item": "discarnate:look_up_task" },
-		"D": { "item": "discarnate:look_down_task" }
-	}
+		{ "tag": "discarnate:tasks" },
+		{ "item": "discarnate:blank_task" }
+	]
 }

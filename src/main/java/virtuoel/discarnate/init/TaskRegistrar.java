@@ -1,11 +1,15 @@
 package virtuoel.discarnate.init;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -14,6 +18,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,6 +32,7 @@ import net.minecraftforge.registries.RegistryBuilder;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
+import virtuoel.discarnate.api.TaskContainer;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.client.option.KeyBindingUtils;
 import virtuoel.discarnate.task.ClientTask;
@@ -67,8 +73,9 @@ public class TaskRegistrar
 		registerTask((s, p, b) ->
 		{
 			final ItemStack itemStack = p.getInventory().dropSelectedItem(false);
+			final World world = p.getEntityWorld();
 			
-			if (!p.world.isClient)
+			if (!world.isClient)
 			{
 				p.dropItem(itemStack, false, true);
 			}
@@ -87,43 +94,79 @@ public class TaskRegistrar
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keyForward, s.getCount() * 50);
 		}, ItemRegistrar.MOVE_FORWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keyForward);
+		}, ItemRegistrar.TOGGLE_MOVE_FORWARD_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keyBack, s.getCount() * 50);
 		}, ItemRegistrar.MOVE_BACKWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keyBack);
+		}, ItemRegistrar.TOGGLE_MOVE_BACKWARD_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keyLeft, s.getCount() * 50);
 		}, ItemRegistrar.STRAFE_LEFT_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keyLeft);
+		}, ItemRegistrar.TOGGLE_STRAFE_LEFT_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keyRight, s.getCount() * 50);
 		}, ItemRegistrar.STRAFE_RIGHT_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keyRight);
+		}, ItemRegistrar.TOGGLE_STRAFE_RIGHT_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keySneak, s.getCount() * 50);
 		}, ItemRegistrar.SNEAK_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keySneak);
+		}, ItemRegistrar.TOGGLE_SNEAK_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keyJump, s.getCount() * 50);
 		}, ItemRegistrar.JUMP_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keyJump);
+		}, ItemRegistrar.TOGGLE_JUMP_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryReleaseKey(mc.options.keyForward);
 			KeyBindingUtils.tryReleaseKey(mc.options.keyBack);
 			KeyBindingUtils.tryReleaseKey(mc.options.keyLeft);
@@ -179,15 +222,27 @@ public class TaskRegistrar
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keyAttack, s.getCount() * 50);
 		}, ItemRegistrar.SWING_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keyAttack);
+		}, ItemRegistrar.TOGGLE_SWING_ITEM_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryHoldKey(mc.options.keyUse, s.getCount() * 50);
 		}, ItemRegistrar.USE_ITEM_TASK);
+		
+		registerClientTask((s, p, b) ->
+		{
+			final MinecraftClient mc = MinecraftClient.getInstance();
+			KeyBindingUtils.tryToggleKey(mc.options.keyUse);
+		}, ItemRegistrar.TOGGLE_USE_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
@@ -196,7 +251,7 @@ public class TaskRegistrar
 		
 		registerClientTask((s, p, b) ->
 		{
-			MinecraftClient mc = MinecraftClient.getInstance();
+			final MinecraftClient mc = MinecraftClient.getInstance();
 			KeyBindingUtils.tryReleaseKey(mc.options.keyForward);
 			KeyBindingUtils.tryReleaseKey(mc.options.keyBack);
 			KeyBindingUtils.tryReleaseKey(mc.options.keyLeft);
@@ -219,50 +274,87 @@ public class TaskRegistrar
 	@SubscribeEvent
 	public static void registerVanillaTasks(RegistryEvent.Register<Task> event)
 	{
-		final TaskAction shulkerTask = (s, p, b) ->
+		final TaskContainer containedTasks = (s, p, b) ->
 		{
-			NbtCompound stackNbt = s.getNbt();
+			final NbtCompound stackNbt = s.getNbt();
 			
 			if (stackNbt != null && stackNbt.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
 			{
-				NbtCompound beNbt = stackNbt.getCompound("BlockEntityTag");
+				final NbtCompound beNbt = stackNbt.getCompound("BlockEntityTag");
 				
 				if (beNbt.contains("Items", NbtElement.LIST_TYPE))
 				{
-					DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
+					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
+					Inventories.readNbt(beNbt, stacks);
+					
+					final List<TaskAction> tasks = new ArrayList<>();
+					
+					for (final ItemStack stack : stacks)
+					{
+						if (!stack.isEmpty())
+						{
+							Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName()))
+								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+								.ifPresent(tasks::add);
+						}
+					}
+					
+					return tasks;
+				}
+			}
+			
+			return Collections.emptyList();
+		};
+		
+		final TaskContainer shulkerTasks = (s, p, b) ->
+		{
+			final NbtCompound stackNbt = s.getNbt();
+			
+			if (stackNbt != null && stackNbt.contains("BlockEntityTag", NbtElement.COMPOUND_TYPE))
+			{
+				final NbtCompound beNbt = stackNbt.getCompound("BlockEntityTag");
+				
+				if (beNbt.contains("Items", NbtElement.LIST_TYPE))
+				{
+					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
 					Inventories.readNbt(beNbt, stacks);
 					
 					if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.get().asItem()))
 					{
-						for (ItemStack stack : stacks)
+						final List<TaskAction> tasks = new ArrayList<>();
+						
+						for (final ItemStack stack : stacks)
 						{
-							if (SpiritChannelerBlockEntity.canPlayerContinue(p) && SpiritChannelerBlockEntity.isActive(b.getWorld(), b.getPos()))
+							if (!stack.isEmpty())
 							{
-								if (!stack.isEmpty())
-								{
-									Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName())).ifPresent(task -> task.accept(stack, p, b));
-								}
-							}
-							else
-							{
-								break;
+								Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName()))
+									.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+									.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+									.ifPresent(tasks::add);
 							}
 						}
+						
+						return tasks;
 					}
 				}
 			}
+			
+			return Collections.emptyList();
 		};
 		
 		ModContainer container = ModLoadingContext.get().getActiveContainer();
 		ModLoadingContext.get().setActiveContainer(ModList.get().getModContainerById("minecraft").orElseThrow());
 		
-		event.getRegistry().register(new Task(shulkerTask).setRegistryName(ShulkerBoxBlock.get(null).getRegistryName()));
+		event.getRegistry().register(new Task(shulkerTasks).setRegistryName(ShulkerBoxBlock.get(null).getRegistryName()));
 		for (DyeColor color : DyeColor.values())
 		{
-			event.getRegistry().register(new Task(shulkerTask).setRegistryName(ShulkerBoxBlock.get(color).getRegistryName()));
+			event.getRegistry().register(new Task(shulkerTasks).setRegistryName(ShulkerBoxBlock.get(color).getRegistryName()));
 		}
 		
 		ModLoadingContext.get().setActiveContainer(container);
+		
+		event.getRegistry().register(new Task(containedTasks).setRegistryName(BlockRegistrar.SPIRIT_CHANNELER.getId()));
 	}
 	
 	private static RegistryObject<Task> registerTask(Supplier<Task> task, Identifier id)
@@ -280,6 +372,16 @@ public class TaskRegistrar
 		return registerTask(task, entry.getId());
 	}
 	
+	private static RegistryObject<Task> registerTasks(TaskContainer container, Identifier id)
+	{
+		return registerTask(() -> new Task(container), id);
+	}
+	
+	protected static RegistryObject<Task> registerTasks(TaskContainer container, ItemConvertible item)
+	{
+		return registerTasks(container, item.asItem().getRegistryName());
+	}
+	
 	private static RegistryObject<Task> registerClientTask(TaskAction task, Identifier id)
 	{
 		return registerTask(() -> new ClientTask(task), id);
@@ -288,6 +390,16 @@ public class TaskRegistrar
 	private static RegistryObject<Task> registerClientTask(TaskAction task, RegistryObject<?> entry)
 	{
 		return registerClientTask(task, entry.getId());
+	}
+	
+	private static RegistryObject<Task> registerClientTasks(TaskContainer container, Identifier id)
+	{
+		return registerTask(() -> new ClientTask(container), id);
+	}
+	
+	protected static RegistryObject<Task> registerClientTasks(TaskContainer container, ItemConvertible item)
+	{
+		return registerClientTasks(container, item.asItem().getRegistryName());
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();

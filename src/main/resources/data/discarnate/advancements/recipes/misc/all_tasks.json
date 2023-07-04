@@ -1,0 +1,67 @@
+{
+	"parent": "minecraft:recipes/root",
+	"rewards":
+	{
+		"recipes":
+		[
+			"discarnate:cancel_movement_task",
+			"discarnate:drop_task",
+			"discarnate:end_task",
+			"discarnate:face_cardinal_task",
+			"discarnate:face_horizon_task",
+			"discarnate:info_task",
+			"discarnate:jump_task",
+			"discarnate:look_down_task",
+			"discarnate:look_left_task",
+			"discarnate:look_right_task",
+			"discarnate:look_up_task",
+			"discarnate:move_backward_task",
+			"discarnate:move_forward_task",
+			"discarnate:revert_to_blank_task",
+			"discarnate:revert_to_blank_tasks",
+			"discarnate:sneak_task",
+			"discarnate:spirit_channeler",
+			"discarnate:strafe_left_task",
+			"discarnate:strafe_right_task",
+			"discarnate:swap_task",
+			"discarnate:swing_item_task",
+			"discarnate:switch_slot_task",
+			"discarnate:toggle_jump_task",
+			"discarnate:toggle_move_backward_task",
+			"discarnate:toggle_move_forward_task",
+			"discarnate:toggle_sneak_task",
+			"discarnate:toggle_strafe_left_task",
+			"discarnate:toggle_strafe_right_task",
+			"discarnate:toggle_swing_item_task",
+			"discarnate:toggle_use_item_task",
+			"discarnate:use_item_task",
+			"discarnate:wait_task"
+		]
+	},
+	"criteria":
+	{
+		"has_ingredient":
+		{
+			"trigger": "minecraft:inventory_changed",
+			"conditions":
+			{
+				"items":
+				[
+					{
+						"item": "discarnate:blank_task",
+						"items":
+						[
+							"discarnate:blank_task"
+						]
+					}
+				]
+			}
+		}
+	},
+	"requirements":
+	[
+		[
+			"has_ingredient"
+		]
+	]
+}
