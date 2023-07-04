@@ -2,8 +2,8 @@ package virtuoel.discarnate;
 
 import java.util.stream.Stream;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.logging.ILogger;
+import org.spongepowered.asm.service.MixinService;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -33,7 +33,7 @@ public class Discarnate
 {
 	public static final String MOD_ID = "discarnate";
 	
-	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+	public static final ILogger LOGGER = MixinService.getService().getLogger(MOD_ID);
 	
 	@SubscribeEvent
 	public void buildContents(CreativeModeTabEvent.Register event)
