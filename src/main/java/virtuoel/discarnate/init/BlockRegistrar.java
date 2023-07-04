@@ -2,7 +2,6 @@ package virtuoel.discarnate.init;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
-import net.minecraft.block.Material;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.sound.BlockSoundGroup;
@@ -20,7 +19,7 @@ public class BlockRegistrar
 	public static final RegistryObject<Block> SPIRIT_CHANNELER = BLOCKS.register(
 		"spirit_channeler",
 		() -> new SpiritChannelerBlock(
-			Block.Settings.of(Material.METAL)
+			Block.Settings.create()
 			.mapColor(MapColor.BROWN)
 			.strength(5.0F, 10.0F)
 			.sounds(BlockSoundGroup.METAL)

@@ -5,7 +5,9 @@ import java.util.function.Supplier;
 
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -19,6 +21,7 @@ import virtuoel.discarnate.util.ReflectionUtils;
 
 public class ItemRegistrar
 {
+	public static final DeferredRegister<ItemGroup> ITEM_GROUPS = DeferredRegister.create(Registries.ITEM_GROUP.getKey(), Discarnate.MOD_ID);
 	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Discarnate.MOD_ID);
 	
 	public static final RegistryObject<Item> BLANK_TASK = register("blank_task",

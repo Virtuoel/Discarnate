@@ -6,6 +6,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.network.NetworkEvent;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 
@@ -32,9 +33,10 @@ public class ActivatePacket
 		
 		ctx.get().enqueueWork(() ->
 		{
-			if (player.world.isChunkLoaded(msg.pos))
+			final World world = player.getEntityWorld();
+			if (world.isChunkLoaded(msg.pos))
 			{
-				BlockEntity be = player.world.getBlockEntity(msg.pos);
+				BlockEntity be = world.getBlockEntity(msg.pos);
 				if (be instanceof SpiritChannelerBlockEntity)
 				{
 					SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);

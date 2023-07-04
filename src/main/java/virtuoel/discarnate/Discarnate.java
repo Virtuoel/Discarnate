@@ -6,12 +6,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -35,51 +36,56 @@ public class Discarnate
 	
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	
+	public static final RegistryObject<ItemGroup> ITEM_GROUP = ItemRegistrar.ITEM_GROUPS.register(
+		"general",
+		() -> ItemGroup.builder()
+			.icon(() -> new ItemStack(BlockRegistrar.SPIRIT_CHANNELER.get()))
+			.displayName(Text.translatable("itemGroup." + MOD_ID + ".general"))
+			.build()
+	);
+	
 	@SubscribeEvent
-	public void buildContents(CreativeModeTabEvent.Register event)
+	public void buildContents(BuildCreativeModeTabContentsEvent event)
 	{
-		event.registerCreativeModeTab(id("general"), builder ->
+		if (event.getTabKey() != ITEM_GROUP.getKey())
 		{
-			builder.icon(() -> new ItemStack(BlockRegistrar.SPIRIT_CHANNELER.get()))
-				.displayName(Text.translatable("itemGroup." + MOD_ID + ".general"))
-				.entries((ctx, entries) -> {
-					Stream.of(
-						BlockRegistrar.SPIRIT_CHANNELER,
-						ItemRegistrar.BLANK_TASK,
-						ItemRegistrar.INFO_TASK,
-						ItemRegistrar.WAIT_TASK,
-						ItemRegistrar.DROP_TASK,
-						ItemRegistrar.SWAP_TASK,
-						ItemRegistrar.MOVE_FORWARD_TASK,
-						ItemRegistrar.TOGGLE_MOVE_FORWARD_TASK,
-						ItemRegistrar.MOVE_BACKWARD_TASK,
-						ItemRegistrar.TOGGLE_MOVE_BACKWARD_TASK,
-						ItemRegistrar.STRAFE_LEFT_TASK,
-						ItemRegistrar.TOGGLE_STRAFE_LEFT_TASK,
-						ItemRegistrar.STRAFE_RIGHT_TASK,
-						ItemRegistrar.TOGGLE_STRAFE_RIGHT_TASK,
-						ItemRegistrar.CANCEL_MOVEMENT_TASK,
-						ItemRegistrar.LOOK_UP_TASK,
-						ItemRegistrar.LOOK_DOWN_TASK,
-						ItemRegistrar.LOOK_LEFT_TASK,
-						ItemRegistrar.LOOK_RIGHT_TASK,
-						ItemRegistrar.FACE_HORIZON_TASK,
-						ItemRegistrar.FACE_CARDINAL_TASK,
-						ItemRegistrar.SNEAK_TASK,
-						ItemRegistrar.TOGGLE_SNEAK_TASK,
-						ItemRegistrar.JUMP_TASK,
-						ItemRegistrar.TOGGLE_JUMP_TASK,
-						ItemRegistrar.SWING_ITEM_TASK,
-						ItemRegistrar.TOGGLE_SWING_ITEM_TASK,
-						ItemRegistrar.USE_ITEM_TASK,
-						ItemRegistrar.TOGGLE_USE_ITEM_TASK,
-						ItemRegistrar.SWITCH_SLOT_TASK,
-						ItemRegistrar.END_TASK
-					)
-					.map(RegistryObject::get)
-					.forEach(entries::add);
-				});
-		});
+			return;
+		}
+		
+		Stream.of(
+			BlockRegistrar.SPIRIT_CHANNELER,
+			ItemRegistrar.BLANK_TASK,
+			ItemRegistrar.INFO_TASK,
+			ItemRegistrar.WAIT_TASK,
+			ItemRegistrar.DROP_TASK,
+			ItemRegistrar.SWAP_TASK,
+			ItemRegistrar.MOVE_FORWARD_TASK,
+			ItemRegistrar.TOGGLE_MOVE_FORWARD_TASK,
+			ItemRegistrar.MOVE_BACKWARD_TASK,
+			ItemRegistrar.TOGGLE_MOVE_BACKWARD_TASK,
+			ItemRegistrar.STRAFE_LEFT_TASK,
+			ItemRegistrar.TOGGLE_STRAFE_LEFT_TASK,
+			ItemRegistrar.STRAFE_RIGHT_TASK,
+			ItemRegistrar.TOGGLE_STRAFE_RIGHT_TASK,
+			ItemRegistrar.CANCEL_MOVEMENT_TASK,
+			ItemRegistrar.LOOK_UP_TASK,
+			ItemRegistrar.LOOK_DOWN_TASK,
+			ItemRegistrar.LOOK_LEFT_TASK,
+			ItemRegistrar.LOOK_RIGHT_TASK,
+			ItemRegistrar.FACE_HORIZON_TASK,
+			ItemRegistrar.FACE_CARDINAL_TASK,
+			ItemRegistrar.SNEAK_TASK,
+			ItemRegistrar.TOGGLE_SNEAK_TASK,
+			ItemRegistrar.JUMP_TASK,
+			ItemRegistrar.TOGGLE_JUMP_TASK,
+			ItemRegistrar.SWING_ITEM_TASK,
+			ItemRegistrar.TOGGLE_SWING_ITEM_TASK,
+			ItemRegistrar.USE_ITEM_TASK,
+			ItemRegistrar.TOGGLE_USE_ITEM_TASK,
+			ItemRegistrar.SWITCH_SLOT_TASK,
+			ItemRegistrar.END_TASK
+		)
+		.forEach(event::accept);
 	}
 	
 	public Discarnate()
@@ -90,6 +96,7 @@ public class Discarnate
 		ItemRegistrar.ITEMS.register(modBus);
 		BlockEntityRegistrar.BLOCK_ENTITY_TYPES.register(modBus);
 		ScreenHandlerRegistrar.SCREEN_HANDLERS.register(modBus);
+		ItemRegistrar.ITEM_GROUPS.register(modBus);
 		TaskRegistrar.TASKS.register(modBus);
 		modBus.register(TaskRegistrar.class);
 		modBus.register(this);
