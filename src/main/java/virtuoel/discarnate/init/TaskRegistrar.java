@@ -3,6 +3,7 @@ package virtuoel.discarnate.init;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
@@ -59,7 +60,7 @@ public class TaskRegistrar
 			}
 			catch (InterruptedException e)
 			{
-				
+				SpiritChannelerBlockEntity.onPlayerStop(p, b);
 			}
 		}, ItemRegistrar.WAIT_TASK);
 		
@@ -259,7 +260,10 @@ public class TaskRegistrar
 		{
 			if (b instanceof SpiritChannelerBlockEntity)
 			{
-				((SpiritChannelerBlockEntity) b).deactivate();
+				Optional.ofNullable(b.getWorld()).map(World::getServer).ifPresent(server ->
+				{
+					server.execute(((SpiritChannelerBlockEntity) b)::deactivate);
+				});
 			}
 		}, ItemRegistrar.END_TASK);
 		

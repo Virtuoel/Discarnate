@@ -5,7 +5,6 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.RenderLayer;
@@ -49,11 +48,7 @@ public class DiscarnateClient implements ClientModInitializer
 			{
 				if (w.isChunkLoaded(pos))
 				{
-					BlockEntity be = w.getBlockEntity(pos);
-					if (be != null)
-					{
-						task.accept(stack, p, be);
-					}
+					task.accept(stack, p, w.getBlockEntity(pos));
 				}
 			}
 		});
