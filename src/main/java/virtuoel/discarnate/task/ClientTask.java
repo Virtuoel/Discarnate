@@ -46,7 +46,7 @@ public class ClientTask extends Task
 					this,
 					getPosFromBlockEntity(b1),
 					s1,
-					getWorldIdFromBlockEntity(b1)
+					getWorldIdFromBlockEntity(b1, p)
 				);
 				
 				((ServerPlayerEntity) p).networkHandler.sendPacket(DiscarnatePacketHandler.INSTANCE.toVanillaPacket(packet, NetworkDirection.PLAY_TO_CLIENT));
@@ -61,11 +61,13 @@ public class ClientTask extends Task
 		return be != null ? be.getPos() : BlockPos.ORIGIN;
 	}
 	
-	private static Identifier getWorldIdFromBlockEntity(BlockEntity be)
+	private static Identifier getWorldIdFromBlockEntity(BlockEntity be, PlayerEntity p)
 	{
-		if (be != null)
+		final World w = be != null ? be.getWorld() : p.getEntityWorld();
+		
+		if (w != null)
 		{
-			return be.getWorld().getRegistryKey().getValue();
+			return w.getRegistryKey().getValue();
 		}
 		
 		return World.OVERWORLD.getValue();
