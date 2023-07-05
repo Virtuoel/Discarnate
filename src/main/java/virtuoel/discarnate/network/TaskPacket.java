@@ -57,11 +57,7 @@ public class TaskPacket
 				{
 					if (w.isChunkLoaded(pos))
 					{
-						BlockEntity be = w.getBlockEntity(pos);
-						if (be != null)
-						{
-							task.accept(stack, p, be);
-						}
+						task.accept(stack, p, w.getBlockEntity(pos));
 					}
 				}
 			});
