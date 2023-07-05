@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -65,10 +66,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	private static final Random RAND = new Random();
 	
 	@Nullable
-	VexEntity marker = null;
+	volatile VexEntity marker = null;
 	
 	@Nullable
-	Thread taskThread = null;
+	volatile Thread taskThread = null;
+	
+	volatile Runnable stopCallback = () -> {};
 	
 	public boolean activate(PlayerEntity player)
 	{
@@ -115,6 +118,10 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					return false;
 				}
 				onPlayerStart(player);
+				stopCallback = () -> {
+					stopCallback = () -> {};
+					onPlayerStop(player, this);
+				};
 				
 				BlockPos pos = getPos();
 				
@@ -166,14 +173,19 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 						}
 					}
 					
-					onPlayerStop(player);
-					
 					if (hasWorld)
 					{
 						Optional.ofNullable(w.getServer()).ifPresent(s ->
 						{
 							s.execute(this::deactivate);
 						});
+					}
+					else
+					{
+						synchronized (this)
+						{
+							stopCallback.run();
+						}
 					}
 				}, "SpiritChannelerTasks");
 				
@@ -228,10 +240,14 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				taskThread.interrupt();
 				taskThread = null;
 				
+				stopCallback.run();
+				
 				marker = null;
 				
 				return true;
 			}
+			
+			stopCallback.run();
 			
 			marker = null;
 			
@@ -261,9 +277,9 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	private static final Identifier RESET_CHANNELER_TASK_ID = Discarnate.id("reset_channeler_task");
 	
-	protected void onPlayerStop(@NotNull PlayerEntity player)
+	public static void onPlayerStop(@NotNull PlayerEntity player, @Nullable BlockEntity blockEntity)
 	{
-		TaskRegistrar.REGISTRY.get().getValue(RESET_CHANNELER_TASK_ID).accept(ItemStack.EMPTY, player, this);
+		TaskRegistrar.REGISTRY.get().getValue(RESET_CHANNELER_TASK_ID).accept(ItemStack.EMPTY, player, blockEntity);
 	}
 	
 	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)
