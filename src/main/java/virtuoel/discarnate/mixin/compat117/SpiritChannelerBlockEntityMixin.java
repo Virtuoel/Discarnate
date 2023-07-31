@@ -12,14 +12,18 @@ import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 @Mixin(SpiritChannelerBlockEntity.class)
 public abstract class SpiritChannelerBlockEntityMixin extends LockableContainerBlockEntityMixin
 {
-	@Shadow
+	@Shadow(remap = false)
 	DefaultedList<ItemStack> inventory;
+	
+	@Shadow(remap = false)
+	abstract boolean isLocked();
 	
 	@Override
 	public NbtCompound method_11007(NbtCompound nbt)
 	{
 		super.method_11007(nbt);
 		Inventories.writeNbt(nbt, this.inventory);
+		nbt.putBoolean("Locked", isLocked());
 		return nbt;
 	}
 }
