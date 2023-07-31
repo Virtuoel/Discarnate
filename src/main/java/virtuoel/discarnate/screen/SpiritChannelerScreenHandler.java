@@ -72,16 +72,16 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		{
 			for (int col = 0; col < inventorySlotsHorizontal; col++)
 			{
-				int x = xOffset + col * (slotWidth + (slotBorder * 2));
-				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
+				final int x = xOffset + col * (slotWidth + (slotBorder * 2));
+				final int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
 				addSlot(new Slot(playerInventory, col + row * inventorySlotsHorizontal + hotbarSlotsHorizontal, x, y));
 			}
 		}
 		
-		int hotbarY = (inventorySlotsVertical * (slotHeight + (slotBorder * 2))) + hotbarSeparation + yOffset;
+		final int hotbarY = (inventorySlotsVertical * (slotHeight + (slotBorder * 2))) + hotbarSeparation + yOffset;
 		for (int col = 0; col < inventorySlotsHorizontal; col++)
 		{
-			int x = xOffset + col * (slotWidth + (slotBorder * 2));
+			final int x = xOffset + col * (slotWidth + (slotBorder * 2));
 			addSlot(new Slot(playerInventory, col, x, hotbarY));
 		}
 	}
@@ -100,8 +100,8 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		{
 			for (int col = 0; col < inventorySlotsHorizontal; col++)
 			{
-				int x = xOffset + col * (slotWidth + (slotBorder * 2));
-				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
+				final int x = xOffset + col * (slotWidth + (slotBorder * 2));
+				final int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
 				this.addSlot(new Slot(this.inventory, col + row * inventorySlotsHorizontal, x, y)
 				{
 					@Override
@@ -127,10 +127,10 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		{
 			if (world.isChunkLoaded(pos))
 			{
-				BlockEntity be = world.getBlockEntity(pos);
+				final BlockEntity be = world.getBlockEntity(pos);
 				if (be instanceof SpiritChannelerBlockEntity)
 				{
-					SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
+					final SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
 					
 					switch (id)
 					{
@@ -178,7 +178,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 			final ItemStack itemstack1 = slot.getStack();
 			final ItemStack itemstack = itemstack1.copy();
 			
-			int containerSlots = this.slots.size() - player.getInventory().main.size();
+			final int containerSlots = this.slots.size() - player.getInventory().main.size();
 			
 			if (index < containerSlots)
 			{
