@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
@@ -14,6 +15,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registry;
@@ -281,7 +283,7 @@ public class TaskRegistrar
 				
 				if (beNbt.contains("Items", NbtElement.LIST_TYPE))
 				{
-					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
+					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(25, ItemStack.EMPTY);
 					Inventories.readNbt(beNbt, stacks);
 					
 					final List<TaskAction> tasks = new ArrayList<>();
@@ -340,13 +342,46 @@ public class TaskRegistrar
 			return Collections.emptyList();
 		};
 		
+		final TaskContainer bundleTasks = (s, p, b) ->
+		{
+			final NbtCompound stackNbt = s.getNbt();
+			
+			if (stackNbt.contains("Items", NbtElement.LIST_TYPE))
+			{
+				final List<ItemStack> stacks = stackNbt.getList("Items", NbtElement.COMPOUND_TYPE)
+					.stream().map(NbtCompound.class::cast).map(ItemStack::fromNbt).collect(Collectors.toList());
+				
+				if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.asItem()))
+				{
+					final List<TaskAction> tasks = new ArrayList<>();
+					
+					for (final ItemStack stack : stacks)
+					{
+						if (!stack.isEmpty())
+						{
+							ReflectionUtils.getOrEmpty(REGISTRY, getId(stack.getItem()))
+								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+								.ifPresent(tasks::add);
+						}
+					}
+					
+					return tasks;
+				}
+			}
+			
+			return Collections.emptyList();
+		};
+		
+		registerTasks(containedTasks, BlockRegistrar.SPIRIT_CHANNELER.asItem());
+		
 		registerTasks(shulkerTasks, ShulkerBoxBlock.get(null));
 		for (DyeColor color : DyeColor.values())
 		{
 			registerTasks(shulkerTasks, ShulkerBoxBlock.get(color));
 		}
 		
-		registerTasks(containedTasks, BlockRegistrar.SPIRIT_CHANNELER.asItem());
+		registerTasks(bundleTasks, Items.BUNDLE);
 	}
 	
 	private static Task registerTask(Task task, Identifier id)
