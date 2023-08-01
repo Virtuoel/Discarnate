@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
@@ -66,7 +67,10 @@ public class TaskRegistrar
 		
 		registerTask((s, p, b) ->
 		{
-			final ItemStack itemStack = p.getInventory().dropSelectedItem(false);
+			final PlayerInventory inv = p.getInventory();
+			ItemStack itemStack = inv.getMainHandStack();
+			itemStack = itemStack.isEmpty() ? ItemStack.EMPTY : inv.removeStack(inv.selectedSlot, s.getCount());
+			
 			final World world = p.getEntityWorld();
 			
 			if (!world.isClient)
