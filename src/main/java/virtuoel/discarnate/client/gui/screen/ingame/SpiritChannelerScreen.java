@@ -3,9 +3,11 @@ package virtuoel.discarnate.client.gui.screen.ingame;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.LockButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameMode;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import virtuoel.discarnate.Discarnate;
@@ -29,6 +31,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	}
 	
 	ButtonWidget confirmButton;
+	LockButtonWidget lockButton;
 	
 	private static final Text START_TEXT = I18nUtils.translate("gui.discarnate.spirit_channeler.start", "Start");
 	private static final Text STOP_TEXT = I18nUtils.translate("gui.discarnate.spirit_channeler.stop", "Stop");
@@ -38,12 +41,24 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	{
 		super.init();
 		
-		final boolean active = handler.isActive();
+		final boolean creative = this.client.player.isCreative();
+		
+		final boolean active = this.handler.isActive();
+		final boolean locked = this.handler.isLocked();
 		
 		this.titleX = ((this.backgroundWidth - this.textRenderer.getWidth(this.title)) / 2) - 26;
-		this.confirmButton = ReflectionUtils.Client.buildButtonWidget(this.x + 124, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
-		this.confirmButton.active = active || (this.client.player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && this.client.player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get()) || this.client.player.isCreative();
-		this.addDrawableChild(confirmButton);
+		
+		this.confirmButton = ReflectionUtils.Client.buildButtonWidget(this.x + 122, this.y + 52, 40, 20, active ? STOP_TEXT : START_TEXT, this::confirmAction);
+		this.confirmButton.active = active || (this.client.player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && this.client.player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get()) || creative;
+		this.addDrawableChild(this.confirmButton);
+		
+		this.lockButton = new LockButtonWidget(this.x + 132, this.y + 88, this::lockAction);
+		this.lockButton.setLocked(locked);
+		this.lockButton.active = !active && creative;
+		if (this.client.interactionManager.getCurrentGameMode() == GameMode.CREATIVE)
+		{
+			this.addDrawableChild(this.lockButton);
+		}
 	}
 	
 	@Override
@@ -51,15 +66,29 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	{
 		super.handledScreenTick();
 		
-		final boolean active = handler.isActive();
+		final boolean creative = this.client.player.isCreative();
+		
+		final boolean active = this.handler.isActive();
+		final boolean locked = this.handler.isLocked();
 		
 		this.confirmButton.setMessage(active ? STOP_TEXT : START_TEXT);
-		this.confirmButton.active = active || (this.client.player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && this.client.player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get()) || this.client.player.isCreative();
+		this.confirmButton.active = active || (this.client.player.experienceLevel >= DiscarnateConfig.COMMON.minLevel.get() && this.client.player.experienceLevel >= DiscarnateConfig.COMMON.levelCost.get()) || creative;
+		
+		this.lockButton.setLocked(locked);
+		this.lockButton.active = !active && creative;
 	}
 	
 	private void confirmAction(ButtonWidget button)
 	{
-		client.interactionManager.clickButton(handler.syncId, 0);
+		this.client.interactionManager.clickButton(this.handler.syncId, 0);
+	}
+	
+	private void lockAction(ButtonWidget button)
+	{
+		if (this.client.interactionManager.getCurrentGameMode() == GameMode.CREATIVE)
+		{
+			this.client.interactionManager.clickButton(this.handler.syncId, 1);
+		}
 	}
 	
 	@Override

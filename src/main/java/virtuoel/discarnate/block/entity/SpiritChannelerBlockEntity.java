@@ -56,6 +56,9 @@ import virtuoel.discarnate.util.I18nUtils;
 
 public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ScreenHandlerFactory
 {
+	public static final int ACTIVE = 0;
+	public static final int LOCKED = 1;
+	
 	@Override
 	public void markRemoved()
 	{
@@ -113,7 +116,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 						w.playSound(null, player == null ? getPos() : player.getBlockPos(), SoundEvents.ENTITY_VEX_HURT, SoundCategory.BLOCKS, 1.0F, (RAND.nextFloat() - RAND.nextFloat()) * 0.2F + 1.0F);
 					}
 					
-					propertyDelegate.set(0, 0);
+					propertyDelegate.set(ACTIVE, 0);
 					
 					return false;
 				}
@@ -204,12 +207,12 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				
 				taskThread.start();
 				
-				propertyDelegate.set(0, 1);
+				propertyDelegate.set(ACTIVE, 1);
 				
 				return true;
 			}
 			
-			propertyDelegate.set(0, 0);
+			propertyDelegate.set(ACTIVE, 0);
 			
 			return false;
 		}
@@ -233,7 +236,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				}
 			}
 			
-			propertyDelegate.set(0, 0);
+			propertyDelegate.set(ACTIVE, 0);
 			
 			if (taskThread != null)
 			{
@@ -407,6 +410,16 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		return false;
 	}
 	
+	public void setLocked(boolean locked)
+	{
+		this.propertyDelegate.set(LOCKED, locked ? 1 : 0);
+	}
+	
+	public boolean isLocked()
+	{
+		return this.propertyDelegate.get(LOCKED) == 1;
+	}
+	
 	private static final int[] NO_SLOTS = new int[0];
 	private DefaultedList<ItemStack> inventory;
 	protected final PropertyDelegate propertyDelegate;
@@ -415,8 +428,8 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	{
 		super(BlockEntityRegistrar.SPIRIT_CHANNELER.get(), blockPos, blockState);
 		this.inventory = DefaultedList.ofSize(25, ItemStack.EMPTY);
-		this.propertyDelegate = new ArrayPropertyDelegate(1);
-		this.propertyDelegate.set(0, isActive(blockState) ? 1 : 0);
+		this.propertyDelegate = new ArrayPropertyDelegate(2);
+		this.propertyDelegate.set(ACTIVE, isActive(blockState) ? 1 : 0);
 	}
 	
 	@Override
@@ -443,6 +456,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 		super.readNbt(nbt);
 		this.inventory = DefaultedList.ofSize(this.size(), ItemStack.EMPTY);
 		Inventories.readNbt(nbt, this.inventory);
+		setLocked(nbt.getBoolean("Locked"));
 	}
 	
 	@Override
@@ -450,6 +464,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	{
 		super.writeNbt(nbt);
 		Inventories.writeNbt(nbt, this.inventory);
+		nbt.putBoolean("Locked", isLocked());
 	}
 	
 	@Override
@@ -525,6 +540,6 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	@Override
 	protected ScreenHandler createScreenHandler(int syncId, PlayerInventory playerInventory)
 	{
-		return new SpiritChannelerScreenHandler(syncId, playerInventory, this, propertyDelegate, ScreenHandlerContext.create(getWorld(), getPos()));
+		return new SpiritChannelerScreenHandler(syncId, playerInventory, this, this.propertyDelegate, ScreenHandlerContext.create(getWorld(), getPos()));
 	}
 }
