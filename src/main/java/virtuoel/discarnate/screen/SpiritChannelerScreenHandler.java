@@ -27,7 +27,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	
 	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory)
 	{
-		this(syncId, playerInventory, new SimpleInventory(25), new ArrayPropertyDelegate(1), ScreenHandlerContext.EMPTY);
+		this(syncId, playerInventory, new SimpleInventory(25), new ArrayPropertyDelegate(2), ScreenHandlerContext.EMPTY);
 	}
 	
 	public SpiritChannelerScreenHandler(int syncId, PlayerInventory playerInventory, final Inventory inventory, PropertyDelegate propertyDelegate, ScreenHandlerContext screenHandlerContext)
@@ -43,7 +43,17 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	
 	public boolean isActive()
 	{
-		return this.propertyDelegate.get(0) == 1;
+		return this.propertyDelegate.get(SpiritChannelerBlockEntity.ACTIVE) == 1;
+	}
+	
+	public boolean isLocked()
+	{
+		return this.propertyDelegate.get(SpiritChannelerBlockEntity.LOCKED) == 1;
+	}
+	
+	private boolean isMutable()
+	{
+		return !isActive() && !isLocked();
 	}
 	
 	public void addPlayerSlots(PlayerInventory playerInventory)
@@ -62,16 +72,16 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		{
 			for (int col = 0; col < inventorySlotsHorizontal; col++)
 			{
-				int x = xOffset + col * (slotWidth + (slotBorder * 2));
-				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
+				final int x = xOffset + col * (slotWidth + (slotBorder * 2));
+				final int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
 				addSlot(new Slot(playerInventory, col + row * inventorySlotsHorizontal + hotbarSlotsHorizontal, x, y));
 			}
 		}
 		
-		int hotbarY = (inventorySlotsVertical * (slotHeight + (slotBorder * 2))) + hotbarSeparation + yOffset;
+		final int hotbarY = (inventorySlotsVertical * (slotHeight + (slotBorder * 2))) + hotbarSeparation + yOffset;
 		for (int col = 0; col < inventorySlotsHorizontal; col++)
 		{
-			int x = xOffset + col * (slotWidth + (slotBorder * 2));
+			final int x = xOffset + col * (slotWidth + (slotBorder * 2));
 			addSlot(new Slot(playerInventory, col, x, hotbarY));
 		}
 	}
@@ -90,20 +100,20 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 		{
 			for (int col = 0; col < inventorySlotsHorizontal; col++)
 			{
-				int x = xOffset + col * (slotWidth + (slotBorder * 2));
-				int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
-				this.addSlot(new Slot(inventory, col + row * inventorySlotsHorizontal, x, y)
+				final int x = xOffset + col * (slotWidth + (slotBorder * 2));
+				final int y = row * (slotHeight + (slotBorder * 2)) + yOffset;
+				this.addSlot(new Slot(this.inventory, col + row * inventorySlotsHorizontal, x, y)
 				{
 					@Override
 					public boolean canTakeItems(PlayerEntity player)
 					{
-						return !isActive() && super.canTakeItems(player);
+						return isMutable() && super.canTakeItems(player);
 					}
 					
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return !isActive() && Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(stack.getItem().getRegistryName())).map(t -> !t.getContainedTasks(stack, player, inventory instanceof BlockEntity ? (BlockEntity) inventory : null).isEmpty()).orElse(false);
+						return isMutable() && Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(stack.getItem().getRegistryName())).map(t -> !t.getContainedTasks(stack, player, this.inventory instanceof BlockEntity ? (BlockEntity) this.inventory : null).isEmpty()).orElse(false);
 					}
 				});
 			}
@@ -113,22 +123,35 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	@Override
 	public boolean onButtonClick(PlayerEntity player, int id)
 	{
-		return context.get((world, pos) ->
+		return this.context.get((world, pos) ->
 		{
 			if (world.isChunkLoaded(pos))
 			{
-				BlockEntity be = world.getBlockEntity(pos);
+				final BlockEntity be = world.getBlockEntity(pos);
 				if (be instanceof SpiritChannelerBlockEntity)
 				{
-					SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
-					if (!channeler.isActive())
+					final SpiritChannelerBlockEntity channeler = ((SpiritChannelerBlockEntity) be);
+					
+					switch (id)
 					{
-						return channeler.activate(player);
-					}
-					else
-					{
-						channeler.deactivate();
-						return true;
+						case 0:
+							if (!channeler.isActive())
+							{
+								return channeler.activate(player);
+							}
+							else
+							{
+								channeler.deactivate();
+								return true;
+							}
+						case 1:
+							if (player.isCreative())
+							{
+								channeler.setLocked(!channeler.isLocked());
+								return true;
+							}
+						default:
+							break;
 					}
 				}
 			}
@@ -141,35 +164,34 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 	@Override
 	public boolean canUse(PlayerEntity player)
 	{
-		return inventory.canPlayerUse(player);
+		return this.inventory.canPlayerUse(player);
 	}
 	
 	@Override
 	@NotNull
 	public ItemStack transferSlot(PlayerEntity player, int index)
 	{
-		ItemStack itemstack = ItemStack.EMPTY;
-		Slot slot = slots.get(index);
+		final Slot slot = this.slots.get(index);
 		
 		if (slot != null && slot.hasStack())
 		{
-			ItemStack itemstack1 = slot.getStack();
-			itemstack = itemstack1.copy();
+			final ItemStack itemstack1 = slot.getStack();
+			final ItemStack itemstack = itemstack1.copy();
 			
-			int containerSlots = slots.size() - player.getInventory().main.size();
+			final int containerSlots = this.slots.size() - player.getInventory().main.size();
 			
 			if (index < containerSlots)
 			{
-				if (!this.insertItem(itemstack1, containerSlots, slots.size(), false))
+				if (!this.insertItem(itemstack1, containerSlots, this.slots.size(), false))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (isActive() || !this.insertItem(itemstack1, 0, containerSlots, false))
+			else if (!isMutable() || !this.insertItem(itemstack1, 0, containerSlots, false))
 			{
 				if (index < containerSlots + 27)
 				{
-					if (!this.insertItem(itemstack1, containerSlots + 27, slots.size(), false))
+					if (!this.insertItem(itemstack1, containerSlots + 27, this.slots.size(), false))
 					{
 						return ItemStack.EMPTY;
 					}
@@ -198,8 +220,10 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 			}
 			
 			slot.onTakeItem(player, itemstack1);
+			
+			return itemstack;
 		}
 		
-		return itemstack;
+		return ItemStack.EMPTY;
 	}
 }
