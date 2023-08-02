@@ -273,7 +273,7 @@ public class TaskRegistrar
 			}
 		}, ItemRegistrar.END_TASK);
 		
-		final TaskContainer containedTasks = (s, p, b) ->
+		final TaskContainer channelerTasks = (s, p, b) ->
 		{
 			final NbtCompound stackNbt = s.getNbt();
 			
@@ -319,40 +319,6 @@ public class TaskRegistrar
 					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
 					Inventories.readNbt(beNbt, stacks);
 					
-					if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.asItem()))
-					{
-						final List<TaskAction> tasks = new ArrayList<>();
-						
-						for (final ItemStack stack : stacks)
-						{
-							if (!stack.isEmpty())
-							{
-								ReflectionUtils.getOrEmpty(REGISTRY, getId(stack.getItem()))
-									.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
-									.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
-									.ifPresent(tasks::add);
-							}
-						}
-						
-						return tasks;
-					}
-				}
-			}
-			
-			return Collections.emptyList();
-		};
-		
-		final TaskContainer bundleTasks = (s, p, b) ->
-		{
-			final NbtCompound stackNbt = s.getNbt();
-			
-			if (stackNbt.contains("Items", NbtElement.LIST_TYPE))
-			{
-				final List<ItemStack> stacks = stackNbt.getList("Items", NbtElement.COMPOUND_TYPE)
-					.stream().map(NbtCompound.class::cast).map(ItemStack::fromNbt).collect(Collectors.toList());
-				
-				if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.asItem()))
-				{
 					final List<TaskAction> tasks = new ArrayList<>();
 					
 					for (final ItemStack stack : stacks)
@@ -373,7 +339,35 @@ public class TaskRegistrar
 			return Collections.emptyList();
 		};
 		
-		registerTasks(containedTasks, BlockRegistrar.SPIRIT_CHANNELER.asItem());
+		final TaskContainer bundleTasks = (s, p, b) ->
+		{
+			final NbtCompound stackNbt = s.getNbt();
+			
+			if (stackNbt != null && stackNbt.contains("Items", NbtElement.LIST_TYPE))
+			{
+				final List<ItemStack> stacks = stackNbt.getList("Items", NbtElement.COMPOUND_TYPE)
+					.stream().map(NbtCompound.class::cast).map(ItemStack::fromNbt).collect(Collectors.toList());
+				
+				final List<TaskAction> tasks = new ArrayList<>();
+				
+				for (final ItemStack stack : stacks)
+				{
+					if (!stack.isEmpty())
+					{
+						ReflectionUtils.getOrEmpty(REGISTRY, getId(stack.getItem()))
+							.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+							.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+							.ifPresent(tasks::add);
+					}
+				}
+				
+				return tasks;
+			}
+			
+			return Collections.emptyList();
+		};
+		
+		registerTasks(channelerTasks, BlockRegistrar.SPIRIT_CHANNELER.asItem());
 		
 		registerTasks(shulkerTasks, ShulkerBoxBlock.get(null));
 		for (DyeColor color : DyeColor.values())
