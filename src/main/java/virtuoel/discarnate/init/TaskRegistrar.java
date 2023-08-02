@@ -5,12 +5,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.DyeColor;
@@ -72,7 +75,10 @@ public class TaskRegistrar
 		
 		registerTask((s, p, b) ->
 		{
-			final ItemStack itemStack = p.getInventory().dropSelectedItem(false);
+			final PlayerInventory inv = p.getInventory();
+			ItemStack itemStack = inv.getMainHandStack();
+			itemStack = itemStack.isEmpty() ? ItemStack.EMPTY : inv.removeStack(inv.selectedSlot, s.getCount());
+			
 			final World world = p.getEntityWorld();
 			
 			if (!world.isClient)
@@ -277,7 +283,7 @@ public class TaskRegistrar
 	@SubscribeEvent
 	public static void registerVanillaTasks(RegistryEvent.Register<Task> event)
 	{
-		final TaskContainer containedTasks = (s, p, b) ->
+		final TaskContainer channelerTasks = (s, p, b) ->
 		{
 			final NbtCompound stackNbt = s.getNbt();
 			
@@ -287,7 +293,7 @@ public class TaskRegistrar
 				
 				if (beNbt.contains("Items", NbtElement.LIST_TYPE))
 				{
-					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
+					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(25, ItemStack.EMPTY);
 					Inventories.readNbt(beNbt, stacks);
 					
 					final List<TaskAction> tasks = new ArrayList<>();
@@ -323,24 +329,49 @@ public class TaskRegistrar
 					final DefaultedList<ItemStack> stacks = DefaultedList.<ItemStack>ofSize(27, ItemStack.EMPTY);
 					Inventories.readNbt(beNbt, stacks);
 					
-					if (stacks.stream().anyMatch(i -> i.getItem() == BlockRegistrar.SPIRIT_CHANNELER.get().asItem()))
+					final List<TaskAction> tasks = new ArrayList<>();
+					
+					for (final ItemStack stack : stacks)
 					{
-						final List<TaskAction> tasks = new ArrayList<>();
-						
-						for (final ItemStack stack : stacks)
+						if (!stack.isEmpty())
 						{
-							if (!stack.isEmpty())
-							{
-								Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName()))
-									.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
-									.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
-									.ifPresent(tasks::add);
-							}
+							Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName()))
+								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+								.ifPresent(tasks::add);
 						}
-						
-						return tasks;
+					}
+					
+					return tasks;
+				}
+			}
+			
+			return Collections.emptyList();
+		};
+		
+		final TaskContainer bundleTasks = (s, p, b) ->
+		{
+			final NbtCompound stackNbt = s.getNbt();
+			
+			if (stackNbt != null && stackNbt.contains("Items", NbtElement.LIST_TYPE))
+			{
+				final List<ItemStack> stacks = stackNbt.getList("Items", NbtElement.COMPOUND_TYPE)
+					.stream().map(NbtCompound.class::cast).map(ItemStack::fromNbt).collect(Collectors.toList());
+				
+				final List<TaskAction> tasks = new ArrayList<>();
+				
+				for (final ItemStack stack : stacks)
+				{
+					if (!stack.isEmpty())
+					{
+						Optional.ofNullable(REGISTRY.get().getValue(stack.getItem().getRegistryName()))
+							.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
+							.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
+							.ifPresent(tasks::add);
 					}
 				}
+				
+				return tasks;
 			}
 			
 			return Collections.emptyList();
@@ -355,9 +386,11 @@ public class TaskRegistrar
 			event.getRegistry().register(new Task(shulkerTasks).setRegistryName(ShulkerBoxBlock.get(color).getRegistryName()));
 		}
 		
+		event.getRegistry().register(new Task(bundleTasks).setRegistryName(Items.BUNDLE.getRegistryName()));
+		
 		ModLoadingContext.get().setActiveContainer(container);
 		
-		event.getRegistry().register(new Task(containedTasks).setRegistryName(BlockRegistrar.SPIRIT_CHANNELER.getId()));
+		event.getRegistry().register(new Task(channelerTasks).setRegistryName(BlockRegistrar.SPIRIT_CHANNELER.getId()));
 	}
 	
 	private static RegistryObject<Task> registerTask(Supplier<Task> task, Identifier id)
