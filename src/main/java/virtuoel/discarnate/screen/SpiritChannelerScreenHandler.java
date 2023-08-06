@@ -150,6 +150,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 								channeler.setLocked(!channeler.isLocked());
 								return true;
 							}
+							break;
 						default:
 							break;
 					}
