@@ -9,6 +9,11 @@
 	[
 		"MobEntityAccessor"
 	],
+	"client":
+	[
+		"client.compat1181minus.MinecraftClientMixin",
+		"client.compat1182plus.MinecraftClientMixin"
+	],
 	"injectors":
 	{
 		"defaultRequire": 1
