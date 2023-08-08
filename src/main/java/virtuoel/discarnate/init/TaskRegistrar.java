@@ -40,15 +40,13 @@ import virtuoel.discarnate.api.TaskContainer;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.client.option.KeyBindingUtils;
 import virtuoel.discarnate.task.ClientTask;
+import virtuoel.discarnate.util.DiscarnateMinecraftClientExtensions;
 import virtuoel.discarnate.util.I18nUtils;
 
 public class TaskRegistrar
 {
 	public static final DeferredRegister<Task> TASKS = DeferredRegister.create(Discarnate.id("task"), Discarnate.MOD_ID);
-	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry(() ->
-	{
-		return new RegistryBuilder<Task>().setDefaultKey(ItemRegistrar.BLANK_TASK.getId());
-	}));
+	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry(RegistryBuilder::new));
 	
 	private TaskRegistrar()
 	{
@@ -230,12 +228,14 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
+			((DiscarnateMinecraftClientExtensions) mc).discarnate_doAttack();
 			KeyBindingUtils.tryHoldKey(mc.options.attackKey, s.getCount() * 50);
 		}, ItemRegistrar.SWING_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
+			((DiscarnateMinecraftClientExtensions) mc).discarnate_doAttack();
 			KeyBindingUtils.tryToggleKey(mc.options.attackKey);
 		}, ItemRegistrar.TOGGLE_SWING_ITEM_TASK);
 		
