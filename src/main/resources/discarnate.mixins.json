@@ -13,6 +13,8 @@
 	],
 	"client":
 	[
+		"client.compat1181minus.MinecraftClientMixin",
+		"client.compat1182plus.MinecraftClientMixin",
 		"client.compat119minus.DrawableHelperInvoker",
 		"client.compat119minus.HandledScreenMixin",
 		"client.compat119minus.ScreenMixin",
