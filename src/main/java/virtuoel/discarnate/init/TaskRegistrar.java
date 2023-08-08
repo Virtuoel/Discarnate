@@ -45,10 +45,7 @@ import virtuoel.discarnate.util.I18nUtils;
 public class TaskRegistrar
 {
 	public static final DeferredRegister<Task> TASKS = DeferredRegister.create(Task.class, Discarnate.MOD_ID);
-	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry("task", () ->
-	{
-		return new RegistryBuilder<Task>().setDefaultKey(ItemRegistrar.BLANK_TASK.getId());
-	}));
+	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry("task", RegistryBuilder::new));
 	
 	private TaskRegistrar()
 	{
