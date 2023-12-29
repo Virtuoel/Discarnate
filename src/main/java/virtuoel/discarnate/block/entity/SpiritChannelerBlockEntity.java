@@ -133,7 +133,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				{
 					try
 					{
-						Thread.sleep(250);
+						Thread.sleep((long) (5 * ReflectionUtils.getMspt(this::getWorld)));
 					}
 					catch (InterruptedException e)
 					{

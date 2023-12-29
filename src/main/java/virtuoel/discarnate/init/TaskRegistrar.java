@@ -60,7 +60,7 @@ public class TaskRegistrar
 		{
 			try
 			{
-				Thread.sleep(s.getCount() * 50);
+				Thread.sleep((long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 			}
 			catch (InterruptedException e)
 			{
@@ -96,7 +96,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.forwardKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.forwardKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.MOVE_FORWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -108,7 +108,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.backKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.backKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.MOVE_BACKWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -120,7 +120,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.leftKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.leftKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.STRAFE_LEFT_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -132,7 +132,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.rightKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.rightKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.STRAFE_RIGHT_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -144,7 +144,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.sneakKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.sneakKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.SNEAK_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -156,7 +156,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.jumpKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.jumpKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.JUMP_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -225,7 +225,7 @@ public class TaskRegistrar
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
 			((DiscarnateMinecraftClientExtensions) mc).discarnate_doAttack();
-			KeyBindingUtils.tryHoldKey(mc.options.attackKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.attackKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.SWING_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -238,7 +238,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.useKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.useKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.USE_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->

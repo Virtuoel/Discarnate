@@ -97,7 +97,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta)
 	{
-		this.renderBackground(context);
+		ReflectionUtils.Client.renderBackground(this, context, mouseX, mouseY, delta);
 		super.render(context, mouseX, mouseY, delta);
 		this.drawMouseoverTooltip(context, mouseX, mouseY);
 	}

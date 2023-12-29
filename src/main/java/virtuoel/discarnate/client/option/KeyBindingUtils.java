@@ -10,7 +10,7 @@ public class KeyBindingUtils
 {
 	private static final Map<KeyBinding, Thread> KEY_THREAD_MAP = new HashMap<>();
 	
-	public static void tryHoldKey(KeyBinding key, int millis)
+	public static void tryHoldKey(KeyBinding key, long millis)
 	{
 		Thread t = new Thread(() ->
 		{

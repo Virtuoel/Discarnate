@@ -22,6 +22,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.MappingResolver;
 import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.ClickableWidget;
 import net.minecraft.client.util.math.MatrixStack;
@@ -38,15 +40,17 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import virtuoel.discarnate.Discarnate;
 
 public final class ReflectionUtils
 {
-	public static final MethodHandle FORMATTED, GROUP, BUTTON_WIDGET, RENDER_TOOLTIP, BUILD, REGISTER, GET, GET_ID, GET_OR_EMPTY, OF;
+	public static final MethodHandle FORMATTED, GROUP, BUTTON_WIDGET, RENDER_TOOLTIP, BUILD, REGISTER, GET, GET_ID, GET_OR_EMPTY, OF, RENDER_BACKGROUND;
 	public static final Registry<Block> BLOCK_REGISTRY;
 	public static final Registry<Item> ITEM_REGISTRY;
 	public static final Registry<BlockEntityType<?>> BLOCK_ENTITY_TYPE_REGISTRY;
 	public static final Object METAL;
+	public static final Class<?> LITERAL_TEXT;
 	
 	static
 	{
@@ -54,6 +58,7 @@ public final class ReflectionUtils
 		final Int2ObjectMap<MethodHandle> h = new Int2ObjectArrayMap<MethodHandle>();
 		Object rB, rI, rBe = rI = rB = null;
 		Object metal = null;
+		Class<?> literal = null;
 		
 		final Lookup lookup = MethodHandles.lookup();
 		String mapped = "unset";
@@ -66,6 +71,7 @@ public final class ReflectionUtils
 		{
 			final boolean is115Minus = VersionUtils.MINOR <= 15;
 			final boolean is1192Minus = VersionUtils.MINOR < 19 || (VersionUtils.MINOR == 19 && VersionUtils.PATCH <= 2);
+			final boolean is1201Minus = VersionUtils.MINOR < 20 || (VersionUtils.MINOR == 20 && VersionUtils.PATCH <= 1);
 			
 			if (is115Minus)
 			{
@@ -155,6 +161,22 @@ public final class ReflectionUtils
 				m = Block.Settings.class.getMethod(mapped, clazz);
 				h.put(9, lookup.unreflect(m).asType(MethodType.methodType(Block.Settings.class, clazz)));
 			}
+			
+			if (VersionUtils.MINOR <= 18)
+			{
+				mapped = mappingResolver.mapClassName("intermediary", "net.minecraft.class_2585");
+				literal = Class.forName(mapped);
+			}
+			
+			if (is1201Minus)
+			{
+				if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT)
+				{
+					mapped = mappingResolver.mapMethodName("intermediary", "net.minecraft.class_437", "method_25420", VersionUtils.MINOR <= 19 ? "(Lnet/minecraft/class_4587;)V" : "(Lnet/minecraft/class_332;)V");
+					m = Screen.class.getMethod(mapped, VersionUtils.MINOR <= 19 ? MatrixStack.class : DrawContext.class);
+					h.put(10, lookup.unreflect(m));
+				}
+			}
 		}
 		catch (NoSuchMethodException | SecurityException | IllegalAccessException | ClassNotFoundException | NoSuchFieldException e)
 		{
@@ -172,10 +194,12 @@ public final class ReflectionUtils
 		GET_ID = h.get(7);
 		GET_OR_EMPTY = h.get(8);
 		OF = h.get(9);
+		RENDER_BACKGROUND = h.get(10);
 		BLOCK_REGISTRY = castRegistry(rB);
 		ITEM_REGISTRY = castRegistry(rI);
 		BLOCK_ENTITY_TYPE_REGISTRY = castRegistry(rBe);
 		METAL = metal;
+		LITERAL_TEXT = literal;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -206,6 +230,16 @@ public final class ReflectionUtils
 		}
 		
 		return (Text) input;
+	}
+	
+	public static float getMspt(final Supplier<World> world)
+	{
+		if (VersionUtils.MINOR < 20 || (VersionUtils.MINOR == 20 && VersionUtils.PATCH <= 2))
+		{
+			return 50;
+		}
+		
+		return world.get().getTickManager().getMillisPerTick();
 	}
 	
 	public static void setItemSettingsGroup(Item.Settings settings, ItemGroup group)
@@ -364,6 +398,46 @@ public final class ReflectionUtils
 	
 	public static final class Client
 	{
+		public static void renderBackground(Screen screen, MatrixStack matrices, int mouseX, int mouseY, float delta)
+		{
+			if (RENDER_BACKGROUND != null)
+			{
+				if (VersionUtils.MINOR <= 19)
+				{
+					try
+					{
+						RENDER_BACKGROUND.invokeExact(screen, matrices);
+					}
+					catch (Throwable e)
+					{
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		}
+		
+		public static void renderBackground(Screen screen, DrawContext context, int mouseX, int mouseY, float delta)
+		{
+			if (RENDER_BACKGROUND != null)
+			{
+				if (VersionUtils.MINOR > 19)
+				{
+					try
+					{
+						RENDER_BACKGROUND.invokeExact(screen, context);
+					}
+					catch (Throwable e)
+					{
+						throw new RuntimeException(e);
+					}
+				}
+			}
+			else
+			{
+				screen.renderBackground(context, mouseX, mouseY, delta);
+			}
+		}
+		
 		public static ButtonWidget buildButtonWidget(int x, int y, int width, int height, Text message, ButtonWidget.PressAction onPress)
 		{
 			if (BUTTON_WIDGET != null)
