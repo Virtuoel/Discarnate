@@ -10,12 +10,12 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
-import net.minecraftforge.registries.ForgeRegistries;
 import virtuoel.discarnate.block.entity.SpiritChannelerBlockEntity;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 import virtuoel.discarnate.init.TaskRegistrar;
@@ -114,7 +114,7 @@ public class SpiritChannelerScreenHandler extends ScreenHandler
 					@Override
 					public boolean canInsert(ItemStack stack)
 					{
-						return isMutable() && Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem()))).map(t -> !t.getContainedTasks(stack, player, this.inventory instanceof BlockEntity ? (BlockEntity) this.inventory : null).isEmpty()).orElse(false);
+						return isMutable() && Optional.ofNullable(TaskRegistrar.REGISTRY.get().get(Registries.ITEM.getId(stack.getItem()))).map(t -> !t.getContainedTasks(stack, player, this.inventory instanceof BlockEntity ? (BlockEntity) this.inventory : null).isEmpty()).orElse(false);
 					}
 				});
 			}

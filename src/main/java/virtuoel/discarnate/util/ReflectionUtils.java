@@ -4,19 +4,29 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 public final class ReflectionUtils
 {
 	public static MutableText formatted(MutableText input, Formatting... formatting)
 	{
 		return input.formatted(formatting);
+	}
+	
+	public static float getMspt(final Supplier<World> world)
+	{
+		return 50;
 	}
 	
 	public static <V> V get(Registry<V> registry, Identifier id)
@@ -36,6 +46,16 @@ public final class ReflectionUtils
 	
 	public static final class Client
 	{
+		public static void renderBackground(Screen screen, MatrixStack matrices, int mouseX, int mouseY, float delta)
+		{
+			
+		}
+		
+		public static void renderBackground(Screen screen, DrawContext context, int mouseX, int mouseY, float delta)
+		{
+			screen.renderBackground(context, mouseX, mouseY, delta);
+		}
+		
 		public static ButtonWidget buildButtonWidget(int x, int y, int width, int height, Text message, ButtonWidget.PressAction onPress)
 		{
 			return ButtonWidget.builder(message, onPress).dimensions(x, y, width, height).build();

@@ -8,8 +8,8 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameMode;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
@@ -94,7 +94,7 @@ public class SpiritChannelerScreen extends HandledScreen<SpiritChannelerScreenHa
 	@Override
 	public void render(DrawContext context, int mouseX, int mouseY, float delta)
 	{
-		this.renderBackground(context);
+		ReflectionUtils.Client.renderBackground(this, context, mouseX, mouseY, delta);
 		super.render(context, mouseX, mouseY, delta);
 		this.drawMouseoverTooltip(context, mouseX, mouseY);
 	}

@@ -1,7 +1,7 @@
 package virtuoel.discarnate.network;
 
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.NetworkRegistry;
+import net.neoforged.neoforge.network.simple.SimpleChannel;
 import virtuoel.discarnate.Discarnate;
 
 public class DiscarnatePacketHandler

@@ -1,7 +1,5 @@
 package virtuoel.discarnate.network;
 
-import java.util.function.Supplier;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
@@ -9,9 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.network.NetworkEvent;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.init.TaskRegistrar;
 
@@ -32,22 +30,22 @@ public class TaskPacket
 	
 	protected TaskPacket(PacketByteBuf buf)
 	{
-		this.task = TaskRegistrar.REGISTRY.get().getValue(buf.readIdentifier());
+		this.task = TaskRegistrar.REGISTRY.get().get(buf.readIdentifier());
 		this.pos = buf.readBlockPos();
 		this.stack = buf.readItemStack();
 		this.id = buf.readIdentifier();
 	}
 	
-	public static void handle(TaskPacket msg, Supplier<NetworkEvent.Context> ctx)
+	public static void handle(TaskPacket msg, NetworkEvent.Context ctx)
 	{
 		Task task = msg.task;
 		BlockPos pos = msg.pos;
 		ItemStack stack = msg.stack;
 		Identifier id = msg.id;
 		
-		ctx.get().enqueueWork(() ->
+		ctx.enqueueWork(() ->
 		{
-			DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+			if (FMLEnvironment.dist == Dist.CLIENT)
 			{
 				MinecraftClient client = MinecraftClient.getInstance();
 				PlayerEntity p = (PlayerEntity) (Object) client.player;
@@ -59,15 +57,15 @@ public class TaskPacket
 						task.accept(stack, p, w.getBlockEntity(pos));
 					}
 				}
-			});
+			}
 		});
 		
-		ctx.get().setPacketHandled(true);
+		ctx.setPacketHandled(true);
 	}
 	
 	public void encode(PacketByteBuf buf)
 	{
-		buf.writeIdentifier(TaskRegistrar.REGISTRY.get().getKey(task));
+		buf.writeIdentifier(TaskRegistrar.REGISTRY.get().getId(task));
 		buf.writeBlockPos(pos);
 		buf.writeItemStack(stack);
 		buf.writeIdentifier(id);

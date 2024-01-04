@@ -12,9 +12,8 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.util.I18nUtils;
 import virtuoel.discarnate.util.ReflectionUtils;
@@ -22,125 +21,125 @@ import virtuoel.discarnate.util.ReflectionUtils;
 public class ItemRegistrar
 {
 	public static final DeferredRegister<ItemGroup> ITEM_GROUPS = DeferredRegister.create(Registries.ITEM_GROUP.getKey(), Discarnate.MOD_ID);
-	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Discarnate.MOD_ID);
+	public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(Registries.ITEM, Discarnate.MOD_ID);
 	
-	public static final RegistryObject<Item> BLANK_TASK = register("blank_task",
+	public static final DeferredHolder<Item, Item> BLANK_TASK = register("blank_task",
 		() -> new Item(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> INFO_TASK = register("info_task",
+	public static final DeferredHolder<Item, Item> INFO_TASK = register("info_task",
 		() -> new Item(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> WAIT_TASK = register("wait_task",
+	public static final DeferredHolder<Item, Item> WAIT_TASK = register("wait_task",
 		() -> withDelayTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> DROP_TASK = register("drop_task",
+	public static final DeferredHolder<Item, Item> DROP_TASK = register("drop_task",
 		() -> withItemCountTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> SWAP_TASK = register("swap_task",
+	public static final DeferredHolder<Item, Item> SWAP_TASK = register("swap_task",
 		() -> new Item(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> MOVE_FORWARD_TASK = register("move_forward_task",
+	public static final DeferredHolder<Item, Item> MOVE_FORWARD_TASK = register("move_forward_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_MOVE_FORWARD_TASK = register("toggle_move_forward_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_MOVE_FORWARD_TASK = register("toggle_move_forward_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> MOVE_BACKWARD_TASK = register("move_backward_task",
+	public static final DeferredHolder<Item, Item> MOVE_BACKWARD_TASK = register("move_backward_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_MOVE_BACKWARD_TASK = register("toggle_move_backward_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_MOVE_BACKWARD_TASK = register("toggle_move_backward_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> STRAFE_LEFT_TASK = register("strafe_left_task",
+	public static final DeferredHolder<Item, Item> STRAFE_LEFT_TASK = register("strafe_left_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_STRAFE_LEFT_TASK = register("toggle_strafe_left_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_STRAFE_LEFT_TASK = register("toggle_strafe_left_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> STRAFE_RIGHT_TASK = register("strafe_right_task",
+	public static final DeferredHolder<Item, Item> STRAFE_RIGHT_TASK = register("strafe_right_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_STRAFE_RIGHT_TASK = register("toggle_strafe_right_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_STRAFE_RIGHT_TASK = register("toggle_strafe_right_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> CANCEL_MOVEMENT_TASK = register("cancel_movement_task",
+	public static final DeferredHolder<Item, Item> CANCEL_MOVEMENT_TASK = register("cancel_movement_task",
 		() -> new Item(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> LOOK_UP_TASK = register("look_up_task",
+	public static final DeferredHolder<Item, Item> LOOK_UP_TASK = register("look_up_task",
 		() -> withAngleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> LOOK_DOWN_TASK = register("look_down_task",
+	public static final DeferredHolder<Item, Item> LOOK_DOWN_TASK = register("look_down_task",
 		() -> withAngleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> LOOK_LEFT_TASK = register("look_left_task",
+	public static final DeferredHolder<Item, Item> LOOK_LEFT_TASK = register("look_left_task",
 		() -> withAngleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> LOOK_RIGHT_TASK = register("look_right_task",
+	public static final DeferredHolder<Item, Item> LOOK_RIGHT_TASK = register("look_right_task",
 		() -> withAngleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> FACE_HORIZON_TASK = register("face_horizon_task",
+	public static final DeferredHolder<Item, Item> FACE_HORIZON_TASK = register("face_horizon_task",
 		() -> new Item(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> FACE_CARDINAL_TASK = register("face_cardinal_task",
+	public static final DeferredHolder<Item, Item> FACE_CARDINAL_TASK = register("face_cardinal_task",
 		() -> new Item(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> SNEAK_TASK = register("sneak_task",
+	public static final DeferredHolder<Item, Item> SNEAK_TASK = register("sneak_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_SNEAK_TASK = register("toggle_sneak_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_SNEAK_TASK = register("toggle_sneak_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> JUMP_TASK = register("jump_task",
+	public static final DeferredHolder<Item, Item> JUMP_TASK = register("jump_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_JUMP_TASK = register("toggle_jump_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_JUMP_TASK = register("toggle_jump_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> SWING_ITEM_TASK = register("swing_item_task",
+	public static final DeferredHolder<Item, Item> SWING_ITEM_TASK = register("swing_item_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_SWING_ITEM_TASK = register("toggle_swing_item_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_SWING_ITEM_TASK = register("toggle_swing_item_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> USE_ITEM_TASK = register("use_item_task",
+	public static final DeferredHolder<Item, Item> USE_ITEM_TASK = register("use_item_task",
 		() -> withDurationTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> TOGGLE_USE_ITEM_TASK = register("toggle_use_item_task",
+	public static final DeferredHolder<Item, Item> TOGGLE_USE_ITEM_TASK = register("toggle_use_item_task",
 		() -> withToggleTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> SWITCH_SLOT_TASK = register("switch_slot_task",
+	public static final DeferredHolder<Item, Item> SWITCH_SLOT_TASK = register("switch_slot_task",
 		() -> withSlotTooltip(commonSettings())
 	);
 	
-	public static final RegistryObject<Item> END_TASK = register("end_task",
+	public static final DeferredHolder<Item, Item> END_TASK = register("end_task",
 		() -> new Item(commonSettings())
 	);
 	
@@ -212,7 +211,7 @@ public class ItemRegistrar
 		};
 	}
 	
-	private static RegistryObject<Item> register(String name, Supplier<Item> entry)
+	private static DeferredHolder<Item, Item> register(String name, Supplier<Item> entry)
 	{
 		return ITEMS.register(name, entry);
 	}

@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[28,)"
+loaderVersion="[1,)"
 license="MIT"
 issueTrackerURL="https://github.com/Virtuoel/Discarnate/issues"
 [[mods]]
@@ -12,3 +12,5 @@ authors="Virtuoel"
 description='''
 Let spirits control your body to do tasks.
 '''
+[[mixins]]
+config="discarnate.mixins.json"

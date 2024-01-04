@@ -14,7 +14,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.network.NetworkDirection;
+import net.neoforged.neoforge.network.PlayNetworkDirection;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.api.TaskContainer;
@@ -49,7 +49,7 @@ public class ClientTask extends Task
 					getWorldIdFromBlockEntity(b1, p)
 				);
 				
-				((ServerPlayerEntity) p).networkHandler.sendPacket(DiscarnatePacketHandler.INSTANCE.toVanillaPacket(packet, NetworkDirection.PLAY_TO_CLIENT));
+				((ServerPlayerEntity) p).networkHandler.sendPacket(DiscarnatePacketHandler.INSTANCE.toVanillaPacket(packet, PlayNetworkDirection.PLAY_TO_CLIENT));
 			});
 		}
 		

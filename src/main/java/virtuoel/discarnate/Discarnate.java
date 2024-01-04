@@ -8,19 +8,20 @@ import org.spongepowered.asm.service.MixinService;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.init.BlockEntityRegistrar;
 import virtuoel.discarnate.init.BlockRegistrar;
@@ -36,7 +37,7 @@ public class Discarnate
 	
 	public static final ILogger LOGGER = MixinService.getService().getLogger(MOD_ID);
 	
-	public static final RegistryObject<ItemGroup> ITEM_GROUP = ItemRegistrar.ITEM_GROUPS.register(
+	public static final DeferredHolder<ItemGroup, ItemGroup> ITEM_GROUP = ItemRegistrar.ITEM_GROUPS.register(
 		"general",
 		() -> ItemGroup.builder()
 			.icon(() -> new ItemStack(BlockRegistrar.SPIRIT_CHANNELER.get()))
@@ -47,7 +48,7 @@ public class Discarnate
 	@SubscribeEvent
 	public void buildContents(BuildCreativeModeTabContentsEvent event)
 	{
-		if (event.getTabKey() != ITEM_GROUP.getKey())
+		if (event.getTabKey() != ((RegistryEntry<ItemGroup>) ITEM_GROUP).getKey().orElse(null))
 		{
 			return;
 		}
@@ -85,7 +86,8 @@ public class Discarnate
 			ItemRegistrar.SWITCH_SLOT_TASK,
 			ItemRegistrar.END_TASK
 		)
-		.forEach(event::accept);
+		.map(DeferredHolder::get)
+		.forEach(event::add);
 	}
 	
 	public Discarnate()
@@ -101,26 +103,24 @@ public class Discarnate
 		modBus.register(TaskRegistrar.class);
 		modBus.register(this);
 		
-		MinecraftForge.EVENT_BUS.register(DiscarnateConfig.class);
+		NeoForge.EVENT_BUS.register(DiscarnateConfig.class);
 		
 		ModLoadingContext ctx = ModLoadingContext.get();
 		ctx.registerConfig(ModConfig.Type.CLIENT, DiscarnateConfig.clientSpec);
 		ctx.registerConfig(ModConfig.Type.SERVER, DiscarnateConfig.serverSpec);
 		ctx.registerConfig(ModConfig.Type.COMMON, DiscarnateConfig.commonSpec);
 		
-		DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+		if (FMLEnvironment.dist == Dist.CLIENT)
 		{
 			modBus.addListener(DiscarnateClient::setupClient);
-		});
+		}
 		
 		DiscarnatePacketHandler.init();
 	}
 	
 	public static Item.Settings commonItemSettings()
 	{
-		final Item.Settings settings = new Item.Settings();
-		
-		return settings;
+		return new Item.Settings();
 	}
 	
 	public static Identifier id(String path)

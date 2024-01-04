@@ -3,21 +3,21 @@ package virtuoel.discarnate.api;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import virtuoel.discarnate.Discarnate;
 
 public class DiscarnateConfig
 {
 	@ApiStatus.Internal
-	public static final ForgeConfigSpec clientSpec;
+	public static final ModConfigSpec clientSpec;
 	public static final Client CLIENT;
 	@ApiStatus.Internal
-	public static final ForgeConfigSpec commonSpec;
+	public static final ModConfigSpec commonSpec;
 	public static final Common COMMON;
 	@ApiStatus.Internal
-	public static final ForgeConfigSpec serverSpec;
+	public static final ModConfigSpec serverSpec;
 	public static final Server SERVER;
 	
 	@ApiStatus.Internal
@@ -40,24 +40,24 @@ public class DiscarnateConfig
 	
 	static
 	{
-		Pair<?, ForgeConfigSpec> specPair;
+		Pair<?, ModConfigSpec> specPair;
 		
-		specPair = new ForgeConfigSpec.Builder().configure(Client::new);
+		specPair = new ModConfigSpec.Builder().configure(Client::new);
 		clientSpec = specPair.getRight();
 		CLIENT = (Client) specPair.getLeft();
 		
-		specPair = new ForgeConfigSpec.Builder().configure(Common::new);
+		specPair = new ModConfigSpec.Builder().configure(Common::new);
 		commonSpec = specPair.getRight();
 		COMMON = (Common) specPair.getLeft();
 		
-		specPair = new ForgeConfigSpec.Builder().configure(Server::new);
+		specPair = new ModConfigSpec.Builder().configure(Server::new);
 		serverSpec = specPair.getRight();
 		SERVER = (Server) specPair.getLeft();
 	}
 	
 	public static class Client
 	{
-		Client(ForgeConfigSpec.Builder builder)
+		Client(ModConfigSpec.Builder builder)
 		{
 			builder
 				.comment("Client only settings, mostly things related to rendering")
@@ -68,12 +68,12 @@ public class DiscarnateConfig
 	
 	public static class Common
 	{
-		public final ForgeConfigSpec.BooleanValue pumpkinToStart;
-		public final ForgeConfigSpec.BooleanValue pumpkinToContinue;
-		public final ForgeConfigSpec.IntValue minLevel;
-		public final ForgeConfigSpec.IntValue levelCost;
+		public final ModConfigSpec.BooleanValue pumpkinToStart;
+		public final ModConfigSpec.BooleanValue pumpkinToContinue;
+		public final ModConfigSpec.IntValue minLevel;
+		public final ModConfigSpec.IntValue levelCost;
 		
-		Common(ForgeConfigSpec.Builder builder)
+		Common(ModConfigSpec.Builder builder)
 		{
 			builder
 				.comment("General configuration settings")
@@ -97,7 +97,7 @@ public class DiscarnateConfig
 	
 	public static class Server
 	{
-		Server(ForgeConfigSpec.Builder builder)
+		Server(ModConfigSpec.Builder builder)
 		{
 			builder
 				.comment("Server configuration settings")

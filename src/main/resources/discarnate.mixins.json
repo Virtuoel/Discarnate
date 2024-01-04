@@ -4,7 +4,6 @@
 	"package": "virtuoel.discarnate.mixin",
 	"compatibilityLevel": "JAVA_8",
 	"plugin": "virtuoel.discarnate.mixin.DiscarnateMixinConfigPlugin",
-	"refmap": "Discarnate-refmap.json",
 	"mixins":
 	[
 		"MobEntityAccessor"

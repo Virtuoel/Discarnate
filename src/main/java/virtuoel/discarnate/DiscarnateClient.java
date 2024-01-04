@@ -1,7 +1,7 @@
 package virtuoel.discarnate;
 
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import virtuoel.discarnate.client.gui.screen.ingame.SpiritChannelerScreen;
 import virtuoel.discarnate.init.ScreenHandlerRegistrar;
 

@@ -27,6 +27,7 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
@@ -43,7 +44,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.registries.ForgeRegistries;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.DiscarnateConfig;
 import virtuoel.discarnate.api.TaskAction;
@@ -53,6 +53,7 @@ import virtuoel.discarnate.init.TaskRegistrar;
 import virtuoel.discarnate.mixin.MobEntityAccessor;
 import virtuoel.discarnate.screen.SpiritChannelerScreenHandler;
 import virtuoel.discarnate.util.I18nUtils;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity implements SidedInventory, ScreenHandlerFactory
 {
@@ -91,7 +92,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 					
 					if (!stack.isEmpty())
 					{
-						Optional.ofNullable(TaskRegistrar.REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem())))
+						Optional.ofNullable(TaskRegistrar.REGISTRY.get().get(Registries.ITEM.getId(stack.getItem())))
 							.map(task -> task.getContainedTasks(stack, player, this))
 							.filter(Predicate.not(List::isEmpty))
 							.ifPresent(t ->
@@ -132,7 +133,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 				{
 					try
 					{
-						Thread.sleep(250);
+						Thread.sleep((long) (5 * ReflectionUtils.getMspt(this::getWorld)));
 					}
 					catch (InterruptedException e)
 					{
@@ -282,7 +283,7 @@ public class SpiritChannelerBlockEntity extends LockableContainerBlockEntity imp
 	
 	public static void onPlayerStop(@NotNull PlayerEntity player, @Nullable BlockEntity blockEntity)
 	{
-		TaskRegistrar.REGISTRY.get().getValue(RESET_CHANNELER_TASK_ID).accept(ItemStack.EMPTY, player, blockEntity);
+		TaskRegistrar.REGISTRY.get().get(RESET_CHANNELER_TASK_ID).accept(ItemStack.EMPTY, player, blockEntity);
 	}
 	
 	protected static boolean isWearingPumpkin(@NotNull PlayerEntity player)

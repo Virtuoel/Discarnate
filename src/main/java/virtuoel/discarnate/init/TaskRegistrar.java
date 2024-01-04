@@ -16,23 +16,22 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.jarjar.nio.util.Lazy;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
@@ -42,11 +41,12 @@ import virtuoel.discarnate.client.option.KeyBindingUtils;
 import virtuoel.discarnate.task.ClientTask;
 import virtuoel.discarnate.util.DiscarnateMinecraftClientExtensions;
 import virtuoel.discarnate.util.I18nUtils;
+import virtuoel.discarnate.util.ReflectionUtils;
 
 public class TaskRegistrar
 {
 	public static final DeferredRegister<Task> TASKS = DeferredRegister.create(Discarnate.id("task"), Discarnate.MOD_ID);
-	public static final Lazy<IForgeRegistry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry(RegistryBuilder::new));
+	public static final Lazy<Registry<Task>> REGISTRY = Lazy.of(TASKS.makeRegistry(builder -> {}));
 	
 	private TaskRegistrar()
 	{
@@ -64,7 +64,7 @@ public class TaskRegistrar
 		{
 			try
 			{
-				Thread.sleep(s.getCount() * 50);
+				Thread.sleep((long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 			}
 			catch (InterruptedException e)
 			{
@@ -100,7 +100,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.forwardKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.forwardKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.MOVE_FORWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -112,7 +112,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.backKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.backKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.MOVE_BACKWARD_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -124,7 +124,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.leftKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.leftKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.STRAFE_LEFT_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -136,7 +136,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.rightKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.rightKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.STRAFE_RIGHT_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -148,7 +148,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.sneakKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.sneakKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.SNEAK_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -160,7 +160,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.jumpKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.jumpKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.JUMP_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -229,7 +229,7 @@ public class TaskRegistrar
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
 			((DiscarnateMinecraftClientExtensions) mc).discarnate_doAttack();
-			KeyBindingUtils.tryHoldKey(mc.options.attackKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.attackKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.SWING_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -242,7 +242,7 @@ public class TaskRegistrar
 		registerClientTask((s, p, b) ->
 		{
 			final MinecraftClient mc = MinecraftClient.getInstance();
-			KeyBindingUtils.tryHoldKey(mc.options.useKey, s.getCount() * 50);
+			KeyBindingUtils.tryHoldKey(mc.options.useKey, (long) (s.getCount() * ReflectionUtils.getMspt(p::getEntityWorld)));
 		}, ItemRegistrar.USE_ITEM_TASK);
 		
 		registerClientTask((s, p, b) ->
@@ -308,7 +308,7 @@ public class TaskRegistrar
 					{
 						if (!stack.isEmpty())
 						{
-							Optional.ofNullable(REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem())))
+							Optional.ofNullable(REGISTRY.get().get(Registries.ITEM.getId(stack.getItem())))
 								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
 								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
 								.ifPresent(tasks::add);
@@ -341,7 +341,7 @@ public class TaskRegistrar
 					{
 						if (!stack.isEmpty())
 						{
-							Optional.ofNullable(REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem())))
+							Optional.ofNullable(REGISTRY.get().get(Registries.ITEM.getId(stack.getItem())))
 								.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
 								.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
 								.ifPresent(tasks::add);
@@ -370,7 +370,7 @@ public class TaskRegistrar
 				{
 					if (!stack.isEmpty())
 					{
-						Optional.ofNullable(REGISTRY.get().getValue(ForgeRegistries.ITEMS.getKey(stack.getItem())))
+						Optional.ofNullable(REGISTRY.get().get(Registries.ITEM.getId(stack.getItem())))
 							.filter(t -> !t.getContainedTasks(stack, p, b).isEmpty())
 							.map(t -> (TaskAction) (s1, p1, b1) -> t.accept(stack, p1, b1))
 							.ifPresent(tasks::add);
@@ -386,62 +386,62 @@ public class TaskRegistrar
 		ModContainer container = ModLoadingContext.get().getActiveContainer();
 		ModLoadingContext.get().setActiveContainer(ModList.get().getModContainerById("minecraft").orElseThrow());
 		
-		event.getForgeRegistry().register(ForgeRegistries.BLOCKS.getKey(ShulkerBoxBlock.get(null)), new Task(shulkerTasks));
+		event.register(TASKS.getRegistryKey(), Registries.BLOCK.getId(ShulkerBoxBlock.get(null)), () -> new Task(shulkerTasks));
 		for (DyeColor color : DyeColor.values())
 		{
-			event.getForgeRegistry().register(ForgeRegistries.BLOCKS.getKey(ShulkerBoxBlock.get(color)), new Task(shulkerTasks));
+			event.register(TASKS.getRegistryKey(), Registries.BLOCK.getId(ShulkerBoxBlock.get(color)), () -> new Task(shulkerTasks));
 		}
 		
-		event.getForgeRegistry().register(ForgeRegistries.ITEMS.getKey(Items.BUNDLE), new Task(bundleTasks));
+		event.register(TASKS.getRegistryKey(), Registries.ITEM.getId(Items.BUNDLE), () -> new Task(bundleTasks));
 		
 		ModLoadingContext.get().setActiveContainer(container);
 		
-		event.getForgeRegistry().register(BlockRegistrar.SPIRIT_CHANNELER.getId(), new Task(channelerTasks));
+		event.register(TASKS.getRegistryKey(), BlockRegistrar.SPIRIT_CHANNELER.getId(), () -> new Task(channelerTasks));
 	}
 	
-	private static RegistryObject<Task> registerTask(Supplier<Task> task, Identifier id)
+	private static DeferredHolder<Task, Task> registerTask(Supplier<Task> task, Identifier id)
 	{
 		return TASKS.register(id.getPath(), task);
 	}
 	
-	private static RegistryObject<Task> registerTask(TaskAction task, Identifier id)
+	private static DeferredHolder<Task, Task> registerTask(TaskAction task, Identifier id)
 	{
 		return registerTask(() -> new Task(task), id);
 	}
 	
-	private static RegistryObject<Task> registerTask(TaskAction task, RegistryObject<?> entry)
+	private static DeferredHolder<Task, Task> registerTask(TaskAction task, DeferredHolder<?, ?> entry)
 	{
 		return registerTask(task, entry.getId());
 	}
 	
-	private static RegistryObject<Task> registerTasks(TaskContainer container, Identifier id)
+	private static DeferredHolder<Task, Task> registerTasks(TaskContainer container, Identifier id)
 	{
 		return registerTask(() -> new Task(container), id);
 	}
 	
-	protected static RegistryObject<Task> registerTasks(TaskContainer container, ItemConvertible item)
+	protected static DeferredHolder<Task, Task> registerTasks(TaskContainer container, ItemConvertible item)
 	{
-		return registerTasks(container, ForgeRegistries.ITEMS.getKey(item.asItem()));
+		return registerTasks(container, Registries.ITEM.getId(item.asItem()));
 	}
 	
-	private static RegistryObject<Task> registerClientTask(TaskAction task, Identifier id)
+	private static DeferredHolder<Task, Task> registerClientTask(TaskAction task, Identifier id)
 	{
 		return registerTask(() -> new ClientTask(task), id);
 	}
 	
-	private static RegistryObject<Task> registerClientTask(TaskAction task, RegistryObject<?> entry)
+	private static DeferredHolder<Task, Task> registerClientTask(TaskAction task, DeferredHolder<?, ?> entry)
 	{
 		return registerClientTask(task, entry.getId());
 	}
 	
-	private static RegistryObject<Task> registerClientTasks(TaskContainer container, Identifier id)
+	private static DeferredHolder<Task, Task> registerClientTasks(TaskContainer container, Identifier id)
 	{
 		return registerTask(() -> new ClientTask(container), id);
 	}
 	
-	protected static RegistryObject<Task> registerClientTasks(TaskContainer container, ItemConvertible item)
+	protected static DeferredHolder<Task, Task> registerClientTasks(TaskContainer container, ItemConvertible item)
 	{
-		return registerClientTasks(container, ForgeRegistries.ITEMS.getKey(item.asItem()));
+		return registerClientTasks(container, Registries.ITEM.getId(item.asItem()));
 	}
 	
 	public static final TaskRegistrar INSTANCE = new TaskRegistrar();

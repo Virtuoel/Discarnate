@@ -4,19 +4,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.sound.BlockSoundGroup;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.block.SpiritChannelerBlock;
 
 public class BlockRegistrar
 {
-	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, Discarnate.MOD_ID);
+	public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, Discarnate.MOD_ID);
 	private static final DeferredRegister<Item> ITEMS = ItemRegistrar.ITEMS;
 	
-	public static final RegistryObject<Block> SPIRIT_CHANNELER = BLOCKS.register(
+	public static final DeferredHolder<Block, SpiritChannelerBlock> SPIRIT_CHANNELER = BLOCKS.register(
 		"spirit_channeler",
 		() -> new SpiritChannelerBlock(
 			Block.Settings.create()
