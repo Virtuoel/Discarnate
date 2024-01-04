@@ -5,15 +5,17 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import virtuoel.discarnate.Discarnate;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.init.TaskRegistrar;
 
-public class TaskPacket
+public class TaskPacket implements CustomPayload
 {
 	private Task task;
 	private BlockPos pos;
@@ -36,14 +38,14 @@ public class TaskPacket
 		this.id = buf.readIdentifier();
 	}
 	
-	public static void handle(TaskPacket msg, NetworkEvent.Context ctx)
+	public static void handle(TaskPacket msg, PlayPayloadContext ctx)
 	{
 		Task task = msg.task;
 		BlockPos pos = msg.pos;
 		ItemStack stack = msg.stack;
 		Identifier id = msg.id;
 		
-		ctx.enqueueWork(() ->
+		ctx.workHandler().execute(() ->
 		{
 			if (FMLEnvironment.dist == Dist.CLIENT)
 			{
@@ -59,15 +61,20 @@ public class TaskPacket
 				}
 			}
 		});
-		
-		ctx.setPacketHandled(true);
 	}
 	
-	public void encode(PacketByteBuf buf)
+	@Override
+	public void write(PacketByteBuf buf)
 	{
 		buf.writeIdentifier(TaskRegistrar.REGISTRY.get().getId(task));
 		buf.writeBlockPos(pos);
 		buf.writeItemStack(stack);
 		buf.writeIdentifier(id);
+	}
+	
+	@Override
+	public Identifier id()
+	{
+		return Discarnate.TASK_PACKET;
 	}
 }

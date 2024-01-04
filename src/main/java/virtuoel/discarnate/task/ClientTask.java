@@ -10,15 +10,14 @@ import org.jetbrains.annotations.Nullable;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.neoforged.neoforge.network.PlayNetworkDirection;
 import virtuoel.discarnate.api.Task;
 import virtuoel.discarnate.api.TaskAction;
 import virtuoel.discarnate.api.TaskContainer;
-import virtuoel.discarnate.network.DiscarnatePacketHandler;
 import virtuoel.discarnate.network.TaskPacket;
 
 public class ClientTask extends Task
@@ -49,7 +48,7 @@ public class ClientTask extends Task
 					getWorldIdFromBlockEntity(b1, p)
 				);
 				
-				((ServerPlayerEntity) p).networkHandler.sendPacket(DiscarnatePacketHandler.INSTANCE.toVanillaPacket(packet, PlayNetworkDirection.PLAY_TO_CLIENT));
+				((ServerPlayerEntity) p).networkHandler.sendPacket(new CustomPayloadS2CPacket(packet));
 			});
 		}
 		

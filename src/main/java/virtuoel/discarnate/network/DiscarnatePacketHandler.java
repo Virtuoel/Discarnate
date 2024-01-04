@@ -1,20 +1,17 @@
 package virtuoel.discarnate.network;
 
-import net.neoforged.neoforge.network.NetworkRegistry;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import virtuoel.discarnate.Discarnate;
 
 public class DiscarnatePacketHandler
 {
-	private static final String PROTOCOL_VERSION = Integer.toString(2);
-	public static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
-		Discarnate.id("main"), () -> PROTOCOL_VERSION, PROTOCOL_VERSION::equals, PROTOCOL_VERSION::equals
-	);
-	
-	public static void init()
+	@SubscribeEvent
+	public static void register(final RegisterPayloadHandlerEvent event)
 	{
-		int regId = 0;
-		INSTANCE.registerMessage(regId++, ActivatePacket.class, ActivatePacket::encode, ActivatePacket::new, ActivatePacket::handle);
-		INSTANCE.registerMessage(regId++, TaskPacket.class, TaskPacket::encode, TaskPacket::new, TaskPacket::handle);
+		final IPayloadRegistrar registrar = event.registrar(Discarnate.MOD_ID);
+		
+		registrar.play(Discarnate.TASK_PACKET, TaskPacket::new, TaskPacket::handle);
 	}
 }

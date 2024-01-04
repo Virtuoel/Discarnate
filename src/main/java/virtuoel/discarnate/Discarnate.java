@@ -17,9 +17,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import virtuoel.discarnate.api.DiscarnateConfig;
@@ -92,7 +90,7 @@ public class Discarnate
 	
 	public Discarnate()
 	{
-		IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+		IEventBus modBus = ModLoadingContext.get().getActiveContainer().getEventBus();
 		
 		BlockRegistrar.BLOCKS.register(modBus);
 		ItemRegistrar.ITEMS.register(modBus);
@@ -103,7 +101,7 @@ public class Discarnate
 		modBus.register(TaskRegistrar.class);
 		modBus.register(this);
 		
-		NeoForge.EVENT_BUS.register(DiscarnateConfig.class);
+		modBus.register(DiscarnateConfig.class);
 		
 		ModLoadingContext ctx = ModLoadingContext.get();
 		ctx.registerConfig(ModConfig.Type.CLIENT, DiscarnateConfig.clientSpec);
@@ -115,7 +113,7 @@ public class Discarnate
 			modBus.addListener(DiscarnateClient::setupClient);
 		}
 		
-		DiscarnatePacketHandler.init();
+		modBus.register(DiscarnatePacketHandler.class);
 	}
 	
 	public static Item.Settings commonItemSettings()
