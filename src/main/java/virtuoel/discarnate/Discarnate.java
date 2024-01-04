@@ -75,11 +75,7 @@ public class Discarnate implements ModInitializer
 	
 	public static Item.Settings commonItemSettings()
 	{
-		final Item.Settings settings = new Item.Settings();
-		
-		ReflectionUtils.setItemSettingsGroup(settings, ITEM_GROUP);
-		
-		return settings;
+		return ReflectionUtils.setItemSettingsGroup(new Item.Settings(), ITEM_GROUP);
 	}
 	
 	public static Identifier id(String path)

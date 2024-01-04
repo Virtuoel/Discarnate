@@ -242,7 +242,7 @@ public final class ReflectionUtils
 		return world.get().getTickManager().getMillisPerTick();
 	}
 	
-	public static void setItemSettingsGroup(Item.Settings settings, ItemGroup group)
+	public static Item.Settings setItemSettingsGroup(Item.Settings settings, ItemGroup group)
 	{
 		if (GROUP != null)
 		{
@@ -255,6 +255,8 @@ public final class ReflectionUtils
 				throw new RuntimeException(e);
 			}
 		}
+		
+		return settings;
 	}
 	
 	public static ItemGroup buildItemGroup(Identifier id, Supplier<ItemStack> icon, Supplier<Stream<ItemConvertible>> items)
