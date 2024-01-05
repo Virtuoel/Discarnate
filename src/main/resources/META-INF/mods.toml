@@ -7,7 +7,7 @@ modId="discarnate"
 version="${file.jarVersion}"
 displayName="Discarnate"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/discarnate/"
-logoFile="discarnate_icon.png"
+logoFile="assets/discarnate/icon.png"
 authors="Virtuoel"
 description='''
 Let spirits control your body to do tasks.

@@ -15,7 +15,7 @@
 		"sources": "https://github.com/Virtuoel/Discarnate"
 	},
 	"license": "MIT",
-	"icon": "discarnate_icon.png",
+	"icon": "assets/discarnate/icon.png",
 	"environment": "*",
 	"entrypoints":
 	{
